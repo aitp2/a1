@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Orika : DataMapper -->
+	<alias alias="dataMapper" name="defaultDataMapper"/>
+	<bean id="defaultDataMapper" class="de.hybris.platform.webservicescommons.mapping.impl.DefaultDataMapper">
+		<property name="fieldSetBuilder" ref="fieldSetBuilder"/>
+	</bean>
+
+	<!-- Orika : Filters -->
+	<bean class="de.hybris.platform.webservicescommons.mapping.filters.GeneralFieldFilter">
+		<property name="fieldSelectionStrategy" ref="fieldSelectionStrategy"/>
+	</bean>
+
+	<!-- Orika : Mappers -->
+	<bean class="org.training.mapping.mappers.AddressValidationDataMapper"
+	      parent="abstractCustomMapper"/>
+	<bean class="org.training.mapping.mappers.SpellingSuggestionMapper"
+	      parent="abstractCustomMapper"/>
+	<bean class="org.training.mapping.mappers.CCPaymentInfoDataMapper"
+	      parent="abstractCustomMapper"/>
+	<bean class="org.training.mapping.mappers.ImageUrlMapper"
+	      parent="abstractCustomMapper"/>
+
+	<!-- Orika : Converters -->
+	<bean class="org.training.mapping.converters.StockLevelStatusConverter"/>
+	<bean class="org.training.mapping.converters.OrderStatusConverter"/>
+	<bean class="org.training.mapping.converters.ConsignmentStatusConverter"/>
+	<bean class="org.training.mapping.converters.DeliveryStatusConverter"/>
+	<bean class="org.training.mapping.converters.ProductReferenceTypeEnumConverter"/>
+	<bean class="org.training.mapping.converters.VoucherConverter">
+		<property name="dataMapper" ref="dataMapper" />
+		<property name="voucherFacade" ref="voucherFacade" />
+	</bean>
+
+	<!-- Field Mappings : User -->
+
+	<bean id="userSignUpFieldMapper" parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.user.UserSignUpWsDTO"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercefacades.user.data.RegisterData"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="uid" value="login"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="userFieldMapper" parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commercefacades.user.data.CustomerData"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.user.UserWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="defaultShippingAddress" value="defaultAddress"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Field Mappings : Catalog -->
+
+	<bean id="catalogVersionFieldMapper" parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commercefacades.catalog.data.CatalogVersionData"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.catalog.CatalogVersionWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="categoriesHierarchyData" value="categories"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Field Mappings : Cart -->
+
+	<bean id="cartModificationListFieldMapper" parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commercefacades.order.data.CartModificationDataList"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.order.CartModificationListWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="cartModificationList" value="cartModifications"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="paymentDetailsListFieldMapper" parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commercefacades.order.data.CCPaymentInfoDatas"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.order.PaymentDetailsListWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="paymentInfos" value="payments"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Field Mappings : Product -->
+
+	<bean id="promotionResultFieldMapper" parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commercefacades.product.data.PromotionResultData"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.product.PromotionResultWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="promotionData" value="promotion"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="productSearchPageFieldMapper" parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commerceservices.search.facetdata.ProductSearchPageData"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.search.facetdata.ProductSearchPageWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="results" value="products"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Field Mappings : Stores -->
+
+	<bean id="storeFinderSearchPageFieldMapper" parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commerceservices.storefinder.data.StoreFinderSearchPageData"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.store.StoreFinderSearchPageWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="results" value="stores"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="storeFinderStockSearchPageFieldMapper" parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commercefacades.storefinder.data.StoreFinderStockSearchPageData"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.store.StoreFinderStockSearchPageWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="results" value="stores"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="pointOfServiceStockFieldMapper" parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commercefacades.storelocator.data.PointOfServiceStockData"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.store.PointOfServiceStockWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="stockData" value="stockInfo"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Field Mappings : Search -->
+
+	<bean id="paginationFieldMapper" parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commerceservices.search.pagedata.PaginationData"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PaginationWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="totalNumberOfResults" value="totalResults"/>
+				<entry key="numberOfPages" value="totalPages"/>
+			</map>
+		</property>
+	</bean>
+</beans>

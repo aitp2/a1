@@ -1,0 +1,11 @@
+#Ant properties
+#Fri Apr 07 22:44:02 UTC 2017
+builddate=20170407 2243
+description=cartOptimizationWebservice
+group.id=de.hybris.platform
+module.name=platform-module
+name=cartOptimizationWebservice
+releasedate=20170406 1647
+vendor=hybris
+version=6.3.0.0-SNAPSHOT
+version.api=6.3.0

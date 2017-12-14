@@ -1,0 +1,163 @@
+/*
+ * [y] hybris Platform
+ *
+ * Copyright (c) 2000-2017 SAP SE
+ * All rights reserved.
+ *
+ * This software is the confidential and proprietary information of SAP
+ * Hybris ("Confidential Information"). You shall not disclose such
+ * Confidential Information and shall use it only in accordance with the
+ * terms of the license agreement you entered into with SAP Hybris.
+ */
+package com.accenture.performance.optimization.service.impl;
+
+
+import de.hybris.platform.commerceservices.order.CommerceCartRestorationException;
+import de.hybris.platform.yacceleratorstorefront.filters.CartRestorationFilter;
+
+import java.io.IOException;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+
+import com.accenture.performance.optimization.constants.WebConstants;
+import com.accenture.performance.optimization.service.OptimizeCartService;
+
+
+/**
+ *
+ */
+public class DefaultOptimizeCartRestorationFilter extends CartRestorationFilter
+{
+
+	private static final Logger LOG = Logger.getLogger(CartRestorationFilter.class);
+
+	private OptimizeCartService optimizeCartService;
+
+	@Override
+	public void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response,
+			final FilterChain filterChain) throws IOException, ServletException
+	{
+		if (getUserService().isAnonymousUser(getUserService().getCurrentUser()))
+		{
+			processAnonymousUser(request, response);
+		}
+		else
+		{
+			restoreCartWithNoCode();
+		}
+
+		filterChain.doFilter(request, response);
+	}
+
+	@Override
+	protected void restoreCartWithNoCode()
+	{
+
+		if ((!getOptimizeCartService().hasSessionCart() && getSessionService().getAttribute(WebConstants.CART_RESTORATION) == null)
+				|| (getOptimizeCartService().hasSessionCart() && !getBaseSiteService().getCurrentBaseSite().equals(
+						getBaseSiteService().getBaseSiteForUID(getOptimizeCartService().getSessionOptimizedCart().getBaseSite()))))
+		{
+			getSessionService().setAttribute(WebConstants.CART_RESTORATION_SHOW_MESSAGE, Boolean.TRUE);
+			try
+			{
+				getSessionService().setAttribute(WebConstants.CART_RESTORATION, getCartFacade().restoreSavedCart(null));
+			}
+			catch (final CommerceCartRestorationException e)
+			{
+				if (LOG.isDebugEnabled())
+				{
+					LOG.debug(e);
+				}
+				getSessionService().setAttribute(WebConstants.CART_RESTORATION, WebConstants.CART_RESTORATION_ERROR_STATUS);
+			}
+		}
+	}
+
+	@Override
+	protected void processAnonymousUser(final HttpServletRequest request, final HttpServletResponse response)
+	{
+		if (getOptimizeCartService().hasSessionCart() && getBaseSiteService().getCurrentBaseSite()
+				.equals(getBaseSiteService().getBaseSiteForUID(getOptimizeCartService().getSessionOptimizedCart().getBaseSite())))
+		{
+			final String guid = getOptimizeCartService().getSessionCart().getGuid();
+
+			if (!StringUtils.isEmpty(guid))
+			{
+				getCartRestoreCookieGenerator().addCookie(response, guid);
+			}
+		}
+		else if (request.getSession().isNew()
+				|| (getOptimizeCartService().hasSessionCart() && !getBaseSiteService().getCurrentBaseSite()
+						.equals(getBaseSiteService().getBaseSiteForUID(getOptimizeCartService().getSessionCart().getSite().getUid()))))
+		{
+			processRestoration(request);
+		}
+	}
+
+	@Override
+	protected void processRestoration(final HttpServletRequest request)
+	{
+		String cartGuid = null;
+
+		if (request.getCookies() != null)
+		{
+			final String anonymousCartCookieName = getCartRestoreCookieGenerator().getCookieName();
+
+			for (final Cookie cookie : request.getCookies())
+			{
+				if (anonymousCartCookieName.equals(cookie.getName()))
+				{
+					cartGuid = cookie.getValue();
+					break;
+				}
+			}
+		}
+
+		if (!StringUtils.isEmpty(cartGuid))
+		{
+			getSessionService().setAttribute(WebConstants.CART_RESTORATION_SHOW_MESSAGE, Boolean.TRUE);
+			try
+			{
+				getSessionService().setAttribute(WebConstants.CART_RESTORATION, getCartFacade().restoreSavedCart(cartGuid));
+			}
+			catch (final CommerceCartRestorationException e)
+			{
+				if (LOG.isDebugEnabled())
+				{
+					LOG.debug(e);
+				}
+				getSessionService().setAttribute(WebConstants.CART_RESTORATION_ERROR_STATUS,
+						WebConstants.CART_RESTORATION_ERROR_STATUS);
+			}
+		}
+	}
+
+
+
+	/**
+	 * @return the optimizeCartService
+	 */
+	public OptimizeCartService getOptimizeCartService()
+	{
+		return optimizeCartService;
+	}
+
+	/**
+	 * @param optimizeCartService
+	 *           the optimizeCartService to set
+	 */
+	public void setOptimizeCartService(final OptimizeCartService optimizeCartService)
+	{
+		this.optimizeCartService = optimizeCartService;
+	}
+
+
+
+}

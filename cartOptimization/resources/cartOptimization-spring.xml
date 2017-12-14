@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2017 SAP SE or an SAP affiliate company. 
+	All rights reserved. This software is the confidential and proprietary information 
+	of SAP ("Confidential Information"). You shall not disclose such Confidential 
+	Information and shall use it only in accordance with the terms of the license 
+	agreement you entered into with SAP. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- The hybris platform provides one single Spring application context 
+		for beans located at the jalo layer. Each extension can add beans to this 
+		context by specifying them at this configuration file. You can use and/or 
+		redefine beans defined at configuration files of other extensions as well 
+		as adding new one. If you want to locate this file at a different location 
+		or want to use several files for better, structuring, please use the '<yourextension>.application-context' 
+		property at your project.properties file. There you can specify a comma separated 
+		list of files where first is tried to find a file per classpath and then 
+		per file system. If you want to configure beans for your web module please 
+		have a look at your web/webroot/WEB-INF/<extname>-web-spring.xml. -->
+
+	<!-- Example how to override a manager -->
+	<!-- <bean id="core.productManager" class="com.accenture.performance.optimization.jalo.CartOptimizationProductManager" 
+		init-method="init" destroy-method="destroy" /> -->
+
+
+	<!-- Example how to configure the class to use for jalo session creation -->
+	<!-- <bean id="jalosession" class="de.hybris.platform.jalo.JaloSessionFactory"> 
+		<property name="targetClassName" value="com.accenture.performance.optimization.jalo.CartOptimizationJaloSession"/> 
+		</bean> -->
+
+
+	<!-- Example how to override an item -->
+	<!-- <bean id="de.hybris.platform.jalo.product.Product" class="com.accenture.performance.optimization.jalo.CartOptimizationProduct" 
+		scope="prototype" /> -->
+
+	<!-- Example how to register and use an AOP aspect Also see http://static.springframework.org/spring/docs/2.5.x/reference/aop.html -->
+
+	<!-- <bean id="cartOptimizationProfBean" class="com.accenture.performance.optimization.aop.CartOptimizationProfilingAspect"/> 
+		<aop:config proxy-target-class="true"> <aop:aspect id="cartOptimizationProfAspect" 
+		ref="cartOptimizationProfBean" > <aop:pointcut id="profiledMethods" expression="execution(* 
+		getModificationTime(..))" /> <aop:around pointcut-ref="profiledMethods" method="profile" 
+		/> </aop:aspect> </aop:config> -->
+
+
+	<!-- some other examples of a pointcut that matches everything: <aop:pointcut 
+		id="profiledMethods" expression="bean(de.hybris.platform.jalo.user.Customer) 
+		&amp;&amp; !execution(* getPK(..))" /> <aop:pointcut id="profiledMethods" 
+		expression="execution(* *(..))" /> -->
+
+	<bean id="cartOptimizationSystemSetup"
+		class="com.accenture.performance.optimization.setup.CartOptimizationSystemSetup">
+		<!-- constructor arg injection example -->
+		<constructor-arg ref="cartOptimizationService" />
+	</bean>
+
+	<alias name="cartOptimizationService" alias="cartOptimizationService" />
+	<bean id="cartOptimizationService"
+		class="com.accenture.performance.optimization.service.impl.DefaultCartOptimizationService">
+		<!-- setter injection example -->
+		<property name="modelService" ref="modelService" />
+		<property name="mediaService" ref="mediaService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<alias name="defaultOptimizeCartFacade" alias="cartFacade" />
+	<bean id="defaultOptimizeCartFacade"
+		class="com.accenture.performance.optimization.facades.impl.DefaultOptimizeCartFacade"
+		parent="defaultCartFacade">
+		<property name="cartService" ref="cartService" />
+	</bean>
+
+
+	<alias alias="optimizedCartFactory" name="optimizeCartFactory" />
+	<bean id="optimizeCartFactory"
+		class="com.accenture.performance.optimization.service.impl.OptimizeCartFactory"
+		parent="commerceCartFactory">
+		<property name="optimizeModelDealService" ref="optimizeModelDealService" />
+	</bean>
+
+
+	<alias alias="commerceCartService" name="defaultOptimizeCommerceCartService" />
+	<bean id="defaultOptimizeCommerceCartService"
+		class="com.accenture.performance.optimization.service.impl.DefaultOptimizeCommerceCartService"
+		parent="defaultCommerceCartService">
+		<property name="calculationService" ref="calculationService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="timeService" ref="timeService" />
+		<property name="promotionEngineService" ref="promotionEngineService" />
+	</bean>
+
+	<alias alias="promotionEngineService" name="defaultOptimizationPromotionService" />
+	<bean id="defaultOptimizationPromotionService"
+		class="com.accenture.performance.optimization.service.impl.DefaultOptimizationPromotionService"
+		parent="defaultPromotionEngineService">
+	</bean>
+	
+	<alias alias="cartService" name="defaultOptimizeCartService" />
+	<bean id="defaultOptimizeCartService"
+		class="com.accenture.performance.optimization.service.impl.DefaultOptimizeCartService"
+		parent="defaultCartService">
+		<property name="cartFactory" ref="optimizeCartFactory" />
+		<property name="configurationService" ref="configurationService" />
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="pointOfServiceService" ref="pointOfServiceService" />
+		<property name="productService" ref="productService" />
+		<property name="commerceAddToCartMethodHooks" ref="commerceAddToCartMethodHooks" />
+		<property name="userService" ref="userService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="customerAccountService" ref="customerAccountService" />
+		<property name="optimizeModelDealService" ref="optimizeModelDealService" />
+	</bean>
+
+	<alias alias="customerFacade" name="defaultOptimizeCustomerFacade" />
+	<bean id="defaultOptimizeCustomerFacade"
+		class="com.accenture.performance.optimization.facades.impl.DefaultOptimizeCustomerFacade"
+		parent="defaultCustomerFacade">
+		<property name="optimizeCartService" ref="defaultOptimizeCartService" />
+		<property name="optimizeCommerceCartService" ref="commerceCartService" />
+	</bean>
+
+	<alias name="defaultOptimizeCheckoutFacade" alias="checkoutFacade" />
+	<bean id="defaultOptimizeCheckoutFacade"
+		class="com.accenture.performance.optimization.facades.impl.DefaultOptimizeCheckoutFacade"
+		parent="defaultCheckoutFacade">
+		<property name="sessionService" ref="sessionService" />
+		<property name="optimizeModelDealService" ref="optimizeModelDealService" />
+		<property name="optimizeCommerceCartService" ref="commerceCartService" />
+		<property name="optimizedCartFacade" ref="cartFacade" />
+		<property name="optimizeCartService" ref="cartService" />
+		<property name="userFacade" ref="userFacade" />
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="addressConverter" ref="addressConverter" />
+		<property name="cartReverseConverter" ref="cartReverseConverter" />
+	</bean>
+
+	<alias name="defaultOptimizeCommerceCheckoutService" alias="commerceCheckoutService" />
+	<bean id="defaultOptimizeCommerceCheckoutService"
+		class="com.accenture.performance.optimization.service.impl.DefaultOptimizeCommerceCheckoutService"
+		parent="defaultCommerceCheckoutService">
+		<property name="configurationService" ref="configurationService" />
+		<property name="commercePlaceOrderMethodHooks" ref="commercePlaceOrderMethodHooks" />
+		<property name="userService" ref="userService" />
+		<!-- modify by junbin -->
+		<property name="keyGenerator" ref="orderCodeGenerator" />
+		<property name="productService" ref="productService" />
+		<property name="unitService" ref="unitService" />
+		<property name="customerFacade" ref="customerFacade" />
+		<property name="creditCardPaymentInfoConverter" ref="creditCardPaymentInfoConverter" />
+		<property name="optimizeModelDealService" ref="optimizeModelDealService" />
+		<property name="optimizeCartService" ref="cartService" />
+	</bean>
+
+	<alias name="defatulOptimizeModelDealService" alias="optimizeModelDealService" />
+	<bean id="defatulOptimizeModelDealService"
+		class="com.accenture.performance.optimization.service.impl.DefatulOptimizeModelDealService">
+		<property name="keyGenerator" ref="orderCodeGenerator" />
+		<property name="modelService" ref="modelService" />
+		<property name="userService" ref="userService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="productService" ref="productService" />
+		<property name="pointOfServiceService" ref="pointOfServiceService" />
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="guidKeyGenerator" ref="guidKeyGenerator" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="customerAccountService" ref="customerAccountService" />
+		<property name="deliveryService" ref="deliveryService" />
+		<property name="unitService" ref="unitService" />
+		<property name="mediaService" ref="mediaService" />
+	</bean>
+
+	<alias name="defaultRedisModelDealService" alias="optimizeModelDealService" />
+	<bean id="defaultRedisModelDealService" class="com.accenture.performance.optimization.service.impl.DefaultRedisModelDealService" parent="defatulOptimizeModelDealService">
+		<property name="redisTemplate" ref="redisTemplate" />
+	</bean>
+
+	<alias name="defaultOptimizedCartReversePopulator" alias="optimizedCartReversePopulator" />
+	<bean id="defaultOptimizedCartReversePopulator"
+		class="com.accenture.performance.optimization.facades.populators.OptimizedCartReversePopulator" />
+
+	<bean id="cartReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+			value="com.accenture.performance.optimization.model.OptimizedCartModel" />
+		<property name="populators">
+			<list>
+				<ref bean="optimizedCartReversePopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="dfsOrderLogInterceptor" class="com.acc.hybris.inteceptor.OrderStatusLogInteceptor"
+		scope="tenant" autowire="byName">
+	</bean>
+	<bean id="dfsOrderLogInterceptorMapping" scope="tenant"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="dfsOrderLogInterceptor" />
+		<property name="typeCode" value="Order" />
+	</bean>
+
+
+	<!-- <alias name="defaultOptimizeGuestCheckoutCartCleanStrategy" alias="guestCheckoutCartCleanStrategy"/> 
+		<bean id="defaultOptimizeGuestCheckoutCartCleanStrategy" class="com.accenture.performance.optimization.service.impl.DefaultOptimizeGuestCheckoutCartCleanStrategy" 
+		parent="defaultGuestCheckoutCartCleanStrategy"/> <alias name="defaultOptimizeCartRestorationFilter" 
+		alias="cartRestorationFilter"/> <bean id="defaultOptimizeCartRestorationFilter" 
+		class="com.accenture.performance.optimization.service.impl.DefaultOptimizeCartRestorationFilter" 
+		parent="cartRestorationFilter"> <property name="optimizeCartService" ref="defaultOptimizeCartService"/> 
+		</bean> -->
+
+	<!-- promotoion -->
+	
+	<alias name="optimizeCartRaoPopulator" alias="cartRaoPopulator" />
+	<bean id="optimizeCartRaoPopulator"
+		class="com.accenture.performance.optimization.ruleengineservices.converts.populator.CartDataRaoPopulator">
+		<property name="entryConverter" ref="orderEntryRaoConverter" />
+		<property name="userConverter" ref="userRaoConverter" />
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+	
+	<alias name="optimizeOrderEntryRaoPopulator" alias="orderEntryRaoPopulator" />
+	<bean id="optimizeOrderEntryRaoPopulator" class="com.accenture.performance.optimization.ruleengineservices.converts.populator.CartEntryDataRaoPopulator">
+			<property name="flexibleSearchService" ref="flexibleSearchService" />
+			<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+	
+	<alias name="optimizeCouponRaoPopulator" alias="couponRaoPopulator" />
+	<bean id="optimizeCouponRaoPopulator" class="com.accenture.performance.optimization.ruleengineservices.converts.populator.OptimizeCouponRaoPopulator" />
+	
+	<bean id="optimizePromotionOrderRaoProvidersMapping" depends-on="raoProviders" parent="mapMergeDirective" >
+		<property name="key" value="PROMOTION_ORDER"/>
+		<property name="value" ref="optimizeOrderPromotionRaoProviders"/>
+	</bean>
+
+    <alias name="optimizeRuleEngineContextFinderStrategy" alias="ruleEngineContextFinderStrategy" />
+    <bean id="optimizeRuleEngineContextFinderStrategy" class="com.accenture.performance.optimization.ruleengineservices.strategy.OptimizeRuleEngineContextFinderStrategy" parent="defaultRuleEngineContextFinderStrategy">
+    </bean>
+
+	<alias name="optimizePromotionCartRaoProvider" alias="promotionCartRaoProvider"/>
+	<bean id="optimizePromotionCartRaoProvider" class="com.accenture.performance.optimization.ruleengineservices.provider.OptimizeCartRAOProvider">
+		<property name="cartRaoConverter" ref="cartRaoConverter"/>
+		<property name="ruleEngineCalculationService" ref="ruleEngineCalculationService" />
+		<property name="factExtractorList" ref="cartRAOProviderExtractors"/>
+	</bean>
+	
+	<alias name="optimizeDeliveryModeRAOProvider" alias="deliveryModeRaoProvider" />
+	<bean id="optimizeDeliveryModeRAOProvider" class="com.accenture.performance.optimization.ruleengineservices.provider.OptimizeDeliveryModeRAOProvider">
+		<property name="deliveryModeRaoConverter" ref="deliveryModeRaoConverter" />
+		<property name="deliveryModeDao" ref="deliveryModeDao" />
+		<property name="deliveryCostEvaluationStrategy" ref="deliveryCostEvaluationStrategy" />
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+	
+	<alias name="optimizeRuleActionService" alias="ruleActionService" />
+	<bean id="optimizeRuleActionService" class="com.accenture.performance.optimization.ruleengineservices.service.impl.OptimizeRuleActionServiceImpl" parent="defaultPromoRuleActionService">
+	</bean>
+	
+	<alias name="optimizeOrderEntryAdjustActionStrategy" alias="orderEntryAdjustActionStrategy"/>
+	<bean id="optimizeOrderEntryAdjustActionStrategy" class="com.accenture.performance.optimization.ruleengineservices.strategy.OptimizeOrderEntryAdjustActionStrategy" >
+		<property name="promotionAction" value="com.accenture.performance.optimization.data.OptimizedPromotionOrderEntryAdjustAction"/>
+		<property name="oldStrategy" ref="defaultOrderEntryAdjustActionStrategy"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="promotionActionService" ref="promotionActionService"/>
+		<property name="calculationService" ref="calculationService" />
+		<property name="extendedOrderDao" ref="extendedOrderDao" />
+		<property name="forceImmediateRecalculation" value="false" />
+		<property name="ruleActionMetadataHandlers" ref="ruleActionMetadataHandlers"/>
+	</bean>
+	
+	
+	<alias name="optimizeCalculateServiceImpl" alias="calculationService"/>
+	<bean id="optimizeCalculateServiceImpl" class="com.accenture.performance.optimization.service.impl.OptimizeCalculateServiceImpl"
+			parent="defaultCalculationService">
+	</bean>
+	
+	<!-- new -->
+	<alias name="optimizeOrderAdjustTotalActionStrategy" alias="orderTotalAdjustActionStrategy"/>
+	<bean id="optimizeOrderAdjustTotalActionStrategy" class="com.accenture.performance.optimization.ruleengineservices.strategy.OptimizeOrderAdjustTotalActionStrategy" >
+		<property name="promotionAction" value="com.accenture.performance.optimization.data.OptimizedPromotionOrderAdjustTotalAction"></property>
+		<property name="oldStrategy" ref="defaultOrderAdjustTotalActionStrategy"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="promotionActionService" ref="promotionActionService"/>
+		<property name="calculationService" ref="calculationService" />
+		<property name="extendedOrderDao" ref="extendedOrderDao" />
+		<property name="forceImmediateRecalculation" value="false" />
+		<property name="ruleActionMetadataHandlers" ref="ruleActionMetadataHandlers"/>
+	</bean>
+	
+	<alias name="optimizePromotionResultServiceImpl" alias="promotionResultService" />
+	<bean id="optimizePromotionResultServiceImpl" class="com.accenture.performance.optimization.ruleengineservices.service.impl.OptimizePromotionResultServiceImpl" parent="defaultPromotionEngineResultService">
+	</bean>
+	
+	<alias name="optimizePromotionActionServiceImpl" alias="promotionActionService" />
+	<bean id="optimizePromotionActionServiceImpl" class="com.accenture.performance.optimization.ruleengineservices.service.impl.OptimizePromotionActionServiceImpl" parent="defaultPromotionActionService">
+		<property name="optimizeCartService" ref="cartService"/>
+	</bean>
+
+	<util:map id="optimizeOrderPromotionRaoProviders">
+        <entry key="de.hybris.platform.core.model.order.AbstractOrderModel">
+        	<util:list>
+        		<ref bean="promotionCartRaoProvider"/>
+        		<ref bean="promotionDeliveryModeRaoProvider"/>
+        		<ref bean="customerSupportRAOProvider"/>
+        	</util:list>
+        </entry>
+        <entry key="de.hybris.platform.promotions.model.PromotionGroupModel">
+        	<util:list>
+        		<ref bean="websiteGroupRaoProvider"/>
+        	</util:list>
+        </entry>
+        <entry key="java.util.Date">
+        	<util:list><ref bean="promotionEvaluationTimeRRDProvider"/></util:list>
+        </entry>
+        <entry key="com.accenture.performance.optimization.facades.data.OptimizedCartData">
+        	<util:list>
+        		<ref bean="promotionCartRaoProvider"/>
+        		<ref bean="promotionDeliveryModeRaoProvider"/>
+        		<ref bean="customerSupportRAOProvider"/>
+        	</util:list>
+        </entry>
+    </util:map>
+    
+    <!-- Redis config -->
+   <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig" >  
+         <property name="maxIdle" value="${redis.maxIdle:100}" /> 
+         <property name="maxTotal" value="${redis.maxIdle:500}" />  
+         <property name="maxWaitMillis" value="${redis.maxWait:5000}" />   
+   </bean >  
+ 
+   <bean id="connectionFactory"  class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" >  
+         <property name="poolConfig" ref="poolConfig" />  
+         <property name="port" value="${redis.port:6379}" />  
+         <property name="hostName" value="${redis.host:127.0.0.1}" />  
+   </bean >  
+   <bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate" >  
+         <property name="connectionFactory" ref="connectionFactory" />  
+         <property name="keySerializer" >  
+             <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />  
+         </property>  
+         <property name="valueSerializer" >  
+             <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />  
+         </property>  
+   </bean >
+
+	<!-- <alias name="defaultCommerceOptimizedCartRestorationStrategy" alias="commerceCartRestorationStrategy"/> 
+		<bean id="defaultCommerceOptimizedCartRestorationStrategy" class="com.accenture.performance.optimization.service.impl.DefaultCommerceOptimizedCartRestorationStrategy" 
+		parent="defaultCommerceCartRestorationStrategy"> <property name="timeService" 
+		ref="timeService"/> <property name="baseSiteService" ref="baseSiteService"/> 
+		<property name="cartFactory" ref="cartFactory"/> <property name="commerceCommonI18NService" 
+		ref="commerceCommonI18NService"/> <property name="commerceAddToCartStrategy" 
+		ref="commerceAddToCartStrategy"/> <property name="guidKeyGenerator" ref="guidKeyGenerator"/> 
+		<property name="cartValidityPeriod" value="${commerceservices.cartValidityPeriod}" 
+		/> <property name="sessionService" ref="sessionService"/> <property name="cartFactory" 
+		ref="cartFactory"/>
+		<property name="optimizeCommerceCartService" ref="optimizeCommerceCartService"/> 
+		<property name="optimizeCartService" ref="optimizeCartService"/> <property 
+		name="modelService" ref="modelService"/> </bean> -->
+
+</beans>

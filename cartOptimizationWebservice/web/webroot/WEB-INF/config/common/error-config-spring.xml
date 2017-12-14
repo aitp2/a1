@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean id="messageSource" class="org.training.util.ws.impl.AddonAwareMessageSource">
+		<property name="baseAddonDir" value="/WEB-INF/messages/addons/" />
+		<property name="basenames">
+			<list>
+				<value>/WEB-INF/messages/messages</value>
+			</list>
+		</property>
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+
+	<!-- webservice error factory & converters -->
+
+	<alias alias="webserviceErrorFactory" name="defaultWebserviceErrorFactory" />
+	<bean id="defaultWebserviceErrorFactory" class="de.hybris.platform.webservicescommons.errors.factory.impl.DefaultWebserviceErrorFactory">
+		<property name="converters">
+			<list>
+				<ref bean="validationErrorConverter" />
+				<ref bean="cartModificationDataListErrorConverter" />
+				<ref bean="webserviceExceptionConverter" />
+				<ref bean="exceptionConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="abstractLocalizedErrorConverter" abstract="true"
+		class="de.hybris.platform.webservicescommons.errors.converters.AbstractLocalizedErrorConverter">
+		<property name="messageSource" ref="messageSource" />
+	</bean>
+
+	<alias alias="validationErrorConverter" name="defaultValidationErrorConverter" />
+	<bean name="defaultValidationErrorConverter" class="de.hybris.platform.webservicescommons.errors.converters.ValidationErrorConverter"
+		parent="abstractLocalizedErrorConverter">
+		<property name="i18NService" ref="i18NService" />
+	</bean>
+
+	<alias alias="webserviceExceptionConverter" name="defaultWebserviceExceptionConverter" />
+	<bean name="defaultWebserviceExceptionConverter" class="de.hybris.platform.webservicescommons.errors.converters.WebserviceExceptionConverter" />
+
+	<alias alias="cartModificationDataErrorConverter" name="defaultCartModificationDataErrorConverter" />
+	<bean name="defaultCartModificationDataErrorConverter" class="org.training.errors.converters.CartModificationDataErrorConverter"
+		parent="abstractLocalizedErrorConverter">
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService" />
+	</bean>
+
+	<alias alias="cartModificationDataListErrorConverter" name="defaultCartModificationDataListErrorConverter" />
+	<bean name="defaultCartModificationDataListErrorConverter" class="org.training.errors.converters.CartModificationDataListErrorConverter">
+		<property name="cartModificationDataErrorConverter" ref="cartModificationDataErrorConverter" />
+	</bean>
+</beans>

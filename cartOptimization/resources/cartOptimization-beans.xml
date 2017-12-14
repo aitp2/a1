@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	
+	<bean class="com.accenture.performance.optimization.facades.data.OptimizedCartData">
+		<property name="userId" type="java.lang.String"/>
+		<property name="code" type="java.lang.String"/>
+		<property name="deliveryMode" type="java.lang.String"/>
+		<property name="deliveryAddress" type="de.hybris.platform.commercefacades.user.data.AddressData"/>
+		<property name="paymentInfo" type="de.hybris.platform.commercefacades.order.data.CCPaymentInfoData"/>
+		<property name="deliveryCost" type="java.lang.Double"/>
+		<property name="paymentCost" type="java.lang.Double"/>
+		<property name="createTime" type="java.util.Date"/>
+		<property name="totalPrice" type="java.lang.Double"/>
+		<property name="totalTax" type="java.lang.Double"/>
+		<property name="subtotal" type="java.lang.Double"/>
+		<property name="calculated" type="java.lang.Boolean"/>
+		<property name="entries"
+		          type="java.util.List&lt;com.accenture.performance.optimization.facades.data.OptimizedCartEntryData>"/>
+		<property name="potentialOrderPromotions"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.PromotionResultData>"/>
+        <property name="baseSite" type="java.lang.String"/>
+        <property name="baseStore" type="java.lang.String"/>
+        <property name="guid" type="java.lang.String"/>
+        <property name="globalDiscountValues" type="java.util.List&lt;de.hybris.platform.util.DiscountValue>"/>
+        
+		<property name="totalDiscounts" type="java.lang.Double"/>
+		<property name="allPromotionResults" type="java.util.List&lt;com.accenture.performance.optimization.data.OptimizedPromotionResultData>"/>
+	 </bean>
+	 
+	 <bean class="com.accenture.performance.optimization.facades.data.OptimizedCartEntryData">
+		<property name="entryNumber" type="java.lang.Integer"/>
+		<property name="entryPK" type="java.lang.String"/>
+		<property name="info" type="java.lang.String"/>
+		<property name="productCode" type="java.lang.String"/>
+		<property name="productName" type="java.lang.String"/>
+		<property name="productDescription" type="java.lang.String"/>
+		<property name="unit" type="java.lang.String"/>
+		<property name="quantity" type="java.lang.Long"/>
+		<property name="maxOrderQuantity" type="java.lang.Integer"/>
+		<property name="basePrice" type="java.lang.Double"/>
+		<property name="discountList" type="java.util.List&lt;de.hybris.platform.util.DiscountValue>"/>
+		<property name="taxValues" type="java.lang.Double"/>
+		<property name="totalPrice" type="java.lang.Double"/>
+		<property name="promomtionGiftEntry" type="java.lang.Boolean"/>
+		<property name="deliveryMode" type="java.lang.String"/>
+		<property name="entryStatus" type="java.lang.String"/>
+		<property name="calculated" type="java.lang.Boolean"/>
+		<property name="cartData" type="com.accenture.performance.optimization.facades.data.OptimizedCartData"/>
+		
+	 </bean>
+	 
+	  <bean class="de.hybris.platform.commerceservices.service.data.CommerceCartParameter">
+		<property name="optimizeCart" type="com.accenture.performance.optimization.facades.data.OptimizedCartData">
+			<description>Session Cart</description>
+		</property>
+		<property name="basePrice" type="java.lang.Double"/>
+		<property name="productCode" type="java.lang.String"/>
+      </bean>
+      
+      <bean class="de.hybris.platform.commerceservices.service.data.CommerceCheckoutParameter">
+		<property name="optimizeCart" type="com.accenture.performance.optimization.facades.data.OptimizedCartData">
+			<description>Session Cart</description>
+		</property>
+	</bean>
+	
+	<bean class="de.hybris.platform.commerceservices.order.CommerceCartModification">
+		<description>Represents the result of a modification to a cart entry.</description>
+		<property name="entryData" type="com.accenture.performance.optimization.facades.data.OptimizedCartEntryData"/>
+	</bean>
+	
+	<bean class="com.accenture.performance.optimization.data.OptimizedPromotionResultData">
+		<property name="actions" type="java.util.Collection&lt;com.accenture.performance.optimization.data.AbstractOptimizedPromotionActionData>"/>
+		<property name="allPromotionActions" type="java.util.Set&lt;com.accenture.performance.optimization.data.AbstractOptimizedPromotionActionData>"/>
+		<property name="certainty" type="java.lang.Float"/>
+		<property name="consumedEntries" type="java.util.Set&lt;com.accenture.performance.optimization.data.OptimizedPromotionOrderEntryConsumedData>"/>
+		<property name="custom" type="java.lang.String"/>
+		<property name="messageFired" type="java.lang.String"/>
+		<property name="moduleVersion" type="java.lang.Long"/>
+		<property name="cart" type="com.accenture.performance.optimization.facades.data.OptimizedCartData"/>
+		<property name="promotion" type="java.lang.String"/>
+		<property name="promotionPK" type="java.lang.String"/>
+		<property name="rulesModuleName" type="java.lang.String"/>
+		<property name="ruleVersion" type="java.lang.Long"/>
+		<property name="guid" type="java.lang.String"/>
+	 </bean>
+	 
+	<bean class="de.hybris.platform.ruleengineservices.rao.AbstractOrderRAO">
+		<property name="isOptimized" type="java.lang.Boolean" />
+		<property name="optimisticCode" type="java.lang.String" />	
+	</bean>
+	 
+	<bean class="com.accenture.performance.optimization.data.AbstractOptimizedPromotionActionData">
+		<property name="guid" type="java.lang.String"/>
+		<property name="markedApplied" type="java.lang.Boolean"/>
+		<property name="promotionResult" type="com.accenture.performance.optimization.data.OptimizedPromotionResultData"/>
+	 </bean>
+	 
+	<bean class="com.accenture.performance.optimization.data.OptimizedPromotionOrderEntryConsumedData">
+		<property name="adjustedUnitPrice" type="java.lang.Double"/>
+		<property name="code" type="java.lang.String"/>
+		<property name="orderEntry" type="com.accenture.performance.optimization.facades.data.OptimizedCartEntryData"/>
+		<property name="promotionResult" type="com.accenture.performance.optimization.data.OptimizedPromotionResultData"/>
+	 	<property name="quantity" type="java.lang.Integer"/>
+	 </bean>
+
+	<bean class="com.accenture.performance.optimization.data.AbstractOptimizedRuleBasedPromotionActionData" extends="com.accenture.performance.optimization.data.AbstractOptimizedPromotionActionData">
+		<property name="metadataHandlers" type="java.util.Collection&lt;String>"/>
+		<property name="rulePK" type="java.lang.String"/>
+		<property name="strategyId" type="java.lang.String"/>
+		<property name="usedCouponCodes" type="java.util.Collection&lt;String>"/>
+	 </bean>
+	  
+	 <bean class="com.accenture.performance.optimization.data.OptimizedPromotionOrderEntryAdjustAction" extends="com.accenture.performance.optimization.data.AbstractOptimizedRuleBasedPromotionActionData">
+		<property name="amount" type="java.lang.Double"/>
+		<property name="orderEntryNumber" type="java.lang.Integer"/>
+		<property name="orderEntryProduct" type="java.lang.String"/>
+		<property name="orderEntryQuantity" type="java.lang.Long"/>
+	 </bean>	
+	 
+	 <bean class="com.accenture.performance.optimization.data.OptimizedPromotionOrderAdjustTotalAction" extends="com.accenture.performance.optimization.data.AbstractOptimizedRuleBasedPromotionActionData">
+		<property name="amount" type="java.lang.Double"/>
+	 </bean>	
+</beans>

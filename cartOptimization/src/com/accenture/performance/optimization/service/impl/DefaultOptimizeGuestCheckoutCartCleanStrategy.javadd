@@ -1,0 +1,51 @@
+/*
+ * [y] hybris Platform
+ *
+ * Copyright (c) 2000-2017 SAP SE
+ * All rights reserved.
+ *
+ * This software is the confidential and proprietary information of SAP
+ * Hybris ("Confidential Information"). You shall not disclose such
+ * Confidential Information and shall use it only in accordance with the
+ * terms of the license agreement you entered into with SAP Hybris.
+ */
+package com.accenture.performance.optimization.service.impl;
+
+import de.hybris.platform.acceleratorstorefrontcommons.constants.WebConstants;
+import de.hybris.platform.core.model.order.CartModel;
+import de.hybris.platform.yacceleratorstorefront.security.impl.DefaultGuestCheckoutCartCleanStrategy;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
+
+
+/**
+ *
+ */
+public class DefaultOptimizeGuestCheckoutCartCleanStrategy extends DefaultGuestCheckoutCartCleanStrategy
+{
+
+	@Override
+	public void cleanGuestCart(final HttpServletRequest request)
+	{
+
+		if (isAnonymousCheckout() && StringUtils.isBlank(request.getHeader(AJAX_REQUEST_HEADER_NAME)) && isGetMethod(request)
+				&& !checkWhetherURLContainsCheckoutPattern(request))
+		{
+
+			final CartModel cartModel = getCartService().getSessionCart();
+			cartModel.setDeliveryAddress(null);
+			cartModel.setDeliveryMode(null);
+			cartModel.setPaymentInfo(null);
+			cartModel.setUser(getUserService().getAnonymousUser());
+			getCartService().saveOrder(cartModel);
+			getSessionService().removeAttribute(WebConstants.ANONYMOUS_CHECKOUT);
+			getSessionService().removeAttribute(WebConstants.ANONYMOUS_CHECKOUT_GUID);
+		}
+
+	}
+
+
+
+}

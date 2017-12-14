@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype code="OptimizedCartEntryCollection" elementtype="OptimizedCartEntry" autocreate="true" generate="false" type="list"/>
+    </collectiontypes>   
+    
+	<itemtypes>
+		<typegroup name="OptimizeCart">
+			<itemtype code="OptimizedCart"
+					  extends="GenericItem"
+	                  autocreate="true"
+	                  generate="true">
+	            <deployment table="OptimizedCarts" typecode="10000"/>
+	            <attributes>
+	                <attribute qualifier="userId" type="java.lang.String">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                </attribute>
+	                <attribute qualifier="userAccessToken" type="java.lang.String">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                </attribute>
+	                <attribute qualifier="code" type="java.lang.String">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="false"/>
+	                </attribute>
+	                <attribute qualifier="currencyCode" type="java.lang.String">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                </attribute>
+	                
+	                <attribute qualifier="deliveryMode" type="DeliveryMode">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                </attribute>
+	               <attribute autocreate="true" qualifier="deliveryAddress" type="Address" generate="true">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                </attribute>
+	                
+	                <attribute qualifier="site" type="BaseSite">
+						<description>The site on which the cart was created and the order was placed.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="store" type="BaseStore">
+						<description>The store for which the cart was created and the order was placed.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="guid" type="java.lang.String">
+						<description>
+							The guid for the anonymous cart used to lookup stored carts.
+							The order guid is used as a non-authenticated deep link to the order history page.
+						</description>
+						<persistence type="property" />
+					</attribute>
+	                
+	                <attribute autocreate="true" qualifier="deliveryCost" type="java.lang.Double" generate="true">
+	                    <persistence type="property">
+	                        <columntype>
+	                            <value>java.math.BigDecimal</value>
+	                        </columntype>
+	                    </persistence>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                    <defaultvalue>Double.valueOf(0.0d)</defaultvalue>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="subtotal" type="java.lang.Double" generate="true">
+	                    <persistence type="property">
+	                        <columntype>
+	                            <value>java.math.BigDecimal</value>
+	                        </columntype>
+	                    </persistence>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                    <defaultvalue>Double.valueOf(0.0d)</defaultvalue>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="totalPrice" type="java.lang.Double" generate="true">
+	                    <persistence type="property">
+	                        <columntype>
+	                            <value>java.math.BigDecimal</value>
+	                        </columntype>
+	                    </persistence>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                    <defaultvalue>Double.valueOf(0.0d)</defaultvalue>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="totalDiscounts" type="java.lang.Double" generate="true">
+	                    <persistence type="property">
+	                        <columntype>
+	                            <value>java.math.BigDecimal</value>
+	                        </columntype>
+	                    </persistence>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                    <defaultvalue>Double.valueOf(0.0d)</defaultvalue>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="paymentCost" type="java.lang.Double" generate="true">
+	                    <persistence type="property">
+	                        <columntype>
+	                            <value>java.math.BigDecimal</value>
+	                        </columntype>
+	                    </persistence>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                    <defaultvalue>Double.valueOf(0.0d)</defaultvalue>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="paymentInfo" type="PaymentInfo" generate="true">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="totalTax" type="java.lang.Double" generate="true">
+	                    <persistence type="property">
+	                        <columntype>
+	                            <value>java.math.BigDecimal</value>
+	                        </columntype>
+	                    </persistence>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                    <defaultvalue>Double.valueOf(0.0d)</defaultvalue>
+	                </attribute>
+                  <attribute type="Media" qualifier="cartDataMedia">
+                    <description>The image which can be attached to this navigation bar component.</description>
+                    <modifiers read="true" write="true" search="true" optional="true"/>
+                    <persistence type="property"/>
+                  </attribute>
+
+	            </attributes>
+	        </itemtype>
+	        
+
+	        <itemtype code="OptimizedCartEntry"
+	        	  extends="GenericItem"
+                  autocreate="true"
+                  generate="true">
+            	<deployment table="OptimizedCartEntries" typecode="10001"/>
+	            <attributes>
+	                <attribute autocreate="true" qualifier="entryNumber" type="java.lang.Integer" generate="true">
+	                    <defaultvalue>Integer.valueOf(de.hybris.platform.jalo.order.AbstractOrder.APPEND_AS_LAST)</defaultvalue>
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="entryNumberId" type="java.util.Date" generate="true">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="info" type="java.lang.String" generate="true">
+	                    <persistence type="property">
+	                        <columntype>
+	                            <value>HYBRIS.LONG_STRING</value>
+	                        </columntype>
+	                    </persistence>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="productCode" type="java.lang.String" generate="true">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+	                </attribute>
+	                 <attribute autocreate="true" qualifier="productName" type="java.lang.String" generate="true">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                </attribute>
+	                 <attribute autocreate="true" qualifier="productDescription" type="java.lang.String" generate="true">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="quantity" type="java.lang.Long" generate="true">
+	                    <persistence type="property">
+	                        <columntype>
+	                            <value>java.math.BigDecimal</value>
+	                        </columntype>
+	                    </persistence>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="basePrice" type="java.lang.Double" generate="true">
+	                    <persistence type="property">
+	                        <columntype>
+	                            <value>java.math.BigDecimal</value>
+	                        </columntype>
+	                    </persistence>
+	                    <modifiers read="true" write="true" search="false" optional="true"/>
+	                    <defaultvalue>Double.valueOf(0.0d)</defaultvalue>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="maxOrderQuantity" type="java.lang.Integer" generate="true">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="false" optional="true"/>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="discountValues" type="java.lang.Double" generate="true">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="false" optional="true"/>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="taxValues" type="java.lang.Double" generate="true">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="false" optional="true"/>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="totalPrice" type="java.lang.Double" generate="true">
+	                    <persistence type="property">
+	                        <columntype>
+	                            <value>java.math.BigDecimal</value>
+	                        </columntype>
+	                    </persistence>
+	                    <modifiers read="true" write="true" search="false" optional="true"/>
+	                    <defaultvalue>Double.valueOf(0.0d)</defaultvalue>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="unit" type="Unit" generate="true">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="entryStatus" type="java.lang.String" generate="true">
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="isGift" type="java.lang.Boolean" generate="true">
+	                    <defaultvalue>Boolean.FALSE</defaultvalue>
+	                    <persistence type="property"/>
+	                    <modifiers read="true" write="true" search="true" optional="true"/>
+	                </attribute>
+	                <attribute autocreate="true" qualifier="optimizedCart" type="OptimizedCart">
+	                	<persistence type="property"/>
+	                    <modifiers read="true" write="false" search="true" removable="true" optional="false" initial="true"
+	                               unique="true"/>
+	                </attribute>
+	                <attribute qualifier="discountValueString" type="java.lang.String">
+                      <persistence type="property">
+                        <columntype database="oracle">
+                            <value>CLOB</value>
+                        </columntype>
+                        <columntype database="sap">
+                            <value>NCLOB</value>
+                        </columntype>
+                        <columntype database="mysql">
+                            <value>TEXT</value>
+                        </columntype>
+                        <columntype database="sqlserver">
+                            <value>TEXT</value>
+                        </columntype>
+                        <columntype>
+                            <value>HYBRIS.LONG_STRING</value>
+                        </columntype>
+                      </persistence>
+	                  <modifiers read="true" write="true" search="true" optional="true"/>
+	                    
+	                </attribute>
+	            </attributes>
+	            <indexes>
+	                <index name="oeProd">
+	                    <key attribute="productCode"/>
+	                </index>
+	                <index name="oeOrd">
+	                    <key attribute="optimizedCart"/>
+	                </index>
+	            </indexes>
+       		</itemtype>
+         
+		</typegroup>
+	</itemtypes>
+</items>

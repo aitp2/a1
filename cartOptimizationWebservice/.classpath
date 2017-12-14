@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="/platform"/>
+	<classpathentry exported="true" kind="src" path="/commercefacades"/>
+	<classpathentry exported="true" kind="src" path="/commerceservices"/>
+	<classpathentry exported="true" kind="src" path="/commercewebservicescommons"/>
+	<classpathentry exported="true" kind="src" path="/webservicescommons"/>
+	<classpathentry exported="true" kind="lib" path="lib/kxml2-2.3.0.jar"/>
+	<classpathentry kind="lib" path="web/webroot/WEB-INF/lib/cors-filter-1.8.jar"/>
+	<classpathentry kind="lib" path="web/webroot/WEB-INF/lib/java-property-utils-1.9.jar"/>
+	<classpathentry kind="lib" path="web/webroot/WEB-INF/lib/jstl-1.2.jar"/>
+	<classpathentry kind="lib" path="web/webroot/WEB-INF/lib/stax-utils-20070216.jar"/>
+	<classpathentry exported="true" kind="lib" path="resources"/>
+	<classpathentry kind="src" output="eclipsebin/classes" path="src"/>
+	<classpathentry kind="src" output="eclipsebin/web/classes" path="web/src"/>
+	<classpathentry kind="src" output="eclipsebin/web/classes" path="web/testsrc"/>
+	<classpathentry kind="src" output="eclipsebin/classes" path="testsrc"/>
+	<classpathentry kind="src" output="eclipsebin/classes" path="gensrc"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/cartOptimization"/>
+	<classpathentry kind="output" path="eclipsebin/notused"/>
+</classpath>
