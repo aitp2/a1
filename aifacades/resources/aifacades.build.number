@@ -1,0 +1,11 @@
+#Ant properties
+#Thu May 04 15:05:17 UTC 2017
+builddate=20170504 1505
+description=aifacades
+group.id=de.hybris.platform
+module.name=platform-module
+name=aifacades
+releasedate=20170427 0956
+vendor=hybris
+version=6.4.0.0
+version.api=6.4.0

@@ -1,6 +1,7 @@
 <hybrisconfig xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='../bin/platform/resources/schemas/extensions.xsd'>
   <extensions>
     <path dir='${HYBRIS_BIN_DIR}' autoload='false' />
+    <path dir='/Users/mingming/work/a1' autoload='false' />
     <extension name='ordermanagementaddon' />
     <extension name='orderselfserviceaddon' />
     <extension name='ordermanagementwebservices' />
@@ -9,16 +10,15 @@
     <extension name='warehousingwebservices' />
     <extension name='instore' />
     <extension name='mcc' />
+    <extension name='hmc' />
+    <extension name='platformhmc' />
+    <extension name='backoffice' />
     <extension name='adaptivesearchsolr' />
     <extension name='adaptivesearchbackoffice' />
     <extension name='commerceservicesbackoffice' />
     <extension name='solrserver' />
-    <extension name='yacceleratorcockpits' />
-    <extension name='yacceleratorinitialdata' />
-    <extension name='yacceleratorordermanagement' />
-    <extension name='yacceleratorstorefront' />
-     <!-- <extension name='yaddon' />
-	<extension name='ycommercewebservices' /> -->
+   <extension name='yaddon' />
+
     <extension name='electronicsstore' />
     <extension name='apparelstore' />
     <extension name='acceleratorwebservicesaddon' />
@@ -32,11 +32,16 @@
     <extension name='couponfacades' />
     <extension name='promotionenginesamplesaddon' />
     <extension name='consignmenttrackingaddon' />
-    <extension name="demooccaddon"/>
-	<extension name='addonsupport' />
-	<extension name="demohotfolder"/>
-	<extension name="cartOptimization"/>
-	<extension name="cartOptimizationWebservice"/>
-	<extension name="oauth2" />
+    <extension name='addonsupport' />
+    <extension name="oauth2" />
+    
+     <extension name="cartOptimization"/>
+    <extension name="cartOptimizationWebservice"/>
+     <extension name='aistorefront' />
+     <extension name='aicore' />
+     <extension name='aifacades' />
+     <extension name='aifulfilmentprocess' />
+     <extension name='aiinitialdata' />
+    <extension name='aicockpits' />
   </extensions>
 </hybrisconfig>
