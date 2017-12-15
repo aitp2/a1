@@ -23,6 +23,7 @@ import de.hybris.platform.commerceservices.order.CommerceCartRestoration;
 import de.hybris.platform.commerceservices.order.CommerceCartRestorationException;
 import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +69,6 @@ public class DefaultOptimizeCartFacade extends DefaultCartFacade implements Opti
 	{
 		return optimizeCartService.hasSessionCart();
 	}
-
 
 	@Override
 	public CartModificationData addToCart(final String code, final long quantity) throws CommerceCartModificationException
@@ -151,6 +151,34 @@ public class DefaultOptimizeCartFacade extends DefaultCartFacade implements Opti
 
 		getCartService().changeCurrentCartUser(getUserService().getCurrentUser());
 		return getCartRestorationConverter().convert(commerceCartRestoration);
+	}
+
+	@Override
+	public CartRestorationData restoreSavedCart(final String guid) throws CommerceCartRestorationException
+	{
+		if (!hasEntries() && !hasEntryGroups())
+		{
+			getCartService().setSessionCart(null);
+		}
+
+		final CommerceCartParameter parameter = new CommerceCartParameter();
+		parameter.setEnableHooks(true);
+		final OptimizedCartData cartForGuidAndSiteAndUser = optimizeCartService.getSessionOptimizedCart();
+		parameter.setOptimizeCart(cartForGuidAndSiteAndUser);
+
+		return getCartRestorationConverter().convert(getCommerceCartService().restoreCart(parameter));
+	}
+
+	@Override
+	protected boolean hasEntryGroups()
+	{
+		return hasSessionCart();
+	}
+
+	@Override
+	public boolean hasEntries()
+	{
+		return hasSessionCart() && !CollectionUtils.isEmpty(optimizeCartService.getSessionOptimizedCart().getEntries());
 	}
 
 }

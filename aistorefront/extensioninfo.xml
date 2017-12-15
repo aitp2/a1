@@ -12,18 +12,18 @@
 
 	<extension abstractclassprefix="Generated" classprefix="AiStorefront" name="aistorefront" usemaven="false">		
         <requires-extension name="adaptivesearchsamplesaddon"/>
-<requires-extension name="orderselfserviceaddon"/>
-<requires-extension name="customerticketingaddon"/>
-<requires-extension name="assistedservicepromotionaddon"/>
-<requires-extension name="assistedservicestorefront"/>
-<requires-extension name="textfieldconfiguratortemplateaddon"/>
-<requires-extension name="smarteditaddon"/>
-<requires-extension name="promotionenginesamplesaddon"/>
-<requires-extension name="commerceorgsamplesaddon"/>
-<requires-extension name="liveeditaddon"/>
-<requires-extension name="acceleratorstorefrontcommons"/>
+		<requires-extension name="orderselfserviceaddon"/>
+		<requires-extension name="customerticketingaddon"/>
+		<requires-extension name="assistedservicepromotionaddon"/>
+		<requires-extension name="assistedservicestorefront"/>
+		<requires-extension name="textfieldconfiguratortemplateaddon"/>
+		<requires-extension name="smarteditaddon"/>
+		<requires-extension name="promotionenginesamplesaddon"/>
+		<requires-extension name="commerceorgsamplesaddon"/>
+		<requires-extension name="liveeditaddon"/>
+		<requires-extension name="acceleratorstorefrontcommons"/>
 		<requires-extension name="aifacades"/>
-
+		<requires-extension name="cartOptimization"/>
 		<webmodule jspcompile="false" webroot="/aistorefront"/>
 
 		
