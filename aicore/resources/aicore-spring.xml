@@ -545,6 +545,14 @@
 		<property name="eventService" ref="eventService" />
 		<property name="timeService" ref="timeService" />
 	</bean>
+	
+	<bean id="aiTokenService" class="com.acn.ai.core.oauth.impl.AiTokenServiceImpl">
+	<property name="configurationService" ref="configurationService" />
+	<property name="tokenServices" ref="oauthTokenServices" />
+	<property name="clientDetailsService" ref="oauthClientDetails" />
+	<property name="userDetailsService" ref="wsUserDetailsService" />
+	<property name="userService" ref="userService"/>
+	</bean>
 
 	<import resource="/aicore/processes/quote/quote-buyer-process-spring.xml"/>
 	<import resource="/aicore/processes/quote/quote-salesrep-process-spring.xml"/>

@@ -5,6 +5,7 @@
 	<classpathentry kind="lib" path="web/webroot/WEB-INF/lib/displaytag-1.2.jar"/>
 	<classpathentry kind="lib" path="web/webroot/WEB-INF/lib/jstl-impl-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="resources"/>
+	<classpathentry kind="lib" path="lib/spring-data-redis-1.8.9.RELEASE.jar" sourcepath="/var/folders/pj/fgd6c0ns40xcnht8sdhcvz740000gn/T/decompiler/source/spring-data-redis-1.8.9.RELEASE-sources.jar"/>
 	<classpathentry kind="src" output="eclipsebin/classes" path="src"/>
 	<classpathentry kind="src" output="eclipsebin/web/classes" path="web/src"/>
 	<classpathentry kind="src" output="eclipsebin/classes" path="testsrc"/>
