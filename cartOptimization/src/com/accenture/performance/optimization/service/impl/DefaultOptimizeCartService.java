@@ -212,6 +212,18 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 		}
 	}
 
+	@Override
+	public void changeCurrentCartUser(final UserModel user)
+	{
+		validateParameterNotNull(user, "user must not be null!");
+		if (hasSessionCart())
+		{
+			final OptimizedCartData sessionCart = getSessionOptimizedCart();
+			sessionCart.setUserId(user.getUid());
+			setSessionCartData(sessionCart);
+		}
+	}
+
 
 	@Override
 	public void setSessionCartData(final OptimizedCartData cartData)

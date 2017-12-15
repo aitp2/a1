@@ -17,6 +17,8 @@ import de.hybris.platform.order.CartService;
 import de.hybris.platform.servicelayer.session.SessionService;
 import de.hybris.platform.servicelayer.user.UserService;
 import de.hybris.platform.site.BaseSiteService;
+
+import com.accenture.performance.optimization.service.OptimizeCartService;
 import com.acn.ai.storefront.security.cookie.CartRestoreCookieGenerator;
 
 import java.io.IOException;
@@ -42,7 +44,7 @@ public class CartRestorationFilter extends OncePerRequestFilter
 	private static final Logger LOG = Logger.getLogger(CartRestorationFilter.class);
 
 	private CartRestoreCookieGenerator cartRestoreCookieGenerator;
-	private CartService cartService;
+	private OptimizeCartService cartService;
 	private CartFacade cartFacade;
 	private BaseSiteService baseSiteService;
 	private UserService userService;
@@ -67,7 +69,7 @@ public class CartRestorationFilter extends OncePerRequestFilter
 	protected void restoreCartWithNoCode() {
 		if ((!getCartService().hasSessionCart() && getSessionService().getAttribute(WebConstants.CART_RESTORATION) == null)
                 || (getCartService().hasSessionCart() && !getBaseSiteService().getCurrentBaseSite().equals(
-                        getBaseSiteService().getBaseSiteForUID(getCartService().getSessionCart().getSite().getUid()))))
+                        getBaseSiteService().getBaseSiteForUID(getCartService().getSessionOptimizedCart().getBaseSite()))))
         {
             getSessionService().setAttribute(WebConstants.CART_RESTORATION_SHOW_MESSAGE, Boolean.TRUE);
             try
@@ -196,14 +198,12 @@ public class CartRestorationFilter extends OncePerRequestFilter
 		this.userService = userService;
 	}
 
-	protected CartService getCartService()
-	{
+	protected OptimizeCartService getCartService() {
 		return cartService;
 	}
 
 	@Required
-	public void setCartService(final CartService cartService)
-	{
+	public void setCartService(OptimizeCartService cartService) {
 		this.cartService = cartService;
 	}
 }

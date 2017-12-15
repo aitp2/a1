@@ -12,6 +12,7 @@
 package com.accenture.performance.optimization.facades.impl;
 
 import de.hybris.platform.commercefacades.customer.impl.DefaultCustomerFacade;
+import de.hybris.platform.commercefacades.user.data.CustomerData;
 import de.hybris.platform.order.exceptions.CalculationException;
 
 import org.slf4j.Logger;
@@ -57,7 +58,26 @@ public class DefaultOptimizeCustomerFacade extends DefaultCustomerFacade
 			getOptimizeCartService().getSessionOptimizedCart();
 
 		}
-		super.loginSuccess();
+
+		final CustomerData userData = getCurrentCustomer();
+
+		// First thing to do is to try to change the user on the session cart
+		if (getCartService().hasSessionCart())
+		{
+			getCartService().changeCurrentCartUser(getCurrentUser());
+		}
+
+		// Update the session currency (which might change the cart currency)
+		//		if (!updateSessionCurrency(userData.getCurrency(), getStoreSessionFacade().getDefaultCurrency()))
+		//		{
+		//			// Update the user
+		//			getUserFacade().syncSessionCurrency();
+		//		}
+
+		// Update the user
+		getUserFacade().syncSessionLanguage();
+
+		//	super.loginSuccess();
 	}
 
 	/**
