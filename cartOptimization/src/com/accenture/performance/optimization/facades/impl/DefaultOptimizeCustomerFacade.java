@@ -52,12 +52,13 @@ public class DefaultOptimizeCustomerFacade extends DefaultCustomerFacade
 				LOG.error("Failed to recalculate order [" + optimizedCartData.getCode() + "]", ex);
 			}
 		}
-		else
-		{
-			//create new optimized cart
-			getOptimizeCartService().getSessionOptimizedCart();
+		//login user not need to create empty cart
+		//else
+		//{
+		//create new optimized cart
+		//	getOptimizeCartService().getSessionOptimizedCart();
 
-		}
+		//}
 
 		final CustomerData userData = getCurrentCustomer();
 

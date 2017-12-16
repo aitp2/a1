@@ -74,6 +74,8 @@
 		class="com.accenture.performance.optimization.facades.impl.DefaultOptimizeCartFacade"
 		parent="defaultCartFacade">
 		<property name="cartService" ref="cartService" />
+		<property name="optimizeCartConverter" ref="optimizeCartConverter"/>
+		<property name="optimizeMiniCartConverter" ref="optimizeMiniCartConverter"/>
 	</bean>
 
 
@@ -346,8 +348,51 @@
          <property name="valueSerializer" >  
              <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />  
          </property>  
-   </bean >
-
+   </bean>
+   
+   <!-- cart convert and pop start mingming.wang -->
+   <bean id="optimizeCartConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.order.data.CartData"/>
+		<property name="populators">
+			<list>
+				<ref bean="optimizeCartPopulator"/>
+			</list>
+		</property>
+	</bean>
+	 <bean id="optimizeMiniCartConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.order.data.CartData"/>
+		<property name="populators">
+			<list>
+				<ref bean="optimizedMiniCartPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="abstractOptomizedCartPopulator" class="com.accenture.performance.optimization.facades.populators.AbstractOptomizedCartPopulator" abstract="true">
+	  <property name="commonI18NService" ref="commonI18NService"/>
+	  <property name="priceDataFactory" ref="priceDataFactory"/>
+	  <property name="optimizedCartEntryConverter" ref="optimizedCartEntryConverter"/>
+	</bean>
+	<alias name="defaultOptimizedCartPopulator" alias="optimizeCartPopulator"/>
+	<bean id="defaultOptimizedCartPopulator" class="com.accenture.performance.optimization.facades.populators.DefaultOptimizedCartPopulator" parent="abstractOptomizedCartPopulator"/>
+	<alias name="defaultOptimizedMiniCartPopulator" alias="optimizedMiniCartPopulator"/>
+	<bean id="defaultOptimizedMiniCartPopulator" class="com.accenture.performance.optimization.facades.populators.DefaultOptimizedMiniCartPopulator" parent="abstractOptomizedCartPopulator" />
+     <bean id="optimizedCartEntryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.order.data.OrderEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="defaultOptimizedCartEntryPopulator"/>
+			</list>
+		</property>
+	</bean>
+	<alias name="defaultOptimizedCartEntryPopulator" alias="optimizedCartEntryPopulator"/>
+	<bean id="defaultOptimizedCartEntryPopulator" class="com.accenture.performance.optimization.facades.populators.DefaultOptimizedCartEntryPopulator">
+	 <property name="productConverter" ref="productConverter" />
+	 <property name="priceDataFactory" ref="priceDataFactory" />
+	 <property name="commonI18NService" ref="commonI18NService" />
+	 <property name="productService" ref="productService" />
+	</bean>
+  <!-- cart convert and pop end mingming.wang -->
 	<!-- <alias name="defaultCommerceOptimizedCartRestorationStrategy" alias="commerceCartRestorationStrategy"/> 
 		<bean id="defaultCommerceOptimizedCartRestorationStrategy" class="com.accenture.performance.optimization.service.impl.DefaultCommerceOptimizedCartRestorationStrategy" 
 		parent="defaultCommerceCartRestorationStrategy"> <property name="timeService" 

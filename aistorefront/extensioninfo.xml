@@ -23,7 +23,6 @@
 		<requires-extension name="liveeditaddon"/>
 		<requires-extension name="acceleratorstorefrontcommons"/>
 		<requires-extension name="aifacades"/>
-		<requires-extension name="cartOptimization"/>
 		<webmodule jspcompile="false" webroot="/aistorefront"/>
 
 		

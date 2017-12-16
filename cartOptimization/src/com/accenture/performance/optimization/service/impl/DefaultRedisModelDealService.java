@@ -57,10 +57,11 @@ public class DefaultRedisModelDealService extends DefatulOptimizeModelDealServic
 			final OptimizedCartData cart = new OptimizedCartData();
 			cart.setCode(cartModel.getCode());
 			cart.setUserId(cartModel.getUserId());
-			//			cart.setCurrencyCode(cartModel.getCurrencyCode());
+			cart.setCurrencyCode(cartModel.getCurrencyCode());
 			cart.setBaseSite(cartModel.getSite().getUid());
 			cart.setBaseStore(cartModel.getStore().getUid());
 			cart.setGuid(cartModel.getGuid());
+			cart.setCurrencyCode(cartModel.getCurrencyCode());
 			return cart;
 		}
 	}

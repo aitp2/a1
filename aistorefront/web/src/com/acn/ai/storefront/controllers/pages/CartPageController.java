@@ -47,7 +47,6 @@ import de.hybris.platform.core.enums.QuoteState;
 import de.hybris.platform.enumeration.EnumerationService;
 import de.hybris.platform.site.BaseSiteService;
 import de.hybris.platform.util.Config;
-import com.acn.ai.storefront.controllers.ControllerConstants;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -76,6 +75,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.accenture.performance.optimization.facades.OptimizedCartFacade;
+import com.acn.ai.storefront.controllers.ControllerConstants;
 
 
 /**
@@ -126,6 +128,10 @@ public class CartPageController extends AbstractCartPageController
 
 	@Resource(name = "cartEntryActionFacade")
 	private CartEntryActionFacade cartEntryActionFacade;
+
+	@Resource(name = "cartFacade")
+	private OptimizedCartFacade cartFacade;
+
 
 	@ModelAttribute("showCheckoutStrategies")
 	public boolean isCheckoutStrategyVisible()

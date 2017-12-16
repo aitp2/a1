@@ -13,6 +13,7 @@ package com.accenture.performance.optimization.facades.impl;
 
 import de.hybris.platform.basecommerce.model.site.BaseSiteModel;
 import de.hybris.platform.commercefacades.order.data.AddToCartParams;
+import de.hybris.platform.commercefacades.order.data.CartData;
 import de.hybris.platform.commercefacades.order.data.CartModificationData;
 import de.hybris.platform.commercefacades.order.data.CartRestorationData;
 import de.hybris.platform.commercefacades.order.impl.DefaultCartFacade;
@@ -22,6 +23,7 @@ import de.hybris.platform.commerceservices.order.CommerceCartModificationExcepti
 import de.hybris.platform.commerceservices.order.CommerceCartRestoration;
 import de.hybris.platform.commerceservices.order.CommerceCartRestorationException;
 import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
+import de.hybris.platform.servicelayer.dto.converter.Converter;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -44,12 +46,45 @@ public class DefaultOptimizeCartFacade extends DefaultCartFacade implements Opti
 	@Autowired
 	private OptimizeCartService optimizeCartService;
 
+	private Converter<OptimizedCartData, CartData> optimizeCartConverter;
+	private Converter<OptimizedCartData, CartData> optimizeMiniCartConverter;
+
 	@Override
 	public OptimizedCartData getSessionCartData()
 	{
 
 		final OptimizedCartData cartData = optimizeCartService.getSessionOptimizedCart();
 
+		return cartData;
+	}
+
+	@Override
+	public CartData getMiniCart()
+	{
+		final CartData cartData;
+		if (hasSessionCart())
+		{
+			cartData = getOptimizeMiniCartConverter().convert(getSessionCartData());
+		}
+		else
+		{
+			cartData = createEmptyCart();
+		}
+		return cartData;
+	}
+
+	@Override
+	public CartData getSessionCart()
+	{
+		final CartData cartData;
+		if (hasSessionCart())
+		{
+			cartData = getOptimizeCartConverter().convert(getSessionCartData());
+		}
+		else
+		{
+			cartData = createEmptyCart();
+		}
 		return cartData;
 	}
 
@@ -179,6 +214,40 @@ public class DefaultOptimizeCartFacade extends DefaultCartFacade implements Opti
 	public boolean hasEntries()
 	{
 		return hasSessionCart() && !CollectionUtils.isEmpty(optimizeCartService.getSessionOptimizedCart().getEntries());
+	}
+
+	/**
+	 * @return the optimizeCartConverter
+	 */
+	public Converter<OptimizedCartData, CartData> getOptimizeCartConverter()
+	{
+		return optimizeCartConverter;
+	}
+
+	/**
+	 * @param optimizeCartConverter
+	 *           the optimizeCartConverter to set
+	 */
+	public void setOptimizeCartConverter(final Converter<OptimizedCartData, CartData> optimizeCartConverter)
+	{
+		this.optimizeCartConverter = optimizeCartConverter;
+	}
+
+	/**
+	 * @return the optimizeMiniCartConverter
+	 */
+	public Converter<OptimizedCartData, CartData> getOptimizeMiniCartConverter()
+	{
+		return optimizeMiniCartConverter;
+	}
+
+	/**
+	 * @param optimizeMiniCartConverter
+	 *           the optimizeMiniCartConverter to set
+	 */
+	public void setOptimizeMiniCartConverter(final Converter<OptimizedCartData, CartData> optimizeMiniCartConverter)
+	{
+		this.optimizeMiniCartConverter = optimizeMiniCartConverter;
 	}
 
 }

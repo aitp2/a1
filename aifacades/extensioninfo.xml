@@ -16,6 +16,7 @@
 			extensions which are automatically required -->
 		<requires-extension name="acceleratorfacades"/>
 		<requires-extension name="aicore"/>
+		<requires-extension name="cartOptimization"/>
 
 		<coremodule generated="true" manager="de.hybris.platform.jalo.extension.GenericManager" packageroot="com.acn.ai.facades"/>
 

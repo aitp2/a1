@@ -190,4 +190,9 @@
 	</bean>
 
 	<bean id="genderData" class="com.acn.ai.facades.product.data.GenderData" scope="prototype"/>
+	
+	<alias name="optomizedCheckoutFacade" alias="acceleratorCheckoutFacade"/>
+	<bean id="optomizedCheckoutFacade" class="com.acn.ai.facades.order.impl.OptomizedCheckoutFacade" parent="defaultAcceleratorCheckoutFacade">
+	 <property name="optimizeCartService" ref="cartService" />
+	</bean>
 </beans>
