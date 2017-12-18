@@ -90,9 +90,9 @@ public class CartRestorationFilter extends OncePerRequestFilter
 	protected void processAnonymousUser(final HttpServletRequest request, final HttpServletResponse response) {
 		if (getCartService().hasSessionCart()
                 && getBaseSiteService().getCurrentBaseSite().equals(
-                        getBaseSiteService().getBaseSiteForUID(getCartService().getSessionCart().getSite().getUid())))
+                        getBaseSiteService().getBaseSiteForUID(getCartService().getSessionOptimizedCart().getBaseSite())))
         {
-            final String guid = getCartService().getSessionCart().getGuid();
+            final String guid = getCartService().getSessionOptimizedCart().getGuid();
 
             if (!StringUtils.isEmpty(guid))
             {
@@ -101,7 +101,7 @@ public class CartRestorationFilter extends OncePerRequestFilter
         }
         else if (request.getSession().isNew()
                 || (getCartService().hasSessionCart() && !getBaseSiteService().getCurrentBaseSite().equals(
-                        getBaseSiteService().getBaseSiteForUID(getCartService().getSessionCart().getSite().getUid()))))
+                        getBaseSiteService().getBaseSiteForUID(getCartService().getSessionOptimizedCart().getBaseSite()))))
         {
 			processRestoration(request);
         }
