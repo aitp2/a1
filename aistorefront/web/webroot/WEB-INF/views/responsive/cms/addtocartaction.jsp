@@ -64,7 +64,7 @@
 		</c:when>
 		<c:otherwise>
 			<ycommerce:testId code="addToCartButton">
-				<button id="addToCartButton" type="${buttonType}" class="btn btn-primary btn-block js-add-to-cart js-enable-btn btn-icon glyphicon-shopping-cart" disabled="disabled">
+				<button id="addToCartButton" type="button" class="btn btn-primary btn-block js-add-to-cart js-enable-btn btn-icon glyphicon-shopping-cart" disabled="disabled">
 					<spring:theme code="basket.add.to.basket"/>
 				</button>
 			</ycommerce:testId>
@@ -72,4 +72,40 @@
 	</c:choose>
 </c:if>
 </form:form>
+<div id="addToCartLayerPop" style="display:none">
+<div id="addToCartLayer" class="add-to-cart">
+            <div class="cart_popup_error_msg"></div>
 
+        <div class="add-to-cart-item">
+		<div class="thumb">
+			<a href="" id="addToCart_image">
+				<img src=""/>
+			</a>
+		</div>
+		<div class="details">
+			<a class="name" href="entryProductUrl" id="addToCart_product"></a>
+			<div class="qty"><span><spring:theme code="popup.cart.quantity.added"/></span>&nbsp;<span></span></div>
+			<%--
+						<div class="itemColor">
+							<span class="label"><spring:theme code="product.variants.colour"/></span>
+							<img src="${baseOptionQualifier.image.url}"  alt="${baseOptionQualifierValue}" title="${baseOptionQualifierValue}"/>
+						</div>
+
+						<div class="itemSize">
+							<span class="label"><spring:theme code="product.variants.size"/></span>
+								${baseOptionQualifierValue}
+						</div>
+               
+				<div class="itemPickup"><span class="itemPickupLabel"><spring:theme code="popup.cart.pickup"/></span>&nbsp;entry.deliveryPointOfService.name</div>
+				--%>
+			<div class="price"></div>
+		</div>
+    </div>
+                <a href="/cart" class="btn btn-primary btn-block add-to-cart-button">
+	                    <spring:theme code="checkout.checkout" />
+                </a>
+            <a href="" class="btn btn-default btn-block js-mini-cart-close-button">
+                <spring:theme code="cart.page.continue"/>
+            </a>
+		</div>
+</div>

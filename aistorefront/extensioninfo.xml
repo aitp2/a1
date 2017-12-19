@@ -15,7 +15,7 @@
 		<requires-extension name="orderselfserviceaddon"/>
 		<requires-extension name="customerticketingaddon"/>
 		<requires-extension name="assistedservicepromotionaddon"/>
-		<requires-extension name="assistedservicestorefront"/>
+		<!--  <requires-extension name="assistedservicestorefront"/>  -->
 		<requires-extension name="textfieldconfiguratortemplateaddon"/>
 		<requires-extension name="smarteditaddon"/>
 		<requires-extension name="promotionenginesamplesaddon"/>

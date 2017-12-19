@@ -381,7 +381,7 @@
 		<property name="targetClass" value="de.hybris.platform.commercefacades.order.data.OrderEntryData"/>
 		<property name="populators">
 			<list>
-				<ref bean="defaultOptimizedCartEntryPopulator"/>
+				<ref bean="optimizedCartEntryPopulator"/>
 			</list>
 		</property>
 	</bean>
@@ -391,6 +391,10 @@
 	 <property name="priceDataFactory" ref="priceDataFactory" />
 	 <property name="commonI18NService" ref="commonI18NService" />
 	 <property name="productService" ref="productService" />
+	</bean>
+	<alias name="defaultOptinizedCartModification" alias="cartModificationPopulator"/>
+	<bean id="defaultOptinizedCartModification" class="com.accenture.performance.optimization.facades.populators.DefaultOptinizedCartModification" parent="defaultCartModificationPopulator">
+	  <property name="optimizedOrderEntryConverter" ref="optimizedCartEntryConverter"/>
 	</bean>
   <!-- cart convert and pop end mingming.wang -->
 	<!-- <alias name="defaultCommerceOptimizedCartRestorationStrategy" alias="commerceCartRestorationStrategy"/> 
