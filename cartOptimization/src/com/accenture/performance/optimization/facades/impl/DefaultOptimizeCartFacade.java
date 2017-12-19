@@ -23,7 +23,11 @@ import de.hybris.platform.commerceservices.order.CommerceCartModificationExcepti
 import de.hybris.platform.commerceservices.order.CommerceCartRestoration;
 import de.hybris.platform.commerceservices.order.CommerceCartRestorationException;
 import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
+import de.hybris.platform.converters.Converters;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
+
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -204,6 +208,14 @@ public class DefaultOptimizeCartFacade extends DefaultCartFacade implements Opti
 		return getCartRestorationConverter().convert(getCommerceCartService().restoreCart(parameter));
 	}
 
+	//TODO acn
+	@Override
+	public List<CartModificationData> validateCartData() throws CommerceCartModificationException
+	{
+		//super.validateCartData();
+		return Collections.emptyList();
+	}
+	
 	@Override
 	protected boolean hasEntryGroups()
 	{

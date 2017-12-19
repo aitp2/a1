@@ -14,7 +14,9 @@ package com.accenture.performance.optimization.facades.impl;
 import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParameterNotNullStandardMessage;
 
 import de.hybris.platform.commercefacades.order.data.CCPaymentInfoData;
+import de.hybris.platform.commercefacades.order.data.CartData;
 import de.hybris.platform.commercefacades.order.data.OrderData;
+import de.hybris.platform.commercefacades.order.data.OrderEntryData;
 import de.hybris.platform.commercefacades.order.impl.DefaultCheckoutFacade;
 import de.hybris.platform.commercefacades.user.UserFacade;
 import de.hybris.platform.commercefacades.user.data.AddressData;
@@ -22,6 +24,8 @@ import de.hybris.platform.commerceservices.delivery.DeliveryService;
 import de.hybris.platform.commerceservices.enums.SalesApplication;
 import de.hybris.platform.commerceservices.service.data.CommerceCheckoutParameter;
 import de.hybris.platform.core.model.c2l.CountryModel;
+import de.hybris.platform.core.model.order.AbstractOrderEntryModel;
+import de.hybris.platform.core.model.order.CartModel;
 import de.hybris.platform.core.model.order.OrderModel;
 import de.hybris.platform.core.model.order.delivery.DeliveryModeModel;
 import de.hybris.platform.core.model.order.payment.CreditCardPaymentInfoModel;
@@ -40,7 +44,9 @@ import de.hybris.platform.site.BaseSiteService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +89,9 @@ public class DefaultOptimizeCheckoutFacade extends DefaultCheckoutFacade impleme
 	private Converter<AddressModel, AddressData> addressConverter;
 	@Autowired
 	private Converter<OptimizedCartData, OptimizedCartModel> cartReverseConverter;
+	
+	@Autowired
+	private Converter<OptimizedCartData, CartData> optimizeCartConverter;
 
 	@Autowired
 	private UserFacade userFacade;
@@ -96,7 +105,48 @@ public class DefaultOptimizeCheckoutFacade extends DefaultCheckoutFacade impleme
 	@Autowired
 	private UserService userService;
 
-
+	//TODO acn
+	@Override
+	public void prepareCartForCheckout()
+	{
+		//
+	}
+	
+	//TODO acn
+	@Override
+	public boolean hasShippingItems()
+	{
+		return hasItemsMatchingPredicateACN(e -> e.getDeliveryPointOfService() == null);
+	}
+	
+	protected boolean hasItemsMatchingPredicateACN(final Predicate<OrderEntryData> predicate)
+	{
+		final CartData cart = this.optimizeCartConverter.convert(this.optimizeCartService.getSessionOptimizedCart()) ;
+		if (cart != null && CollectionUtils.isNotEmpty(cart.getEntries()))
+		{
+			for (final OrderEntryData entry : cart.getEntries())
+			{
+				if (predicate.test(entry))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+		
+	@Override
+	public CartData getCheckoutCart()
+	{
+		final OptimizedCartData cartData = optimizeCartService.getSessionOptimizedCart();
+		if (cartData != null)
+		{
+			return this.optimizeCartConverter.convert(cartData);
+		}
+		
+		throw new NullPointerException("Cart can not be null");
+	}
+	
 	@Override
 	public OrderData placeOrder() throws InvalidCartException
 	{

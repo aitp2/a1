@@ -62,6 +62,7 @@
 		<property name="entryStatus" type="java.lang.String"/>
 		<property name="calculated" type="java.lang.Boolean"/>
 		<property name="cartData" type="com.accenture.performance.optimization.facades.data.OptimizedCartData"/>
+		<property name="deliveryPointOfService" type="de.hybris.platform.commercefacades.storelocator.data.PointOfServiceData"/>
 		
 	 </bean>
 	 

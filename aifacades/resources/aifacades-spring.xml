@@ -194,5 +194,13 @@
 	<alias name="optomizedCheckoutFacade" alias="acceleratorCheckoutFacade"/>
 	<bean id="optomizedCheckoutFacade" class="com.acn.ai.facades.order.impl.OptomizedCheckoutFacade" parent="defaultAcceleratorCheckoutFacade">
 	 <property name="optimizeCartService" ref="cartService" />
+	 <property name="optimizeCartConverter" ref="optimizeCartConverter" />
+	</bean>
+	
+	<alias name="acnSessionOverrideCheckoutFlowFacade" alias="checkoutFlowFacade" />
+	<bean id="acnSessionOverrideCheckoutFlowFacade" class="com.acn.ai.facades.order.impl.ACNSessionOverrideCheckoutFlowFacade" parent="defaultCheckoutFlowFacade">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="optimizeCartService" ref="cartService" />
+		<property name="optimizeCartConverter" ref="optimizeCartConverter" />
 	</bean>
 </beans>

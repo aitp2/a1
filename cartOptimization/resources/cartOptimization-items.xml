@@ -250,6 +250,12 @@
 	                  <modifiers read="true" write="true" search="true" optional="true"/>
 	                    
 	                </attribute>
+	                
+					<attribute qualifier="deliveryPointOfService" type="PointOfService">
+						<description>The point of service to deliver to/collect from.</description>
+						<persistence type="property" />
+					</attribute>
+				
 	            </attributes>
 	            <indexes>
 	                <index name="oeProd">
