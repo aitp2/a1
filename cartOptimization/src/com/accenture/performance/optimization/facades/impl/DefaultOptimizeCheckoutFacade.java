@@ -112,7 +112,6 @@ public class DefaultOptimizeCheckoutFacade extends DefaultCheckoutFacade impleme
 		//
 	}
 	
-	//TODO acn
 	@Override
 	public boolean hasShippingItems()
 	{
