@@ -20,6 +20,7 @@ import de.hybris.platform.commercefacades.user.data.AddressData;
 import de.hybris.platform.commerceservices.service.data.CommerceCheckoutParameter;
 import de.hybris.platform.core.model.order.CartModel;
 import de.hybris.platform.core.model.user.AddressModel;
+import de.hybris.platform.core.model.user.UserModel;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
 
 
@@ -51,6 +52,7 @@ public class OptomizedCheckoutFacade extends DefaultAcceleratorCheckoutFacade
 		throw new NullPointerException("Cart can not be null");
 	}
 		
+	
 	//TODO acn
 	@Override
 	public List<AddressData> getSupportedDeliveryAddresses(final boolean visibleAddressesOnly)
@@ -58,6 +60,13 @@ public class OptomizedCheckoutFacade extends DefaultAcceleratorCheckoutFacade
 		//super.getSupportedDeliveryAddresses(visibleAddressesOnly);
 		return Collections.emptyList();
 		
+	}
+	
+	//TODO acn
+	@Override
+	public boolean setDeliveryAddressIfAvailable()
+	{
+		return false;
 	}
 	
 	@Override
