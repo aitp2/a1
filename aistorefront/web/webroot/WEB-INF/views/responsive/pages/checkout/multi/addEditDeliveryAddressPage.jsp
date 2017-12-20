@@ -37,8 +37,6 @@
 
                                             <c:forEach items="${deliveryAddresses}" var="deliveryAddress" varStatus="status">
                                                 <div class="addressEntry">
-                                                    <form action="${request.contextPath}/checkout/multi/delivery-address/select" method="GET">
-                                                        <input type="hidden" name="selectedAddressCode" value="${fn:escapeXml(deliveryAddress.id)}" />
                                                         <ul>
                                                             <li>
                                                                 <strong>${fn:escapeXml(deliveryAddress.title)}&nbsp;
@@ -57,10 +55,10 @@
                                                                 ${fn:escapeXml(deliveryAddress.postalCode)}
                                                             </li>
                                                         </ul>
-                                                        <button type="submit" class="btn btn-primary btn-block">
+                                                        <input type="hidden" name="selectedAddressCode" value="${fn:escapeXml(deliveryAddress.id)}" />
+                                                        <button type="button" class="btn btn-primary btn-block" attr-addressID="${fn:escapeXml(deliveryAddress.id)}">
                                                             <spring:theme code="checkout.multi.deliveryAddress.useThisAddress" />
                                                         </button>
-                                                    </form>
                                                 </div>
                                             </c:forEach>
                                         </div>

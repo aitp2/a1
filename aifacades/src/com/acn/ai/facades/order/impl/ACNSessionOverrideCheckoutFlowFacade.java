@@ -31,13 +31,6 @@ public class ACNSessionOverrideCheckoutFlowFacade extends SessionOverrideCheckou
 	}
 	
 	@Override
-	public boolean hasNoDeliveryAddress()
-	{
-		final CartData cartData = getCheckoutCart();
-		return hasShippingItems() && (cartData == null || cartData.getDeliveryAddress() == null);
-	}
-	
-	@Override
 	public boolean hasShippingItems()
 	{
 		return hasItemsMatchingPredicateACN(e -> e.getDeliveryPointOfService() == null);

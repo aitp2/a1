@@ -849,7 +849,7 @@ public class CartsController extends BaseCommerceController
 			LOG.debug("createAddress");
 		}
 
-		final AddressData addressData = super.createAddressInternal(request);
+		final AddressData addressData = createAddressInternal(request);
 		//final String addressId = addressData.getId();
 		//super.setCartDeliveryAddressInternal(addressId);
 		return getDataMapper().map(addressData, AddressWsDTO.class, fields);
@@ -937,6 +937,16 @@ public class CartsController extends BaseCommerceController
 		{
 			throw new CartException("Cannot reset address!", CartException.CANNOT_RESET_ADDRESS);
 		}
+	}
+	
+	protected AddressData createAddressInternal(final HttpServletRequest request) throws WebserviceValidationException //NOSONAR
+	{
+		final AddressData addressData = new AddressData();
+		getHttpRequestAddressDataPopulator().populate(request, addressData);
+
+		validate(addressData, "addressData", getAddressValidator());
+
+		return createAddressInternal(addressData);
 	}
 
 	/**

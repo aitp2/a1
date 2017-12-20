@@ -70,13 +70,6 @@ public class OptomizedCheckoutFacade extends DefaultAcceleratorCheckoutFacade
 	}
 	
 	@Override
-	public boolean hasNoDeliveryAddress()
-	{
-		final CartData cartData = getCheckoutCart();
-		return hasShippingItems() && (cartData == null || cartData.getDeliveryAddress() == null);
-	}
-	
-	@Override
 	public boolean hasValidCart()
 	{
 		final OptimizedCartData optimizeCartData = getOptimizedCart();
