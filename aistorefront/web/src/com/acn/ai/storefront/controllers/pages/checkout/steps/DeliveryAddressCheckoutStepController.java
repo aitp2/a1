@@ -29,6 +29,8 @@ import de.hybris.platform.commerceservices.address.AddressVerificationDecision;
 import de.hybris.platform.util.Config;
 import com.acn.ai.storefront.controllers.ControllerConstants;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -388,6 +390,28 @@ public class DeliveryAddressCheckoutStepController extends AbstractCheckoutStepC
 		storeCmsPageInModel(model, getContentPageForLabelOrId(MULTI_CHECKOUT_SUMMARY_CMS_PAGE_LABEL));
 		setUpMetaDataForContentPage(model, getContentPageForLabelOrId(MULTI_CHECKOUT_SUMMARY_CMS_PAGE_LABEL));
 		setCheckoutStepLinksForModel(model, getCheckoutStep());
+	}
+	
+	protected List<? extends AddressData> getDeliveryAddresses(final AddressData selectedAddressData) // NOSONAR
+	{
+		List<AddressData> deliveryAddresses = null;
+		if (selectedAddressData != null)
+		{
+			deliveryAddresses = (List<AddressData>) getCheckoutFacade().getSupportedDeliveryAddresses(true);
+
+			if (deliveryAddresses == null || deliveryAddresses.isEmpty())
+			{
+				deliveryAddresses = Collections.singletonList(selectedAddressData);
+			}
+			else if (!isAddressOnList(deliveryAddresses, selectedAddressData))
+			{
+				deliveryAddresses.add(selectedAddressData);
+			}
+		}else {
+			deliveryAddresses = this.getUserFacade().getAddressBook();//TODO acn
+		}
+
+		return deliveryAddresses == null ? Collections.<AddressData> emptyList() : deliveryAddresses;
 	}
 
 }

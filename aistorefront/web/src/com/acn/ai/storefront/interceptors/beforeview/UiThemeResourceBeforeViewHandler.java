@@ -10,6 +10,20 @@
  */
 package com.acn.ai.storefront.interceptors.beforeview;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Required;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.acn.ai.storefront.web.view.UiExperienceViewResolver;
+
 import de.hybris.platform.acceleratorfacades.device.DeviceDetectionFacade;
 import de.hybris.platform.acceleratorfacades.device.data.DeviceData;
 import de.hybris.platform.acceleratorservices.addonsupport.RequiredAddOnsNameProvider;
@@ -23,19 +37,6 @@ import de.hybris.platform.commerceservices.enums.SiteTheme;
 import de.hybris.platform.commerceservices.enums.UiExperienceLevel;
 import de.hybris.platform.commerceservices.i18n.CommerceCommonI18NService;
 import de.hybris.platform.core.model.c2l.LanguageModel;
-import com.acn.ai.storefront.web.view.UiExperienceViewResolver;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Required;
-import org.springframework.web.servlet.ModelAndView;
 
 
 /**
@@ -75,7 +76,7 @@ public class UiThemeResourceBeforeViewHandler implements BeforeViewHandler
 
 	@Resource(name = "viewResolver")
 	private UiExperienceViewResolver uiExperienceViewResolver;
-
+	
 	private String defaultThemeName;
 
 	@Override
@@ -112,7 +113,7 @@ public class UiThemeResourceBeforeViewHandler implements BeforeViewHandler
 		modelAndView.addObject("language", currentLanguage != null ? currentLanguage.getIsocode() : "en");
 		modelAndView.addObject("themeName", themeName);
 		modelAndView.addObject("uiExperienceLevel", uiExperienceCode);
-
+		
 		final String detectedUiExperienceCode = uiExperienceService.getDetectedUiExperienceLevel().getCode();
 		modelAndView.addObject("detectedUiExperienceCode", detectedUiExperienceCode);
 
@@ -138,6 +139,10 @@ public class UiThemeResourceBeforeViewHandler implements BeforeViewHandler
 				getAddOnThemeCSSPaths(contextPath, themeName, uiExperienceCodeLower, dependantAddOns));
 		modelAndView.addObject("addOnJavaScriptPaths",
 				getAddOnJSPaths(contextPath, siteName, uiExperienceCodeLower, dependantAddOns));
+		
+		//added by wei.f.zhang
+		modelAndView.addObject("sitUid", siteName);
+		/////////////////////////////////////
 
 	}
 

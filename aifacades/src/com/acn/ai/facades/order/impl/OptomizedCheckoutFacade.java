@@ -37,6 +37,19 @@ public class OptomizedCheckoutFacade extends DefaultAcceleratorCheckoutFacade
 		return hasCheckoutCart() ? optimizeCartService.getSessionOptimizedCart() : null;
 	}
 
+	@Override
+	public CartData getCheckoutCart()
+	{
+		final OptimizedCartData cartData = getOptimizedCart();
+		if (cartData != null)
+		{
+			return this.optimizeCartConverter.convert(cartData);
+		}
+
+		throw new NullPointerException("Cart can not be null");
+	}
+
+
 	//TODO acn
 	@Override
 	public List<AddressData> getSupportedDeliveryAddresses(final boolean visibleAddressesOnly)
@@ -47,10 +60,9 @@ public class OptomizedCheckoutFacade extends DefaultAcceleratorCheckoutFacade
 	}
 
 	@Override
-	public boolean hasNoDeliveryAddress()
+	public boolean setDeliveryAddressIfAvailable()
 	{
-		final CartData cartData = getCheckoutCart();
-		return hasShippingItems() && (cartData == null || cartData.getDeliveryAddress() == null);
+		return false;
 	}
 
 	@Override
