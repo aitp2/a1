@@ -41,7 +41,7 @@
 		<ref bean="userMatchingFilter" />
 
 		<!-- Matching filters -->
-		<!-- <ref bean="cartMatchingFilter" /> -->
+		<ref bean="cartMatchingFilter" />
 		<ref bean="commerceWebServicesSessionAttributesFilterV2" />
 		
 		<ref bean="guestRoleFilterV2" />

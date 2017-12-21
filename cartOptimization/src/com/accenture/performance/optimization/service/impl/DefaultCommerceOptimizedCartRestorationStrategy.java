@@ -11,19 +11,13 @@
  */
 package com.accenture.performance.optimization.service.impl;
 
-import de.hybris.platform.commerceservices.i18n.CommerceCommonI18NService;
-import de.hybris.platform.commerceservices.order.CommerceAddToCartStrategy;
 import de.hybris.platform.commerceservices.order.CommerceCartModification;
 import de.hybris.platform.commerceservices.order.CommerceCartModificationException;
 import de.hybris.platform.commerceservices.order.CommerceCartRestoration;
 import de.hybris.platform.commerceservices.order.CommerceCartRestorationException;
 import de.hybris.platform.commerceservices.order.impl.DefaultCommerceCartRestorationStrategy;
 import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
-import de.hybris.platform.servicelayer.keygenerator.KeyGenerator;
-import de.hybris.platform.servicelayer.model.ModelService;
 import de.hybris.platform.servicelayer.session.SessionService;
-import de.hybris.platform.servicelayer.time.TimeService;
-import de.hybris.platform.site.BaseSiteService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,12 +25,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
 import com.accenture.performance.optimization.facades.data.OptimizedCartEntryData;
 import com.accenture.performance.optimization.service.OptimizeCartService;
-import com.accenture.performance.optimization.service.OptimizeCommerceCartService;
 import com.accenture.performance.optimization.service.OptimizeModelDealService;
 
 
@@ -47,23 +39,9 @@ public class DefaultCommerceOptimizedCartRestorationStrategy extends DefaultComm
 {
 	private static final Logger LOG = Logger.getLogger(DefaultCommerceOptimizedCartRestorationStrategy.class);
 
-	private static final int DEFAULT_CART_VALIDITY_PERIOD = 12960000;
-	private int cartValidityPeriod = DEFAULT_CART_VALIDITY_PERIOD;
-	//private CartFactory cartFactory;
-	private TimeService timeService;
-	private KeyGenerator guidKeyGenerator;
-	private BaseSiteService baseSiteService;
-	private CommerceCommonI18NService commerceCommonI18NService;
-	private CommerceAddToCartStrategy commerceAddToCartStrategy;
-
 	private SessionService sessionService;
-	@Autowired
-	private OptimizeCartFactory cartFactory;
 	private OptimizeModelDealService optimizeModelDealService;
-	private OptimizeCommerceCartService optimizeCommerceCartService;
-	private OptimizeCartService optimizeCartService;
-	private ModelService modelService;
-	public static final String SESSION_OPTIMIZED_CART_PARAMETER_NAME = "optimizedcart";
+	//private OptimizeCommerceCartService optimizeCommerceCartService;
 
 
 
@@ -95,17 +73,12 @@ public class DefaultCommerceOptimizedCartRestorationStrategy extends DefaultComm
 					//	}
 
 					//getModelService().save(cartModel);
-					try
-					{
-						optimizeCommerceCartService.calculateCart(parameter);
-					}
-					catch (final IllegalStateException ex)
-					{
-						LOG.error("Failed to recalculate order [" + cartModel.getCode() + "]", ex);
-					}
-
+					/*
+					 * try { optimizeCommerceCartService.calculateCart(parameter); } catch (final IllegalStateException ex) {
+					 * LOG.error("Failed to recalculate order [" + cartModel.getCode() + "]", ex); }
+					 */
 					//getCartService().setAttribute(cartModel);
-					getSessionService().setAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME, cartModel);
+					getOptimizeCartService().setSessionOptimizedCart(cartModel);
 
 					if (LOG.isDebugEnabled())
 					{
@@ -125,8 +98,9 @@ public class DefaultCommerceOptimizedCartRestorationStrategy extends DefaultComm
 				}
 				//getCommerceCommonI18NService().setCurrentCurrency(cartModel.get);
 				//getCommerceCartService().calculateCart(parameter);
-				optimizeCommerceCartService.calculateCart(parameter);
+				//optimizeCommerceCartService.calculateCart(parameter);
 				//getCommerceCartCalculationStrategy().calculateCart(parameter);
+				getOptimizeCartService().setSessionOptimizedCart(cartModel);
 			}
 			else
 			{
@@ -155,7 +129,7 @@ public class DefaultCommerceOptimizedCartRestorationStrategy extends DefaultComm
 			//newCartParameter.setUnit(get);
 			newCartParameter.setCreateNewEntry(false);
 
-			final CommerceCartModification modification = optimizeCartService.doAddToCart(newCartParameter);
+			final CommerceCartModification modification = getOptimizeCartService().doAddToCart(newCartParameter);
 			modifications.add(modification);
 		}
 	}
@@ -172,7 +146,7 @@ public class DefaultCommerceOptimizedCartRestorationStrategy extends DefaultComm
 	{
 		final List<CommerceCartModification> modifications = new ArrayList<>();
 		// final CartModel newCart = getCartFactory().createCart();
-		final OptimizedCartData newCartData = cartFactory.createSessionCart();
+		final OptimizedCartData newCartData = getCartFactory().createSessionCart();
 		LOG.info("===========user of new cart=========" + newCartData.getUserId());
 		LOG.info("===========user of parameter cart=========" + parameter.getOptimizeCart().getUserId());
 
@@ -181,138 +155,12 @@ public class DefaultCommerceOptimizedCartRestorationStrategy extends DefaultComm
 		rewriteEntriesFromCartToCart(parameter, parameter.getOptimizeCart(), newCartData, modifications);
 
 		newCartData.setCalculated(Boolean.FALSE);
-		getSessionService().setAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME, newCartData);
 		getOptimizeModelDealService().removeCurrentSessionCart(parameter.getOptimizeCart());
 		//}
 		return modifications;
 	}
 
 
-
-	/**
-	 * @return the cartValidityPeriod
-	 */
-	@Override
-	public int getCartValidityPeriod()
-	{
-		return cartValidityPeriod;
-	}
-
-
-	/**
-	 * @param cartValidityPeriod
-	 *           the cartValidityPeriod to set
-	 */
-	@Override
-	public void setCartValidityPeriod(final int cartValidityPeriod)
-	{
-		this.cartValidityPeriod = cartValidityPeriod;
-	}
-
-
-	/**
-	 * @return the timeService
-	 */
-	@Override
-	public TimeService getTimeService()
-	{
-		return timeService;
-	}
-
-
-	/**
-	 * @param timeService
-	 *           the timeService to set
-	 */
-	@Override
-	public void setTimeService(final TimeService timeService)
-	{
-		this.timeService = timeService;
-	}
-
-
-	/**
-	 * @return the guidKeyGenerator
-	 */
-	@Override
-	public KeyGenerator getGuidKeyGenerator()
-	{
-		return guidKeyGenerator;
-	}
-
-
-	/**
-	 * @param guidKeyGenerator
-	 *           the guidKeyGenerator to set
-	 */
-	@Override
-	public void setGuidKeyGenerator(final KeyGenerator guidKeyGenerator)
-	{
-		this.guidKeyGenerator = guidKeyGenerator;
-	}
-
-
-	/**
-	 * @return the baseSiteService
-	 */
-	@Override
-	public BaseSiteService getBaseSiteService()
-	{
-		return baseSiteService;
-	}
-
-
-	/**
-	 * @param baseSiteService
-	 *           the baseSiteService to set
-	 */
-	@Override
-	public void setBaseSiteService(final BaseSiteService baseSiteService)
-	{
-		this.baseSiteService = baseSiteService;
-	}
-
-
-	/**
-	 * @return the commerceCommonI18NService
-	 */
-	@Override
-	public CommerceCommonI18NService getCommerceCommonI18NService()
-	{
-		return commerceCommonI18NService;
-	}
-
-
-	/**
-	 * @param commerceCommonI18NService
-	 *           the commerceCommonI18NService to set
-	 */
-	@Override
-	public void setCommerceCommonI18NService(final CommerceCommonI18NService commerceCommonI18NService)
-	{
-		this.commerceCommonI18NService = commerceCommonI18NService;
-	}
-
-
-	/**
-	 * @return the commerceAddToCartStrategy
-	 */
-	@Override
-	public CommerceAddToCartStrategy getCommerceAddToCartStrategy()
-	{
-		return commerceAddToCartStrategy;
-	}
-
-
-	/**
-	 * @param commerceAddToCartStrategy
-	 *           the commerceAddToCartStrategy to set
-	 */
-	@Override
-	public void setCommerceAddToCartStrategy(final CommerceAddToCartStrategy commerceAddToCartStrategy)
-	{
-		this.commerceAddToCartStrategy = commerceAddToCartStrategy;
-	}
 
 	/**
 	 * @return the sessionService
@@ -331,24 +179,15 @@ public class DefaultCommerceOptimizedCartRestorationStrategy extends DefaultComm
 		this.sessionService = sessionService;
 	}
 
-
 	/**
 	 * @return the cartFactory
 	 */
 	@Override
 	public OptimizeCartFactory getCartFactory()
 	{
-		return cartFactory;
+		return (OptimizeCartFactory) super.getCartFactory();
 	}
 
-	/**
-	 * @param cartFactory
-	 *           the cartFactory to set
-	 */
-	public void setCartFactory(final OptimizeCartFactory cartFactory)
-	{
-		this.cartFactory = cartFactory;
-	}
 
 	/**
 	 * @return the optimizeModelDealService
@@ -367,58 +206,16 @@ public class DefaultCommerceOptimizedCartRestorationStrategy extends DefaultComm
 		this.optimizeModelDealService = optimizeModelDealService;
 	}
 
-	/**
-	 * @return the optimizeCommerceCartService
-	 */
-	public OptimizeCommerceCartService getOptimizeCommerceCartService()
-	{
-		return optimizeCommerceCartService;
-	}
 
-	/**
-	 * @param optimizeCommerceCartService
-	 *           the optimizeCommerceCartService to set
-	 */
-	public void setOptimizeCommerceCartService(final OptimizeCommerceCartService optimizeCommerceCartService)
-	{
-		this.optimizeCommerceCartService = optimizeCommerceCartService;
-	}
-
-	/**
-	 * @return the modelService
-	 */
-	@Override
-	public ModelService getModelService()
-	{
-		return modelService;
-	}
-
-	/**
-	 * @param modelService
-	 *           the modelService to set
-	 */
-	@Override
-	public void setModelService(final ModelService modelService)
-	{
-		this.modelService = modelService;
-	}
 
 	/**
 	 * @return the optimizeCartService
 	 */
 	public OptimizeCartService getOptimizeCartService()
 	{
-		return optimizeCartService;
+		return (OptimizeCartService) super.getCartService();
 	}
 
-	/**
-	 * @param optimizeCartService
-	 *           the optimizeCartService to set
-	 */
-	public void setOptimizeCartService(final OptimizeCartService optimizeCartService)
-	{
-		this.optimizeCartService = optimizeCartService;
-	}
 
 
 

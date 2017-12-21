@@ -27,12 +27,6 @@ import de.hybris.platform.site.BaseSiteService;
 import de.hybris.platform.store.BaseStoreModel;
 import de.hybris.platform.store.services.BaseStoreService;
 import de.hybris.platform.webservicescommons.util.YSanitizer;
-import org.training.constants.YcommercewebservicesConstants;
-import org.training.context.ContextInformationLoader;
-import org.training.exceptions.InvalidResourceException;
-import org.training.exceptions.RecalculationException;
-import org.training.exceptions.UnsupportedCurrencyException;
-import org.training.exceptions.UnsupportedLanguageException;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -44,6 +38,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
+import org.training.constants.YcommercewebservicesConstants;
+import org.training.context.ContextInformationLoader;
+import org.training.exceptions.InvalidResourceException;
+import org.training.exceptions.RecalculationException;
+import org.training.exceptions.UnsupportedCurrencyException;
+import org.training.exceptions.UnsupportedLanguageException;
 
 
 /**
@@ -130,8 +130,8 @@ public class DefaultContextInformationLoader implements ContextInformationLoader
 	}
 
 	@Override
-	public CurrencyModel setCurrencyFromRequest(final HttpServletRequest request) throws UnsupportedCurrencyException,
-			RecalculationException
+	public CurrencyModel setCurrencyFromRequest(final HttpServletRequest request)
+			throws UnsupportedCurrencyException, RecalculationException
 	{
 		final String currencyString = request.getParameter(YcommercewebservicesConstants.HTTP_REQUEST_PARAM_CURRENCY);
 		CurrencyModel currencyToSet = null;
@@ -173,7 +173,7 @@ public class DefaultContextInformationLoader implements ContextInformationLoader
 		if (currencyToSet != null && !currencyToSet.equals(getCommerceCommonI18NService().getCurrentCurrency()))
 		{
 			getCommerceCommonI18NService().setCurrentCurrency(currencyToSet);
-			recalculateCart(currencyString);
+			//recalculateCart(currencyString);
 			if (LOG.isDebugEnabled())
 			{
 				LOG.debug(currencyToSet + " set as current currency");
@@ -211,8 +211,8 @@ public class DefaultContextInformationLoader implements ContextInformationLoader
 	 * <i>/rest/v1/mysite/customers/current</i><br>
 	 * would try to set base site with uid=mysite as a current site.<br>
 	 *
-	 * One should define the path which is expected to be before the site resource in the project properties file
-	 * (<b>commercewebservices.rootcontext</b>).<br>
+	 * One should define the path which is expected to be before the site resource in the project properties file (
+	 * <b>commercewebservices.rootcontext</b>).<br>
 	 * Default and fallback value equals to <i>/rest/v1/</i><br>
 	 *
 	 * Method uses also a comma separated list of url special characters that are used to parse the site id resource. You

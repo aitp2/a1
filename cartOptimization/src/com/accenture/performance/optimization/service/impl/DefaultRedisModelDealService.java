@@ -11,6 +11,8 @@
  */
 package com.accenture.performance.optimization.service.impl;
 
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -45,6 +47,18 @@ public class DefaultRedisModelDealService extends DefatulOptimizeModelDealServic
 	}
 
 	@Override
+	public OptimizedCartData getSessionCart(final String cartGuid)
+	{
+
+		final Object obj = this.getRedisTemplate().opsForValue().get(cartGuid);
+		if (obj != null)
+		{
+			return (OptimizedCartData) obj;
+		}
+		return null;
+	}
+
+	@Override
 	protected OptimizedCartData recoverCart(final OptimizedCartModel cartModel)
 	{
 		final Object obj = this.getRedisTemplate().opsForValue().get(cartModel.getGuid());
@@ -62,6 +76,9 @@ public class DefaultRedisModelDealService extends DefatulOptimizeModelDealServic
 			cart.setBaseStore(cartModel.getStore().getUid());
 			cart.setGuid(cartModel.getGuid());
 			cart.setCurrencyCode(cartModel.getCurrencyCode());
+			cart.setEntries(new ArrayList<>());
+			cart.setSubtotal(new Double(0));
+			this.getRedisTemplate().opsForValue().set(cart.getGuid(), cart);
 			return cart;
 		}
 	}

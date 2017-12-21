@@ -13,6 +13,7 @@ package com.accenture.performance.optimization.service.impl;
 
 import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParameterNotNull;
 
+import de.hybris.platform.basecommerce.model.site.BaseSiteModel;
 import de.hybris.platform.catalog.CatalogVersionService;
 import de.hybris.platform.commercefacades.order.data.AddToCartParams;
 import de.hybris.platform.commerceservices.constants.CommerceServicesConstants;
@@ -179,18 +180,18 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 
 	protected OptimizedCartData internalGetSessionOptimizedCart()
 	{
-
-		final OptimizedCartData cart = getSessionService().getOrLoadAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME,
-				new SessionAttributeLoader<OptimizedCartData>()
+		final String cartId = getSessionService().getOrLoadAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME,
+				new SessionAttributeLoader<String>()
 				{
 					@Override
-					public OptimizedCartData load()
+					public String load()
 					{
 						final OptimizedCartData cartData = cartFactory.createSessionCart();
-						return cartData;
+						return cartData.getGuid();
 					}
 				});
-		return cart;
+
+		return optimizeModelDealService.getSessionCart(cartId);
 	}
 
 	@Override
@@ -220,15 +221,18 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 		{
 			final OptimizedCartData sessionCart = getSessionOptimizedCart();
 			sessionCart.setUserId(user.getUid());
-			setSessionCartData(sessionCart);
+			optimizeModelDealService.removePersistentCart(sessionCart.getGuid(), user.getUid());
+			setSessionOptimizedCart(sessionCart);
 		}
 	}
 
 
+
 	@Override
-	public void setSessionCartData(final OptimizedCartData cartData)
+	public void setSessionOptimizedCart(final OptimizedCartData cartData)
 	{
-		getSessionService().setAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME, cartData);
+		getSessionService().setAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME, cartData.getGuid());
+		optimizeModelDealService.persistCart(cartData);
 	}
 
 	@Override
@@ -236,10 +240,9 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 	{
 
 		final CommerceCartParameter cartParameterData = beforeAddToCart(parameter);
-		//final OptimizedCartData cartData1 = getSessionService().getAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME);
 
 		final CommerceCartModification modification = doAddToCart(cartParameterData);
-		final OptimizedCartData cartData = getSessionService().getAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME);
+		final OptimizedCartData cartData = getSessionOptimizedCart();
 
 		try
 		{
@@ -291,7 +294,7 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 		{
 			// We are allowed to add items to the cart
 			final OptimizedCartEntryData entryData = addCartEntry(parameter, cartData, actualAllowedQuantityChange);
-			getSessionService().setAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME, cartData);
+			setSessionOptimizedCart(cartData);
 			final String statusCode = CommerceCartModificationStatus.SUCCESS;
 			//getStatusCodeAllowedQuantityChange(actualAllowedQuantityChange, maxOrderQuantity, quantityToAdd, cartLevelAfterQuantityChange);
 
@@ -502,7 +505,7 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 
 		final long newQuantity = parameters.getQuantity();
 		final long entryNumber = parameters.getEntryNumber();
-		final OptimizedCartData cartData = getSessionService().getAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME);
+		final OptimizedCartData cartData = getSessionOptimizedCart();
 		final OptimizedCartEntryData cartEntryData = cartData.getEntries().stream()
 				.filter(s -> s.getEntryNumber().equals(Integer.valueOf(String.valueOf(entryNumber)))).findFirst().get();
 		final String productCode = cartEntryData.getProductCode();
@@ -601,10 +604,23 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 	}
 
 	@Override
-	public OptimizedCartData getCartForGuidAndSiteAndUser(final String cartguid, final String currentBaseSite,
+	public OptimizedCartData getCartForGuidAndSiteAndUser(final String cartguid, final BaseSiteModel currentBaseSite,
 			final String currentUser)
 	{
 		return optimizeModelDealService.getCartDataForGuidAndSiteAndUser(cartguid, currentBaseSite, currentUser);
+	}
+
+	@Override
+	public void changeSessionCartCurrency(final CurrencyModel currency)
+	{
+		validateParameterNotNull(currency, "currency must not be null!");
+		if (hasSessionCart())
+		{
+			//final CartModel sessionCart = this.getSessionOptimizedCart();
+			//sessionCart.setCurrency(currency);
+			//getModelService().save(sessionCart);
+		}
+
 	}
 
 	/**

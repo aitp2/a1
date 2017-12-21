@@ -13,7 +13,6 @@ package org.training.auth;
 import de.hybris.platform.commerceservices.enums.CustomerType;
 import de.hybris.platform.core.model.user.CustomerModel;
 import de.hybris.platform.core.model.user.UserModel;
-import de.hybris.platform.order.CartService;
 import de.hybris.platform.servicelayer.user.UserService;
 
 import java.io.IOException;
@@ -33,6 +32,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.accenture.performance.optimization.service.OptimizeCartService;
+
 
 /**
  * This filter should be used after spring security filters and it is responsible for setting current authentication as
@@ -43,7 +44,7 @@ public class GuestRoleFilter extends OncePerRequestFilter
 {
 	private UserService userService;
 
-	private CartService cartService;
+	private OptimizeCartService cartService;
 
 	private AuthenticationEventPublisher authenticationEventPublisher;
 
@@ -57,7 +58,7 @@ public class GuestRoleFilter extends OncePerRequestFilter
 
 		if (userService.isAnonymousUser(userService.getCurrentUser()) && cartService.hasSessionCart())
 		{
-			final UserModel um = cartService.getSessionCart().getUser();
+			final UserModel um = userService.getUserForUID(getCartService().getSessionOptimizedCart().getUserId());
 			if (um != null && CustomerModel.class.isAssignableFrom(um.getClass()))
 			{
 				final CustomerModel cm = (CustomerModel) um;
@@ -142,13 +143,13 @@ public class GuestRoleFilter extends OncePerRequestFilter
 		this.userService = userService;
 	}
 
-	public CartService getCartService()
+	public OptimizeCartService getCartService()
 	{
 		return cartService;
 	}
 
 	@Required
-	public void setCartService(final CartService cartService)
+	public void setCartService(final OptimizeCartService cartService)
 	{
 		this.cartService = cartService;
 	}
