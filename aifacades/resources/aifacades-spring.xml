@@ -191,11 +191,12 @@
 
 	<bean id="genderData" class="com.acn.ai.facades.product.data.GenderData" scope="prototype"/>
 	
-	<alias name="optomizedCheckoutFacade" alias="acceleratorCheckoutFacade"/>
+	<!-- <alias name="optomizedCheckoutFacade" alias="acceleratorCheckoutFacade"/>
 	<bean id="optomizedCheckoutFacade" class="com.acn.ai.facades.order.impl.OptomizedCheckoutFacade" parent="defaultAcceleratorCheckoutFacade">
 	 <property name="optimizeCartService" ref="cartService" />
 	 <property name="optimizeCartConverter" ref="optimizeCartConverter" />
-	</bean>
+	 <property name="cartReverseConverter" ref="cartReverseConverter" />
+	</bean> -->
 	
 	<alias name="acnSessionOverrideCheckoutFlowFacade" alias="checkoutFlowFacade" />
 	<bean id="acnSessionOverrideCheckoutFlowFacade" class="com.acn.ai.facades.order.impl.ACNSessionOverrideCheckoutFlowFacade" parent="defaultCheckoutFlowFacade">

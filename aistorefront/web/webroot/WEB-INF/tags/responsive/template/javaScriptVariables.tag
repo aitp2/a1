@@ -9,6 +9,7 @@
 		<%-- Define a javascript variable to hold the content path --%>
 		var ACC = { config: {} };
 			ACC.config.siteId = "${sitUid}";
+			ACC.config.language = "${language}";
 			ACC.config.contextPath = "${contextPath}";
 			ACC.config.encodedContextPath = "${encodedContextPath}";
 			ACC.config.commonResourcePath = "${commonResourcePath}";

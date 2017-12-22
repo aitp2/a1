@@ -13,34 +13,6 @@ package com.accenture.performance.optimization.facades.impl;
 
 import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParameterNotNullStandardMessage;
 
-import de.hybris.platform.commercefacades.order.data.CCPaymentInfoData;
-import de.hybris.platform.commercefacades.order.data.CartData;
-import de.hybris.platform.commercefacades.order.data.OrderData;
-import de.hybris.platform.commercefacades.order.data.OrderEntryData;
-import de.hybris.platform.commercefacades.order.impl.DefaultCheckoutFacade;
-import de.hybris.platform.commercefacades.user.UserFacade;
-import de.hybris.platform.commercefacades.user.data.AddressData;
-import de.hybris.platform.commerceservices.delivery.DeliveryService;
-import de.hybris.platform.commerceservices.enums.SalesApplication;
-import de.hybris.platform.commerceservices.service.data.CommerceCheckoutParameter;
-import de.hybris.platform.core.model.c2l.CountryModel;
-import de.hybris.platform.core.model.order.AbstractOrderEntryModel;
-import de.hybris.platform.core.model.order.CartModel;
-import de.hybris.platform.core.model.order.OrderModel;
-import de.hybris.platform.core.model.order.delivery.DeliveryModeModel;
-import de.hybris.platform.core.model.order.payment.CreditCardPaymentInfoModel;
-import de.hybris.platform.core.model.user.AddressModel;
-import de.hybris.platform.core.model.user.CustomerModel;
-import de.hybris.platform.order.InvalidCartException;
-import de.hybris.platform.order.exceptions.CalculationException;
-import de.hybris.platform.payment.dto.BillingInfo;
-import de.hybris.platform.payment.dto.CardInfo;
-import de.hybris.platform.payment.dto.CardType;
-import de.hybris.platform.servicelayer.dto.converter.Converter;
-import de.hybris.platform.servicelayer.session.SessionService;
-import de.hybris.platform.servicelayer.user.UserService;
-import de.hybris.platform.site.BaseSiteService;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -56,17 +28,50 @@ import org.springframework.util.Assert;
 import com.accenture.performance.optimization.facades.OptimizeCheckoutFacade;
 import com.accenture.performance.optimization.facades.OptimizedCartFacade;
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
+import com.accenture.performance.optimization.facades.data.OptimizedCartEntryData;
 import com.accenture.performance.optimization.model.OptimizedCartModel;
 import com.accenture.performance.optimization.service.OptimizeCartService;
 import com.accenture.performance.optimization.service.OptimizeCommerceCartService;
 import com.accenture.performance.optimization.service.OptimizeCommerceCheckoutService;
 import com.accenture.performance.optimization.service.OptimizeModelDealService;
 
+import de.hybris.platform.acceleratorfacades.order.impl.DefaultAcceleratorCheckoutFacade;
+import de.hybris.platform.commercefacades.order.data.CCPaymentInfoData;
+import de.hybris.platform.commercefacades.order.data.CartData;
+import de.hybris.platform.commercefacades.order.data.DeliveryModeData;
+import de.hybris.platform.commercefacades.order.data.OrderData;
+import de.hybris.platform.commercefacades.order.data.OrderEntryData;
+import de.hybris.platform.commercefacades.order.data.ZoneDeliveryModeData;
+import de.hybris.platform.commercefacades.user.UserFacade;
+import de.hybris.platform.commercefacades.user.data.AddressData;
+import de.hybris.platform.commerceservices.delivery.DeliveryService;
+import de.hybris.platform.commerceservices.enums.SalesApplication;
+import de.hybris.platform.commerceservices.service.data.CommerceCheckoutParameter;
+import de.hybris.platform.core.model.c2l.CountryModel;
+import de.hybris.platform.core.model.order.AbstractOrderEntryModel;
+import de.hybris.platform.core.model.order.AbstractOrderModel;
+import de.hybris.platform.core.model.order.OrderModel;
+import de.hybris.platform.core.model.order.delivery.DeliveryModeModel;
+import de.hybris.platform.core.model.order.payment.CreditCardPaymentInfoModel;
+import de.hybris.platform.core.model.user.AddressModel;
+import de.hybris.platform.core.model.user.CustomerModel;
+import de.hybris.platform.deliveryzone.model.ZoneDeliveryModeModel;
+import de.hybris.platform.order.InvalidCartException;
+import de.hybris.platform.order.exceptions.CalculationException;
+import de.hybris.platform.payment.dto.BillingInfo;
+import de.hybris.platform.payment.dto.CardInfo;
+import de.hybris.platform.payment.dto.CardType;
+import de.hybris.platform.servicelayer.dto.converter.Converter;
+import de.hybris.platform.servicelayer.session.SessionService;
+import de.hybris.platform.servicelayer.user.UserService;
+import de.hybris.platform.site.BaseSiteService;
+import de.hybris.platform.storelocator.model.PointOfServiceModel;
+
 
 /**
  *
  */
-public class DefaultOptimizeCheckoutFacade extends DefaultCheckoutFacade implements OptimizeCheckoutFacade
+public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFacade implements OptimizeCheckoutFacade
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultOptimizeCheckoutFacade.class);
 	public static final String SESSION_OPTIMIZED_CART_PARAMETER_NAME = "optimizedcart";
@@ -105,6 +110,11 @@ public class DefaultOptimizeCheckoutFacade extends DefaultCheckoutFacade impleme
 	@Autowired
 	private UserService userService;
 
+	protected OptimizedCartData getOptimizedCart()
+	{
+		return hasCheckoutCart() ? optimizeCartService.getSessionOptimizedCart() : null;
+	}
+	
 	//TODO acn
 	@Override
 	public void prepareCartForCheckout()
@@ -112,6 +122,57 @@ public class DefaultOptimizeCheckoutFacade extends DefaultCheckoutFacade impleme
 		//
 	}
 	
+	//TODO acn
+	@Override
+	public List<? extends DeliveryModeData> getSupportedDeliveryModes() 
+	{
+		final List<DeliveryModeData> result = new ArrayList<DeliveryModeData>();
+		
+		final OptimizedCartData optimizedCartData = optimizeCartService.getSessionOptimizedCart();
+		OptimizedCartModel optimizedCartModel = cartReverseConverter.convert(optimizedCartData);
+		
+		if (optimizedCartModel != null)
+		{
+			AbstractOrderModel abstractOrder = new AbstractOrderModel();
+			abstractOrder.setEntries(createOrderEntriesFromOptimizedCart(optimizedCartData));
+			abstractOrder.setCurrency( getCommonI18NService().getCurrency(optimizedCartModel.getCurrencyCode()));
+			abstractOrder.setStore(optimizedCartModel.getStore());
+			abstractOrder.setDeliveryAddress(optimizedCartModel.getDeliveryAddress());
+			abstractOrder.setNet(optimizedCartModel.getNet());
+			
+			for (final DeliveryModeModel deliveryModeModel : getDeliveryService().getSupportedDeliveryModeListForOrder(abstractOrder))
+			{
+				result.add(convert(deliveryModeModel));
+			}
+		}
+		return result;
+	}
+	
+	protected List<AbstractOrderEntryModel> createOrderEntriesFromOptimizedCart(final OptimizedCartData optimizedCartData)
+	{
+		List<AbstractOrderEntryModel> orderEntryList = new ArrayList<>();
+		if(optimizedCartData.getEntries() != null)
+		{
+			for(OptimizedCartEntryData entry:optimizedCartData.getEntries())
+			{
+				AbstractOrderEntryModel orderEntryModel = new AbstractOrderEntryModel();
+				if( entry.getDeliveryPointOfService() != null)
+				{
+					orderEntryModel.setDeliveryPointOfService(new PointOfServiceModel());
+					orderEntryList.add(orderEntryModel);
+				}
+				
+			}
+		}
+		return orderEntryList;
+	}
+	
+	@Override
+	public boolean hasPickUpItems()
+	{
+		return hasItemsMatchingPredicateACN(e -> e.getDeliveryPointOfService() != null);
+	}
+
 	@Override
 	public boolean hasShippingItems()
 	{
@@ -144,6 +205,62 @@ public class DefaultOptimizeCheckoutFacade extends DefaultCheckoutFacade impleme
 		}
 		
 		throw new NullPointerException("Cart can not be null");
+	}
+	
+	// TODO acn
+	@Override
+	public boolean setDeliveryAddressIfAvailable() {
+		return false;
+	}
+		
+	// TODO acn
+	@Override
+	public List<AddressData> getSupportedDeliveryAddresses(final boolean visibleAddressesOnly) {
+		// super.getSupportedDeliveryAddresses(visibleAddressesOnly);
+		return Collections.emptyList();
+
+	}
+		
+	// TODO acn
+	@Override
+	public boolean setDeliveryModeIfAvailable() {
+		return false;
+	}
+		
+	// TODO acn
+	@Override
+	protected DeliveryModeData convert(final DeliveryModeModel deliveryModeModel) {
+		if (deliveryModeModel instanceof ZoneDeliveryModeModel) {
+			final ZoneDeliveryModeModel zoneDeliveryModeModel = (ZoneDeliveryModeModel) deliveryModeModel;
+			final CartData cart = getCheckoutCart();
+			if (cart != null) {
+				final ZoneDeliveryModeData zoneDeliveryModeData = getZoneDeliveryModeConverter()
+						.convert(zoneDeliveryModeModel);
+				// TODO calculate DeliveryCost
+				// final PriceValue deliveryCost =
+				// getDeliveryService().getDeliveryCostForDeliveryModeAndAbstractOrder(deliveryModeModel,
+				// cart);
+				// if (deliveryCost != null)
+				// {
+				// zoneDeliveryModeData.setDeliveryCost(getPriceDataFactory().create(PriceDataType.BUY,
+				// BigDecimal.valueOf(deliveryCost.getValue()), deliveryCost.getCurrencyIso()));
+				// }
+
+				return zoneDeliveryModeData;
+			}
+			return null;
+		}
+		return getDeliveryModeConverter().convert(deliveryModeModel);
+	}
+
+	@Override
+	public boolean hasValidCart() {
+		final OptimizedCartData optimizeCartData = getOptimizedCart();
+		if (optimizeCartData == null) {
+			return false;
+		} else {
+			return optimizeCartData.getEntries() != null && !optimizeCartData.getEntries().isEmpty();
+		}
 	}
 	
 	@Override

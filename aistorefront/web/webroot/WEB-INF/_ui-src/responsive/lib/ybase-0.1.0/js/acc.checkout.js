@@ -4,7 +4,7 @@ ACC.checkout = {
 		"bindCheckO",
 		"bindForms",
 		"bindSavedPayments",
-		"bindTT"
+		"bindAddressEntryButton"
 	],
 
 	addDeliveryAddress:function(result) {
@@ -43,7 +43,7 @@ ACC.checkout = {
 			},
 			success : function(data) {
 				console.log(data);
-				window.location = ACC.config.contextPath+'/checkout/multi/delivery-method/choose';
+				window.location = ACC.config.contextPath+'/'+ACC.config.siteId+'/'+ACC.config.language+'/checkout/multi/delivery-method/choose';
 			}
 		};
 		
@@ -51,10 +51,9 @@ ACC.checkout = {
 	},
 
 	selectDeliveryAddress:function(result,dataSend){
-		console.log('select addres:'+dataSend.addressId)
 		var options = {
 				type : 'PUT',
-				url : "/cartOptimizationWebservice/v2/"+ACC.config.siteId+"/users/current/carts/"+result.cartUid+"/addresses/delivery?addressId="+dataSend.addressId,//TODO replace electronics
+				url : "/cartOptimizationWebservice/v2/"+ACC.config.siteId+"/users/current/carts/"+result.cartUid+"/addresses/delivery?addressId="+dataSend.addressId,
 				headers : {
 					Authorization : "Bearer " + result.token
 				},
@@ -65,7 +64,28 @@ ACC.checkout = {
 				},
 				success : function(data) {
 					console.log('data:'+data);
-					window.location = ACC.config.contextPath+'/checkout/multi/delivery-method/choose';
+					window.location = ACC.config.contextPath+'/'+ACC.config.siteId+'/'+ACC.config.language+'/checkout/multi/delivery-method/choose';
+				}
+			};
+			
+			$.ajax(options);
+	},
+	
+	selectDeliveryMethod:function(result,dataSend){
+		var options = {
+				type : 'PUT',
+				url : "/cartOptimizationWebservice/v2/"+ACC.config.siteId+"/users/current/carts/"+result.cartUid+"/deliverymode?deliveryModeId="+dataSend.deliveryModeCode,
+				headers : {
+					Authorization : "Bearer " + result.token
+				},
+				async : false,
+				error : function(request) {
+					console.log("something wrong for selectDeliveryAddress");
+					console.log(request);
+				},
+				success : function(data) {
+					console.log('data:'+data);
+					window.location = ACC.config.contextPath+'/'+ACC.config.siteId+'/'+ACC.config.language+'/checkout/multi/payment-method/add';
 				}
 			};
 			
@@ -93,12 +113,16 @@ ACC.checkout = {
 		
 		$(document).on("click","#deliveryMethodSubmit",function(e){
 			e.preventDefault();
-			$('#selectDeliveryMethodForm').submit();	
+			
+			var deliveryModeCode = $("select[name='delivery_method'] option:selected").val();
+			var data = {'deliveryModeCode':deliveryModeCode};
+				
+			ACC.checkout.sendRequest(ACC.checkout.selectDeliveryMethod,data);
 		})
 
 	},
 
-	bindTT:function(){
+	bindAddressEntryButton:function(){
 		$('.addressEntry button').click(function(){
 			var addressId = $(this).attr('attr-addressID');
 			var data = {'addressId':addressId};

@@ -58,8 +58,13 @@ public class OptimizedCartReversePopulator implements Populator<OptimizedCartDat
 		target.setTotalTax(source.getTotalTax());
 		target.setSubtotal(source.getSubtotal());
 		target.setDeliveryCost(source.getDeliveryCost());
-		target.setDeliveryMode(getDeliveryService().getDeliveryModeForCode(source.getDeliveryMode()));
+		target.setCurrencyCode(source.getCurrencyCode());
+		if(source.getDeliveryMode() != null)
+		{
+			target.setDeliveryMode(getDeliveryService().getDeliveryModeForCode(source.getDeliveryMode()));
+		}
 		target.setPaymentCost(source.getPaymentCost());
+		target.setNet(Boolean.valueOf(source.isNet()));
 
 
 		//		//	getModelService().removeAll(target.getEntries());
