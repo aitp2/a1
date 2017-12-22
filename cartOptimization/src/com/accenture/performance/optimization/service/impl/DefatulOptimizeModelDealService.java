@@ -11,12 +11,13 @@
  */
 package com.accenture.performance.optimization.service.impl;
 
+import de.hybris.platform.basecommerce.model.site.BaseSiteModel;
 import de.hybris.platform.catalog.model.CatalogUnawareMediaModel;
 import de.hybris.platform.commerceservices.customer.CustomerAccountService;
 import de.hybris.platform.commerceservices.delivery.DeliveryService;
 import de.hybris.platform.commerceservices.util.GuidKeyGenerator;
+
 import de.hybris.platform.core.PK;
-import de.hybris.platform.core.model.c2l.CurrencyModel;
 import de.hybris.platform.core.model.product.ProductModel;
 import de.hybris.platform.core.model.user.AddressModel;
 import de.hybris.platform.core.model.user.UserModel;
@@ -68,8 +69,8 @@ public class DefatulOptimizeModelDealService implements OptimizeModelDealService
 	protected static final String FIND_PRODUCT_BY_CODE = "SELECT {" + ProductModel.PK + "} FROM {" + ProductModel._TYPECODE
 			+ "}  WHERE 1=1 AND {" + ProductModel.CODE + "} = ?code  AND {" + ProductModel.CATALOGVERSION + "} = ?catalogVersion ";
 
-	protected final static String FIND_CART_FOR_USER_AND_SITE = SELECTCLAUSE + " AND {" + OptimizedCartModel.USERID + "} = ?user "
-			+ ORDERBYCLAUSE;
+	protected final static String FIND_CART_FOR_USER_AND_SITE = SELECTCLAUSE + " AND {" + OptimizedCartModel.USERID
+			+ "} = ?user AND {" + OptimizedCartModel.SITE + "}=?site " + ORDERBYCLAUSE;
 
 	protected final static String FIND_CART_BY_CODE = SELECTCLAUSE + " AND {" + OptimizedCartModel.CODE + "} = ?code ";
 
@@ -89,22 +90,35 @@ public class DefatulOptimizeModelDealService implements OptimizeModelDealService
 	private MediaService mediaService;
 
 	@Override
+	public OptimizedCartData createSessionCart()
+	{
+		final OptimizedCartModel cartModel = doCreationCart();
+		modelService.save(cartModel);
+		return recoverCart(cartModel);
+	}
+
+	protected OptimizedCartModel doCreationCart()
+	{
+		final OptimizedCartModel cartModel = (OptimizedCartModel) modelService.create(OptimizedCartModel.class);
+		cartModel.setCode(String.valueOf(keyGenerator.generate()));
+		//cartModel.setUserAccessToken(value);
+		cartModel.setUserId(getUserService().getCurrentUser().getUid());
+		cartModel.setCurrencyCode(commonI18NService.getCurrentCurrency().getIsocode());
+		//cartModel.setNet(Boolean.valueOf(getNetGrossStrategy().isNet()));
+		cartModel.setSite(getBaseSiteService().getCurrentBaseSite());
+		cartModel.setStore(getBaseStoreService().getCurrentBaseStore());
+		cartModel.setGuid(getGuidKeyGenerator().generate().toString());
+		return cartModel;
+	}
+
+	@Override
 	public OptimizedCartData restoreOrCreateCurrentCartData()
 	{
-		final UserModel user = this.getUserService().getCurrentUser();
-		final CurrencyModel currency = commonI18NService.getCurrentCurrency();
-		OptimizedCartModel cartModel = getRelatedCartModel(user.getUid());
+		final UserModel user = getUserService().getCurrentUser();
+		OptimizedCartModel cartModel = getRelatedCartModel(user.getUid(), baseSiteService.getCurrentBaseSite());
 		if (cartModel == null)
 		{
-			cartModel = (OptimizedCartModel) modelService.create("OptimizedCart");
-			cartModel.setCode(String.valueOf(keyGenerator.generate()));
-			//cartModel.setUserAccessToken(value);
-			cartModel.setUserId(user.getUid());
-			cartModel.setCurrencyCode(currency.getIsocode());
-			//cartModel.setNet(Boolean.valueOf(getNetGrossStrategy().isNet()));
-			cartModel.setSite(getBaseSiteService().getCurrentBaseSite());
-			cartModel.setStore(getBaseStoreService().getCurrentBaseStore());
-			cartModel.setGuid(getGuidKeyGenerator().generate().toString());
+			cartModel = doCreationCart();
 			modelService.save(cartModel);
 		}
 		return this.recoverCart(cartModel);
@@ -114,7 +128,7 @@ public class DefatulOptimizeModelDealService implements OptimizeModelDealService
 	{
 		if (cartData != null && cartData.getGuid() != null)
 		{
-			return this.getCartForGuidAndSiteAndUser(cartData.getGuid(), cartData.getBaseSite(), cartData.getUserId());
+			return this.getCartForGuidAndSiteAndUser(cartData.getGuid(), baseSiteService.getBaseSiteForUID(cartData.getBaseSite()), cartData.getUserId());
 		}
 		else
 		{
@@ -122,12 +136,13 @@ public class DefatulOptimizeModelDealService implements OptimizeModelDealService
 		}
 	}
 
-	protected OptimizedCartModel getRelatedCartModel(final String userid)
+	protected OptimizedCartModel getRelatedCartModel(final String userid, final BaseSiteModel site)
 	{
 		if (!StringUtils.isEmpty(userid))
 		{
 			final FlexibleSearchQuery fQuery = new FlexibleSearchQuery(FIND_CART_FOR_USER_AND_SITE);
 			fQuery.addQueryParameter("user", userid);
+			fQuery.addQueryParameter("site", site);
 			final SearchResult<OptimizedCartModel> optimizedCartModelSearchResult = flexibleSearchService.search(fQuery);
 			if (optimizedCartModelSearchResult.getResult() != null && !optimizedCartModelSearchResult.getResult().isEmpty())
 			{
@@ -352,16 +367,63 @@ public class DefatulOptimizeModelDealService implements OptimizeModelDealService
 	}
 
 	@Override
-	public OptimizedCartData getCartDataForGuidAndSiteAndUser(final String cartguid, final String currentBaseSite,
+	public OptimizedCartData getCartDataForGuidAndSiteAndUser(final String cartguid, final BaseSiteModel currentBaseSite,
 			final String currentUser)
 	{
 		final OptimizedCartModel model = getCartForGuidAndSiteAndUser(cartguid, currentBaseSite, currentUser);
+		if (model == null)
+		{
+			return null;
+		}
 		return this.recoverCart(model);
 	}
 
-	private OptimizedCartModel getCartForGuidAndSiteAndUser(final String cartguid, final String currentBaseSite,
+	@Override
+	public OptimizedCartData getCartDataForCodeAndSiteAndUser(final String cartCode, final BaseSiteModel currentBaseSite,
 			final String currentUser)
 	{
+		final OptimizedCartModel model = getCartForCodeAndSiteAndUser(cartCode, currentBaseSite, currentUser);
+		if (model == null)
+		{
+			return null;
+		}
+		return this.recoverCart(model);
+	}
+
+	private OptimizedCartModel getCartForCodeAndSiteAndUser(final String cartCode, final BaseSiteModel currentBaseSite,
+			final String currentUser)
+	{
+
+		if (StringUtils.isEmpty(cartCode))
+		{
+			return getRelatedCartModel(currentUser, currentBaseSite);
+		}
+
+		final FlexibleSearchQuery fQuery = new FlexibleSearchQuery(FIND_CART_BY_CODE);
+		fQuery.addQueryParameter("code", cartCode);
+
+		//fQuery.addQueryParameter("user", currentUser);
+		//fQuery.addQueryParameter("site", cartData.getBaseSite());
+
+		final SearchResult<OptimizedCartModel> optimizedCartModelSearchResult = flexibleSearchService.search(fQuery);
+		if (optimizedCartModelSearchResult.getResult() != null && !optimizedCartModelSearchResult.getResult().isEmpty())
+		{
+			return optimizedCartModelSearchResult.getResult().get(0);
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+
+	private OptimizedCartModel getCartForGuidAndSiteAndUser(final String cartguid, final BaseSiteModel currentBaseSite,
+			final String currentUser)
+	{
+		if (StringUtils.isEmpty(cartguid))
+		{
+			return getRelatedCartModel(currentUser, currentBaseSite);
+		}
 		final FlexibleSearchQuery fQuery = new FlexibleSearchQuery(FIND_CART_FOR_GUID_AND_USER_AND_SITE);
 		fQuery.addQueryParameter("guid", cartguid);
 		fQuery.addQueryParameter("user", currentUser);
@@ -391,6 +453,13 @@ public class DefatulOptimizeModelDealService implements OptimizeModelDealService
 	public void removeCurrentSessionCart(final OptimizedCartData cartData)
 	{
 		removePersistentCart(cartData.getGuid(), cartData.getUserId());
+	}
+
+	@Override
+	public OptimizedCartData getSessionCart(final String cartGuid)
+	{
+		//
+		return null;
 	}
 
 	/**

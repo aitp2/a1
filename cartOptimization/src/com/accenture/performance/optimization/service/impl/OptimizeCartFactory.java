@@ -28,7 +28,7 @@ public class OptimizeCartFactory extends CommerceCartFactory
 
 	public OptimizedCartData createSessionCart()
 	{
-		return getOptimizeModelDealService().restoreOrCreateCurrentCartData();
+		return optimizeModelDealService.createSessionCart();
 	}
 
 

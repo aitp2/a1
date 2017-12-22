@@ -23,7 +23,6 @@ import de.hybris.platform.commerceservices.order.CommerceCartModificationExcepti
 import de.hybris.platform.commerceservices.order.CommerceCartRestoration;
 import de.hybris.platform.commerceservices.order.CommerceCartRestorationException;
 import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
-import de.hybris.platform.converters.Converters;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
 
 import java.util.Collections;
@@ -158,9 +157,9 @@ public class DefaultOptimizeCartFacade extends DefaultCartFacade implements Opti
 	{
 		final BaseSiteModel currentBaseSite = getBaseSiteService().getCurrentBaseSite();
 		final OptimizedCartData fromCart = optimizeCartService.getCartForGuidAndSiteAndUser(fromAnonymousCartGuid,
-				currentBaseSite.getUid(), getUserService().getAnonymousUser().getUid());
+				currentBaseSite, getUserService().getAnonymousUser().getUid());
 
-		final OptimizedCartData toCart = optimizeCartService.getCartForGuidAndSiteAndUser(toUserCartGuid, currentBaseSite.getUid(),
+		final OptimizedCartData toCart = optimizeCartService.getCartForGuidAndSiteAndUser(toUserCartGuid, currentBaseSite,
 				getUserService().getCurrentUser().getUid());
 
 		if (toCart == null)
@@ -200,12 +199,17 @@ public class DefaultOptimizeCartFacade extends DefaultCartFacade implements Opti
 			getCartService().setSessionCart(null);
 		}
 
-		final CommerceCartParameter parameter = new CommerceCartParameter();
-		parameter.setEnableHooks(true);
-		final OptimizedCartData cartForGuidAndSiteAndUser = optimizeCartService.getSessionOptimizedCart();
-		parameter.setOptimizeCart(cartForGuidAndSiteAndUser);
+		final OptimizedCartData cartForGuidAndSiteAndUser = optimizeCartService.getCartForGuidAndSiteAndUser(guid,
+				getBaseSiteService().getCurrentBaseSite(), getUserService().getCurrentUser().getUid());
+		if (cartForGuidAndSiteAndUser != null)
+		{
+			final CommerceCartParameter parameter = new CommerceCartParameter();
+			parameter.setEnableHooks(true);
+			parameter.setOptimizeCart(cartForGuidAndSiteAndUser);
 
-		return getCartRestorationConverter().convert(getCommerceCartService().restoreCart(parameter));
+			return getCartRestorationConverter().convert(getCommerceCartService().restoreCart(parameter));
+		}
+		return null;
 	}
 
 	//TODO acn
@@ -215,7 +219,7 @@ public class DefaultOptimizeCartFacade extends DefaultCartFacade implements Opti
 		//super.validateCartData();
 		return Collections.emptyList();
 	}
-	
+
 	@Override
 	protected boolean hasEntryGroups()
 	{

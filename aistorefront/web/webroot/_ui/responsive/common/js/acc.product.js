@@ -1,7 +1,7 @@
 ACC.product = {
 
     _autoload: [
-        "bindToAddToCartForm",
+      
         "enableStorePickupButton",
         "enableVariantSelectors",
         "bindFacets"
@@ -41,6 +41,7 @@ ACC.product = {
                 $(this).removeAttr("disabled");
             }
         });
+        $("#addToCartButton").click(ACC.product.bindToAddToCartForm);
     },
 
     enableVariantSelectors: function () {
@@ -48,14 +49,49 @@ ACC.product = {
     },
 
     bindToAddToCartForm: function () {
-        var addToCartForm = $('.add_to_cart_form');
-        addToCartForm.ajaxForm({
-        	beforeSubmit:ACC.product.showRequest,
-        	success: ACC.product.displayAddToCartPopup
-         });    
+        //var addToCartForm = $('.add_to_cart_form');
+        ACC.product.showRequest;
+       var options = {
+			    type : 'GET',
+			    url : "/auth/getToken",
+			    dataType:"json",
+			    async:false,
+			    error : function(request) {
+			    },
+			    success : function(result) {
+			    	ACC.product.doAddToCart(result);
+			    }
+			  };
+			  $.ajax(options);
+        
+        
+        //addToCartForm.ajaxForm({
+        //	beforeSubmit:,
+        //	success: ACC.product.displayAddToCartPopup
+        // });    
         setTimeout(function(){
         	$ajaxCallEvent  = true;
          }, 2000);
+     },
+     doAddToCart:function(result){
+    	 var options = {
+ 			    type : 'POST',
+ 			    url : "/cartOptimizationWebservice/v2/apparel-uk/users/current/carts/"+result.cartUid+"/entries",
+ 			   headers: {Authorization: "Bearer "+result.token },
+ 			   data:{
+ 				   "code":$(".add_to_cart_form input[name='productCodePost']").val(),
+ 				   "qty":$(".add_to_cart_form #qty").val(),
+ 				   "fields":"FULL"
+ 			   },
+ 			    dataType:"json",
+ 			    async:false,
+ 			    error : function(request) {
+ 			    },
+ 			    success : function(data) {
+ 			    	ACC.product.displayAddToCartPopup(data);
+ 			    }
+ 			  };
+ 			  $.ajax(options);
      },
      showRequest: function(arr, $form, options) {  
     	 if($ajaxCallEvent)
@@ -76,27 +112,40 @@ ACC.product = {
         $('.js-pickup-in-store-button').removeAttr("disabled");
     },
 
-    displayAddToCartPopup: function (cartResult, statusText, xhr, formElement) {
+    displayAddToCartPopup: function (cartResult) {
     	$ajaxCallEvent=true;
-        $('#addToCartLayer').remove();
+        //$('#addToCartLayer').remove();
         if (typeof ACC.minicart.updateMiniCartDisplay == 'function') {
             ACC.minicart.updateMiniCartDisplay();
         }
+        var cartIcon = "";
+        var images = cartResult.entry.product.images;
+        for(var i in images){
+        	if(images[i].format=='cartIcon'){
+        		cartIcon = images[i].url;
+        		break;
+        	}
+        }
+        $("#addToCartLayerPop #addToCart_image").attr("href",cartResult.entry.product.url);
+        $("#addToCartLayerPop #addToCart_image img").attr("src",cartIcon);
+        $("#addToCartLayerPop #addToCart_product").attr("href",cartResult.entry.product.url);
+        $("#addToCartLayerPop #addToCart_product").html(cartResult.entry.product.name);
+        $("#addToCartLayerPop .qty span:eq(1)").html(cartResult.quantityAdded);
+        $("#addToCartLayerPop .price").html(cartResult.entry.basePrice.value);
+ 
         var titleHeader = $('#addToCartTitle').html();
-
         ACC.colorbox.open(titleHeader, {
-            html: cartResult.addToCartLayer,
+            html: $("#addToCartLayerPop").html(),
             width: "460px"
         });
-
-        var productCode = $('[name=productCodePost]', formElement).val();
-        var quantityField = $('[name=qty]', formElement).val();
+        /* remove the addtocart track
+        var productCode = $(".add_to_cart_form input[name='productCodePost']").val();
+        var quantityField = $(".add_to_cart_form #qty").val();
 
         var quantity = 1;
         if (quantityField != undefined) {
             quantity = quantityField;
         }
-
         var cartAnalyticsData = cartResult.cartAnalyticsData;
 
         var cartData = {
@@ -106,6 +155,7 @@ ACC.product = {
             "productName": cartAnalyticsData.productName
         };
         ACC.track.trackAddToCart(productCode, quantity, cartData);
+        */
     }
 };
 

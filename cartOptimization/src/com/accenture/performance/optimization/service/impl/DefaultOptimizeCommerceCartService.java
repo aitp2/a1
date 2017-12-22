@@ -11,6 +11,9 @@
  */
 package com.accenture.performance.optimization.service.impl;
 
+import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParameterNotNull;
+
+import de.hybris.platform.commerceservices.order.CommerceCartModification;
 import de.hybris.platform.commerceservices.order.CommerceCartRestoration;
 import de.hybris.platform.commerceservices.order.CommerceCartRestorationException;
 import de.hybris.platform.commerceservices.order.impl.DefaultCommerceCartService;
@@ -43,8 +46,6 @@ public class DefaultOptimizeCommerceCartService extends DefaultCommerceCartServi
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultOptimizeCommerceCartService.class);
 
-	public static final String SESSION_CART_PARAMETER_NAME = "cart";
-	public static final String SESSION_OPTIMIZED_CART_PARAMETER_NAME = "optimizedcart";
 	protected static final int APPEND_AS_LAST = -1;
 	@Autowired
 	private CalculationService calculationService;
@@ -83,6 +84,13 @@ public class DefaultOptimizeCommerceCartService extends DefaultCommerceCartServi
 
 
 	@Override
+	public void recalculateCart(final CommerceCartParameter parameters)
+	{
+		validateParameterNotNull(parameters.getOptimizeCart(), "Cart model cannot be null");
+		calculateCart(parameters.getOptimizeCart(), true);
+	}
+
+	@Override
 	public boolean calculateCart(final OptimizedCartData optimizedCartData, final boolean enableHook)
 	{
 
@@ -115,8 +123,7 @@ public class DefaultOptimizeCommerceCartService extends DefaultCommerceCartServi
 		//	getExternalTaxesService().calculateExternalTaxes(cartModel);
 		//}
 		LOG.info("Calculated Cart Success. Total Price is ......" + optimizedCartData.getTotalPrice());
-
-		getSessionService().setAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME, optimizedCartData);
+		getOptimizeCartService().setSessionOptimizedCart(optimizedCartData);
 		return recalculated;
 	}
 
@@ -259,6 +266,34 @@ public class DefaultOptimizeCommerceCartService extends DefaultCommerceCartServi
 	}
 
 
+	@Override
+	public CommerceCartRestoration restoreCart(final CommerceCartParameter parameters) throws CommerceCartRestorationException
+	{
+		final OptimizedCartData cartModel = parameters.getOptimizeCart();
+		final CommerceCartRestoration restoration = new CommerceCartRestoration();
+		final List<CommerceCartModification> modifications = new ArrayList<>();
+		if (cartModel != null)
+		{
+			if (getBaseSiteService().getCurrentBaseSite().getUid().equals(cartModel.getBaseSite()))
+			{
+				if (LOG.isDebugEnabled())
+				{
+					LOG.debug("Restoring from cart " + cartModel.getCode() + ".");
+				}
+
+				getOptimizeCartService().setSessionOptimizedCart(cartModel);
+			}
+			else
+			{
+				LOG.warn(String.format("Current Site %s does not equal to cart %s Site %s", getBaseSiteService().getCurrentBaseSite(),
+						cartModel, cartModel.getBaseSite()));
+			}
+		}
+		restoration.setModifications(modifications);
+		return restoration;
+	}
+
+
 
 	/**
 	 * @return the calculationService
@@ -277,15 +312,6 @@ public class DefaultOptimizeCommerceCartService extends DefaultCommerceCartServi
 	{
 		this.calculationService = calculationService;
 	}
-
-	@Override
-	public CommerceCartRestoration restoreCart(final CommerceCartParameter parameters) throws CommerceCartRestorationException
-	{
-		return getCommerceCartRestorationStrategy().restoreCart(parameters);
-	}
-
-
-
 
 	/**
 	 * @return the commonI18NService

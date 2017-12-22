@@ -164,11 +164,14 @@ public abstract class AbstractOptomizedCartPopulator<SOURCE extends OptimizedCar
 
 		prototype.setStore(source.getBaseStore());
 
-		prototype.setTotalItems(calcTotalItems(source));
 		//prototype.setNet(Boolean.TRUE.equals(source.getNet()));
 		prototype.setGuid(source.getGuid());
 		prototype.setCalculated(Boolean.TRUE.equals(source.getCalculated()));
-		prototype.setTotalUnitCount(calcTotalUnitCount(source));
+		if (!CollectionUtils.isEmpty(source.getEntries()))
+		{
+			prototype.setTotalItems(calcTotalItems(source));
+			prototype.setTotalUnitCount(calcTotalUnitCount(source));
+		}
 	}
 
 	protected Integer calcTotalItems(final OptimizedCartData source)

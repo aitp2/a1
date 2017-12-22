@@ -43,8 +43,8 @@ import de.hybris.platform.commercefacades.order.data.OrderData;
 import de.hybris.platform.commercefacades.order.data.OrderEntryData;
 import de.hybris.platform.commercefacades.order.data.ZoneDeliveryModeData;
 import de.hybris.platform.commercefacades.user.UserFacade;
+import de.hybris.platform.commercefacades.order.impl.DefaultCheckoutFacade;
 import de.hybris.platform.commercefacades.user.data.AddressData;
-import de.hybris.platform.commerceservices.delivery.DeliveryService;
 import de.hybris.platform.commerceservices.enums.SalesApplication;
 import de.hybris.platform.commerceservices.service.data.CommerceCheckoutParameter;
 import de.hybris.platform.core.model.c2l.CountryModel;
@@ -63,7 +63,6 @@ import de.hybris.platform.payment.dto.CardInfo;
 import de.hybris.platform.payment.dto.CardType;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
 import de.hybris.platform.servicelayer.session.SessionService;
-import de.hybris.platform.servicelayer.user.UserService;
 import de.hybris.platform.site.BaseSiteService;
 import de.hybris.platform.storelocator.model.PointOfServiceModel;
 
@@ -74,7 +73,6 @@ import de.hybris.platform.storelocator.model.PointOfServiceModel;
 public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFacade implements OptimizeCheckoutFacade
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultOptimizeCheckoutFacade.class);
-	public static final String SESSION_OPTIMIZED_CART_PARAMETER_NAME = "optimizedcart";
 	private SessionService sessionService;
 
 	@Autowired
@@ -89,26 +87,15 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 	private OptimizeCartService optimizeCartService;
 
 	@Autowired
-	private OptimizedCartFacade optimizedCartFacade;
-	@Autowired
 	private Converter<AddressModel, AddressData> addressConverter;
 	@Autowired
 	private Converter<OptimizedCartData, OptimizedCartModel> cartReverseConverter;
-	
+
 	@Autowired
 	private Converter<OptimizedCartData, CartData> optimizeCartConverter;
 
 	@Autowired
-	private UserFacade userFacade;
-
-	@Autowired
 	private BaseSiteService baseSiteService;
-
-	@Autowired
-	private DeliveryService deliveryService;
-
-	@Autowired
-	private UserService userService;
 
 	protected OptimizedCartData getOptimizedCart()
 	{
@@ -178,10 +165,10 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 	{
 		return hasItemsMatchingPredicateACN(e -> e.getDeliveryPointOfService() == null);
 	}
-	
+
 	protected boolean hasItemsMatchingPredicateACN(final Predicate<OrderEntryData> predicate)
 	{
-		final CartData cart = this.optimizeCartConverter.convert(this.optimizeCartService.getSessionOptimizedCart()) ;
+		final CartData cart = this.optimizeCartConverter.convert(this.optimizeCartService.getSessionOptimizedCart());
 		if (cart != null && CollectionUtils.isNotEmpty(cart.getEntries()))
 		{
 			for (final OrderEntryData entry : cart.getEntries())
@@ -194,7 +181,7 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 		}
 		return false;
 	}
-		
+
 	@Override
 	public CartData getCheckoutCart()
 	{
@@ -203,7 +190,7 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 		{
 			return this.optimizeCartConverter.convert(cartData);
 		}
-		
+
 		throw new NullPointerException("Cart can not be null");
 	}
 	
@@ -329,7 +316,6 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 		if (orderModel != null)
 		{
 			optimizeModelDealService.removeCurrentSessionCart(cartData);
-			getSessionService().removeAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME);
 		}
 	}
 
@@ -350,8 +336,7 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 			{
 				cartData.setDeliveryMode(deliveryModeModel.getCode());
 				cartData.setCalculated(Boolean.FALSE);
-				optimizeCartService.setSessionCartData(cartData);
-				optimizeModelDealService.persistCart(cartData);
+				optimizeCartService.setSessionOptimizedCart(cartData);
 				return true;
 			}
 		}
@@ -365,7 +350,7 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 	public boolean setDeliveryAddress(final AddressData addressData)
 	{
 
-		final OptimizedCartData cartData = optimizedCartFacade.getSessionCartData();
+		final OptimizedCartData cartData = getOptimizedCartFacade().getSessionCartData();
 		if (cartData != null)
 		{
 			AddressModel addressModel = null;
@@ -417,8 +402,7 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 		if (this.getOptimizeCartService().isValidDeliveryAddress(cartData, addressModel))
 		{
 			cartData.setDeliveryAddress(addressData);
-			optimizeCartService.setSessionCartData(cartData);
-			optimizeModelDealService.persistCart(cartData);
+			optimizeCartService.setSessionOptimizedCart(cartData);
 			return true;
 		}
 		return false;
@@ -458,7 +442,6 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 		{
 			if (cartdata.getEntries() != null)
 			{
-				optimizeCartService.setSessionCartData(cartdata);
 				try
 				{
 					optimizeCommerceCartService.calculateCart(cartdata, true);
@@ -476,7 +459,7 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 
 	public void validateCheckoutCartInfo(final String oldCartId, String evaluatedToMergeCartGuid) throws Exception
 	{
-		if (getUserFacade().isAnonymousUser())
+		if (getUserService().isAnonymousUser(getUserService().getCurrentUser()))
 		{
 			throw new Exception("Anonymous user is not allowed to copy cart!");
 		}
@@ -488,7 +471,7 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 
 		if (StringUtils.isEmpty(evaluatedToMergeCartGuid))
 		{
-			evaluatedToMergeCartGuid = optimizedCartFacade.getSessionCartData().getGuid();
+			evaluatedToMergeCartGuid = getOptimizedCartFacade().getSessionCartData().getGuid();
 		}
 		else
 		{
@@ -504,14 +487,14 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 	{
 
 		final OptimizedCartData cart = optimizeModelDealService.getCartDataForGuidAndSiteAndUser(toMergeCartGuid,
-				getBaseSiteService().getCurrentBaseSite().getUid(), getUserService().getCurrentUser().getUid());
+				getBaseSiteService().getCurrentBaseSite(), getUserService().getCurrentUser().getUid());
 		return cart != null;
 	}
 
 	protected boolean isCartAnonymous(final String cartGuid)
 	{
 		final OptimizedCartData cart = optimizeModelDealService.getCartDataForGuidAndSiteAndUser(cartGuid,
-				getBaseSiteService().getCurrentBaseSite().getUid(), getUserService().getAnonymousUser().getUid());
+				getBaseSiteService().getCurrentBaseSite(), getUserService().getAnonymousUser().getUid());
 		return cart != null;
 	}
 
@@ -567,7 +550,7 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 		final OptimizedCartData cartModel = optimizeCartService.getSessionOptimizedCart();
 		if (cartModel != null)
 		{
-			final CustomerModel customer = (CustomerModel) userService.getUserForUID(cartModel.getUserId());
+			final CustomerModel customer = (CustomerModel) getUserService().getUserForUID(cartModel.getUserId());
 
 			for (final AddressModel address : getSupportedDeliveryAddressesForOrder(customer, false))
 			{
@@ -589,7 +572,7 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 
 		if (!addresses.isEmpty())
 		{
-			final List<CountryModel> deliveryCountries = deliveryService.getDeliveryCountriesForOrder(null);
+			final List<CountryModel> deliveryCountries = getDeliveryService().getDeliveryCountriesForOrder(null);
 
 			final List<AddressModel> result = new ArrayList<AddressModel>();
 
@@ -686,17 +669,10 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 	 */
 	public OptimizedCartFacade getOptimizedCartFacade()
 	{
-		return optimizedCartFacade;
+		return (OptimizedCartFacade) super.getCartFacade();
 	}
 
-	/**
-	 * @param optimizedCartFacade
-	 *           the optimizedCartFacade to set
-	 */
-	public void setOptimizedCartFacade(final OptimizedCartFacade optimizedCartFacade)
-	{
-		this.optimizedCartFacade = optimizedCartFacade;
-	}
+
 
 	/**
 	 * @return the addressConverter
@@ -752,23 +728,6 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 	}
 
 	/**
-	 * @return the userFacade
-	 */
-	public UserFacade getUserFacade()
-	{
-		return userFacade;
-	}
-
-	/**
-	 * @param userFacade
-	 *           the userFacade to set
-	 */
-	public void setUserFacade(final UserFacade userFacade)
-	{
-		this.userFacade = userFacade;
-	}
-
-	/**
 	 * @return the baseSiteService
 	 */
 	public BaseSiteService getBaseSiteService()
@@ -784,43 +743,4 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 	{
 		this.baseSiteService = baseSiteService;
 	}
-
-	/**
-	 * @return the deliveryService
-	 */
-	@Override
-	public DeliveryService getDeliveryService()
-	{
-		return deliveryService;
-	}
-
-	/**
-	 * @param deliveryService
-	 *           the deliveryService to set
-	 */
-	@Override
-	public void setDeliveryService(final DeliveryService deliveryService)
-	{
-		this.deliveryService = deliveryService;
-	}
-
-	/**
-	 * @return the userService
-	 */
-	@Override
-	public UserService getUserService()
-	{
-		return userService;
-	}
-
-	/**
-	 * @param userService
-	 *           the userService to set
-	 */
-	@Override
-	public void setUserService(final UserService userService)
-	{
-		this.userService = userService;
-	}
-
 }

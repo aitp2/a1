@@ -64,7 +64,6 @@ import com.accenture.performance.optimization.facades.data.OptimizedCartData;
 import com.accenture.performance.optimization.facades.data.OptimizedCartEntryData;
 import com.accenture.performance.optimization.service.OptimizeCartService;
 import com.accenture.performance.optimization.service.OptimizeCommerceCheckoutService;
-import com.accenture.performance.optimization.service.OptimizeModelDealService;
 import com.accenture.performance.optimization.service.OptimizePromotionService;
 
 
@@ -93,7 +92,6 @@ public class DefaultOptimizeCommerceCheckoutService extends DefaultCommerceCheck
 	private UnitService unitService;
 	private KeyGenerator keyGenerator;
 	private ProductService productService;
-	private OptimizeModelDealService optimizeModelDealService;
 
 
 
@@ -351,8 +349,7 @@ public class DefaultOptimizeCommerceCheckoutService extends DefaultCommerceCheck
 		validateParameterNotNull(cartData, "Cart model cannot be null");
 		validateParameterNotNull(paymentInfoModel, "payment info model cannot be null");
 		cartData.setPaymentInfo(paymentInfoData);
-		getOptimizeCartService().setSessionCartData(cartData);
-		optimizeModelDealService.persistCart(cartData);
+		getOptimizeCartService().setSessionOptimizedCart(cartData);
 		return true;
 	}
 
@@ -693,25 +690,4 @@ public class DefaultOptimizeCommerceCheckoutService extends DefaultCommerceCheck
 	{
 		this.creditCardPaymentInfoConverter = creditCardPaymentInfoConverter;
 	}
-
-	/**
-	 * @return the optimizeModelDealService
-	 */
-	public OptimizeModelDealService getOptimizeModelDealService()
-	{
-		return optimizeModelDealService;
-	}
-
-	/**
-	 * @param optimizeModelDealService
-	 *           the optimizeModelDealService to set
-	 */
-	public void setOptimizeModelDealService(final OptimizeModelDealService optimizeModelDealService)
-	{
-		this.optimizeModelDealService = optimizeModelDealService;
-	}
-
-
-
-
 }

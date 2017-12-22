@@ -11,6 +11,7 @@
  */
 package com.accenture.performance.optimization.service;
 
+import de.hybris.platform.basecommerce.model.site.BaseSiteModel;
 import de.hybris.platform.commercefacades.order.data.AddToCartParams;
 import de.hybris.platform.commerceservices.order.CommerceCartModification;
 import de.hybris.platform.commerceservices.order.CommerceCartModificationException;
@@ -31,7 +32,7 @@ public interface OptimizeCartService extends CartService
 	@Override
 	public boolean hasSessionCart();
 
-	public void setSessionCartData(OptimizedCartData cartData);
+	public void setSessionOptimizedCart(OptimizedCartData cartData);
 
 	public CommerceCartModification addToCart(final AddToCartParams addToCartParams) throws CommerceCartModificationException;
 
@@ -40,7 +41,7 @@ public interface OptimizeCartService extends CartService
 
 	public boolean isValidDeliveryAddress(OptimizedCartData cartData, AddressModel addressModel);
 
-	public OptimizedCartData getCartForGuidAndSiteAndUser(String cartguid, String currentBaseSite, String currentUser);
+	public OptimizedCartData getCartForGuidAndSiteAndUser(String cartguid, BaseSiteModel baseSite, String currentUser);
 
 	public CommerceCartModification doAddToCart(final CommerceCartParameter parameter) throws CommerceCartModificationException;
 

@@ -135,9 +135,7 @@
 		<property name="sessionService" ref="sessionService" />
 		<property name="optimizeModelDealService" ref="optimizeModelDealService" />
 		<property name="optimizeCommerceCartService" ref="commerceCartService" />
-		<property name="optimizedCartFacade" ref="cartFacade" />
-		<property name="optimizeCartService" ref="cartService" />
-		<property name="userFacade" ref="userFacade" />
+		<property name="cartFacade" ref="cartFacade" />
 		<property name="baseSiteService" ref="baseSiteService" />
 		<property name="addressConverter" ref="addressConverter" />
 		<property name="cartReverseConverter" ref="cartReverseConverter" />
@@ -156,7 +154,6 @@
 		<property name="unitService" ref="unitService" />
 		<property name="customerFacade" ref="customerFacade" />
 		<property name="creditCardPaymentInfoConverter" ref="creditCardPaymentInfoConverter" />
-		<property name="optimizeModelDealService" ref="optimizeModelDealService" />
 		<property name="optimizeCartService" ref="cartService" />
 	</bean>
 
@@ -429,19 +426,19 @@
 	<bean id="defaultOptimizationCustomerShipToDataPopulator"
 	      class="com.accenture.performance.optimization.payment.converters.populators.DefaultOptimizationCustomerShipToDataPopulator"
 	      parent="abstractResultPopulator"/>
+	      
+	  <alias name="optimizationCartLoaderStrategy" alias="cartLoaderStrategy"/>
+	  <bean id="optimizationCartLoaderStrategy" class="com.accenture.performance.optimization.strategies.impl.DefaultOptimizationCartLoaderStrategy" parent="defaultCartLoaderStrategy">
+	     <property name="optimizeModelDealService" ref="optimizeModelDealService"/>
+	     <property name="userService" ref="userService"/>
+	  </bean>
+>>>>>>> 5c36b4f345953145937faf5ac1cf0573dc592d84
   <!-- cart convert and pop end mingming.wang -->
-	<!-- <alias name="defaultCommerceOptimizedCartRestorationStrategy" alias="commerceCartRestorationStrategy"/> 
-		<bean id="defaultCommerceOptimizedCartRestorationStrategy" class="com.accenture.performance.optimization.service.impl.DefaultCommerceOptimizedCartRestorationStrategy" 
-		parent="defaultCommerceCartRestorationStrategy"> <property name="timeService" 
-		ref="timeService"/> <property name="baseSiteService" ref="baseSiteService"/> 
-		<property name="cartFactory" ref="cartFactory"/> <property name="commerceCommonI18NService" 
-		ref="commerceCommonI18NService"/> <property name="commerceAddToCartStrategy" 
-		ref="commerceAddToCartStrategy"/> <property name="guidKeyGenerator" ref="guidKeyGenerator"/> 
-		<property name="cartValidityPeriod" value="${commerceservices.cartValidityPeriod}" 
-		/> <property name="sessionService" ref="sessionService"/> <property name="cartFactory" 
-		ref="cartFactory"/>
-		<property name="optimizeCommerceCartService" ref="optimizeCommerceCartService"/> 
-		<property name="optimizeCartService" ref="optimizeCartService"/> <property 
-		name="modelService" ref="modelService"/> </bean> -->
-
+		<!-- <bean id="defaultCommerceOptimizedCartRestorationStrategy" class="com.accenture.performance.optimization.service.impl.DefaultCommerceOptimizedCartRestorationStrategy" parent="defaultCommerceSaveCartRestorationStrategy"> 
+		<property name="commerceAddToCartStrategy" ref="commerceAddToCartStrategy"/> 
+		<property name="cartFactory" ref="optimizeCartFactory"/> 
+		<property name="sessionService" ref="sessionService" />
+	 property name="optimizeCommerceCartService" ref="defaultOptimizeCommerceCartService"/> 
+		 </bean>
+-->
 </beans>
