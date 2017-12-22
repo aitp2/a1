@@ -432,7 +432,6 @@
 	     <property name="optimizeModelDealService" ref="optimizeModelDealService"/>
 	     <property name="userService" ref="userService"/>
 	  </bean>
->>>>>>> 5c36b4f345953145937faf5ac1cf0573dc592d84
   <!-- cart convert and pop end mingming.wang -->
 		<!-- <bean id="defaultCommerceOptimizedCartRestorationStrategy" class="com.accenture.performance.optimization.service.impl.DefaultCommerceOptimizedCartRestorationStrategy" parent="defaultCommerceSaveCartRestorationStrategy"> 
 		<property name="commerceAddToCartStrategy" ref="commerceAddToCartStrategy"/> 
