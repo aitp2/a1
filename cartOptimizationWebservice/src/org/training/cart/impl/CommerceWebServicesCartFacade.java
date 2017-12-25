@@ -10,7 +10,8 @@
  */
 package org.training.cart.impl;
 
-import de.hybris.platform.commercefacades.order.data.CartData;
+import com.accenture.performance.optimization.facades.impl.DefaultOptimizeCartFacade;
+
 import de.hybris.platform.commercefacades.order.impl.DefaultCartFacade;
 import de.hybris.platform.core.model.order.CartModel;
 
@@ -18,16 +19,8 @@ import de.hybris.platform.core.model.order.CartModel;
 /**
  * Extension of {@link DefaultCartFacade} for commercewebservices.
  */
-public class CommerceWebServicesCartFacade extends DefaultCartFacade
+public class CommerceWebServicesCartFacade extends DefaultOptimizeCartFacade
 {
-	@Override
-	public CartData getSessionCart()
-	{
-		final CartData cartData;
-		final CartModel cart = getCartService().getSessionCart();
-		cartData = getCartConverter().convert(cart);
-		return cartData;
-	}
 
 	/**
 	 * Checks if given card belongs to anonymous user.

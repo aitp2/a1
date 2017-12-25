@@ -11,6 +11,20 @@
  */
 package com.accenture.performance.optimization.service.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.accenture.performance.optimization.facades.data.OptimizedCartData;
+import com.accenture.performance.optimization.model.OptimizedCartModel;
+import com.accenture.performance.optimization.service.OptimizeModelDealService;
+
 import de.hybris.platform.basecommerce.model.site.BaseSiteModel;
 import de.hybris.platform.catalog.model.CatalogUnawareMediaModel;
 import de.hybris.platform.commerceservices.customer.CustomerAccountService;
@@ -29,26 +43,13 @@ import de.hybris.platform.servicelayer.model.ModelService;
 import de.hybris.platform.servicelayer.search.FlexibleSearchQuery;
 import de.hybris.platform.servicelayer.search.FlexibleSearchService;
 import de.hybris.platform.servicelayer.search.SearchResult;
+import de.hybris.platform.servicelayer.session.SessionService;
 import de.hybris.platform.servicelayer.user.UserService;
 import de.hybris.platform.site.BaseSiteService;
 import de.hybris.platform.store.services.BaseStoreService;
 import de.hybris.platform.storelocator.pos.PointOfServiceService;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.List;
-
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.accenture.performance.optimization.facades.data.OptimizedCartData;
-import com.accenture.performance.optimization.model.OptimizedCartModel;
-import com.accenture.performance.optimization.service.OptimizeModelDealService;
-
 
 /**
  *
@@ -88,6 +89,7 @@ public class DefatulOptimizeModelDealService implements OptimizeModelDealService
 	private DeliveryService deliveryService;
 	private UnitService unitService;
 	private MediaService mediaService;
+	private SessionService sessionService;
 
 	@Override
 	public OptimizedCartData createSessionCart()
@@ -454,6 +456,7 @@ public class DefatulOptimizeModelDealService implements OptimizeModelDealService
 	public void removeCurrentSessionCart(final OptimizedCartData cartData)
 	{
 		removePersistentCart(cartData.getGuid(), cartData.getUserId());
+		getSessionService().removeAttribute(DefaultOptimizeCartService.SESSION_OPTIMIZED_CART_PARAMETER_NAME);
 	}
 
 	@Override
@@ -723,6 +726,20 @@ public class DefatulOptimizeModelDealService implements OptimizeModelDealService
 	public void setMediaService(final MediaService mediaService)
 	{
 		this.mediaService = mediaService;
+	}
+
+	/**
+	 * @return the sessionService
+	 */
+	public SessionService getSessionService() {
+		return sessionService;
+	}
+
+	/**
+	 * @param sessionService the sessionService to set
+	 */
+	public void setSessionService(SessionService sessionService) {
+		this.sessionService = sessionService;
 	}
 
 }

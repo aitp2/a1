@@ -11,14 +11,17 @@
  */
 package com.accenture.performance.optimization.facades.populators;
 
+import de.hybris.platform.commercefacades.order.data.DeliveryModeData;
 import de.hybris.platform.commercefacades.order.data.OrderEntryData;
 import de.hybris.platform.commercefacades.product.PriceDataFactory;
 import de.hybris.platform.commercefacades.product.data.PriceData;
 import de.hybris.platform.commercefacades.product.data.PriceDataType;
 import de.hybris.platform.commercefacades.product.data.ProductData;
+import de.hybris.platform.commerceservices.delivery.DeliveryService;
 import de.hybris.platform.converters.Populator;
 import de.hybris.platform.core.model.c2l.CurrencyModel;
 import de.hybris.platform.core.model.order.AbstractOrderEntryModel;
+import de.hybris.platform.core.model.order.delivery.DeliveryModeModel;
 import de.hybris.platform.core.model.product.ProductModel;
 import de.hybris.platform.product.ProductService;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
@@ -41,6 +44,9 @@ public class DefaultOptimizedCartEntryPopulator implements Populator<OptimizedCa
 	private PriceDataFactory priceDataFactory;
 	private CommonI18NService commonI18NService;
 	private ProductService productService;
+	
+	private DeliveryService deliveryService;
+	private Converter<DeliveryModeModel, DeliveryModeData> deliveryModeConverter;
 
 
 	@Override
@@ -52,22 +58,40 @@ public class DefaultOptimizedCartEntryPopulator implements Populator<OptimizedCa
 		addCommon(source, target);
 		addProduct(source, target);
 		addTotals(source, target);
-		//addDeliveryMode(source, target);
+		
+		addDeliveryMode(source, target);
 		//addConfigurations(source, target);
 		//addEntryGroups(source, target);
 		//addComments(source, target);
 	}
 
 
-	/*
-	 * protected void addDeliveryMode(final OptimizedCartEntryData orderEntry, final OrderEntryData entry) { if
-	 * (orderEntry.getDeliveryMode() != null) {
-	 * entry.setDeliveryMode(getDeliveryModeConverter().convert(orderEntry.getDeliveryMode())); }
-	 *
-	 * if (orderEntry.getDeliveryPointOfService() != null) {
-	 * entry.setDeliveryPointOfService(getPointOfServiceConverter().convert(orderEntry.getDeliveryPointOfService())); } }
-	 */
+	
+	protected void addDeliveryMode(final OptimizedCartEntryData orderEntry, final OrderEntryData entry) {
+		if (orderEntry.getDeliveryMode() != null) 
+		{
+			entry.setDeliveryMode(getDeliveryMode(orderEntry.getDeliveryMode()));
+		}
 
+		if (orderEntry.getDeliveryPointOfService() != null) 
+		{
+			entry.setDeliveryPointOfService(orderEntry.getDeliveryPointOfService());
+		}
+	}
+
+	private DeliveryModeData getDeliveryMode(final String deliveryModeCode) 
+	{
+		DeliveryModeModel model = deliveryService.getDeliveryModeForCode(deliveryModeCode);
+		if (model != null) 
+		{
+			return deliveryModeConverter.convert(model);
+		} 
+		else 
+		{
+			return null;
+		}
+	}
+	
 	protected void addCommon(final OptimizedCartEntryData orderEntry, final OrderEntryData entry)
 	{
 		entry.setEntryNumber(orderEntry.getEntryNumber());
@@ -194,6 +218,42 @@ public class DefaultOptimizedCartEntryPopulator implements Populator<OptimizedCa
 	public void setProductService(final ProductService productService)
 	{
 		this.productService = productService;
+	}
+
+
+
+	/**
+	 * @return the deliveryService
+	 */
+	public DeliveryService getDeliveryService() {
+		return deliveryService;
+	}
+
+
+
+	/**
+	 * @param deliveryService the deliveryService to set
+	 */
+	public void setDeliveryService(DeliveryService deliveryService) {
+		this.deliveryService = deliveryService;
+	}
+
+
+
+	/**
+	 * @return the deliveryModeConverter
+	 */
+	public Converter<DeliveryModeModel, DeliveryModeData> getDeliveryModeConverter() {
+		return deliveryModeConverter;
+	}
+
+
+
+	/**
+	 * @param deliveryModeConverter the deliveryModeConverter to set
+	 */
+	public void setDeliveryModeConverter(Converter<DeliveryModeModel, DeliveryModeData> deliveryModeConverter) {
+		this.deliveryModeConverter = deliveryModeConverter;
 	}
 
 }

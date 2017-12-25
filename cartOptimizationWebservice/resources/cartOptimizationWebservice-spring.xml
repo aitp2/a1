@@ -146,8 +146,9 @@
 	<bean id="defaultBaseStoreForSiteSelectorStrategy"
 			class="org.training.strategies.impl.DefaultBaseStoreForSiteSelectorStrategy"/>
 
-	<bean id="commerceWebServicesCartFacade2" class="org.training.cart.impl.CommerceWebServicesCartFacade"
-	      parent="defaultCartFacade">
+	<alias name="optimizationCommerceWebServicesCartFacade" alias="commerceWebServicesCartFacade2"/>
+	<bean id="optimizationCommerceWebServicesCartFacade" class="org.training.cart.impl.CommerceWebServicesCartFacade"
+	      parent="defaultOptimizeCartFacade">
 		<property name="cartConverter" ref="extendedCartConverter"/>
 		<property name="commerceCartService" ref="commerceWebServicesCartService"/>
 	</bean>

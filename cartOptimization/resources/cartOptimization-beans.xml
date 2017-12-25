@@ -40,7 +40,8 @@
         
 		<property name="totalDiscounts" type="java.lang.Double"/>
 		<property name="allPromotionResults" type="java.util.List&lt;com.accenture.performance.optimization.data.OptimizedPromotionResultData>"/>
-		 <property name="currencyCode" type="java.lang.String"/>
+		<property name="currencyCode" type="java.lang.String"/>
+		<property name="net" type="boolean"/>
 	 </bean>
 	 
 	 <bean class="com.accenture.performance.optimization.facades.data.OptimizedCartEntryData">

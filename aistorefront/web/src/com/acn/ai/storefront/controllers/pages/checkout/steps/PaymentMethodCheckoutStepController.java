@@ -397,7 +397,7 @@ public class PaymentMethodCheckoutStepController extends AbstractCheckoutStepCon
 			if (CYBERSOURCE_SOP_CARD_TYPES.containsKey(supportedCardType.getCode()))
 			{
 				sopCardTypes.add(
-						createCardTypeData(CYBERSOURCE_SOP_CARD_TYPES.get(supportedCardType.getCode()), supportedCardType.getName()));
+						createCardTypeData(supportedCardType.getCode(), supportedCardType.getName()));
 			}
 		}
 		return sopCardTypes;

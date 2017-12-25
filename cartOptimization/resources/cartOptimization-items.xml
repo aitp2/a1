@@ -133,7 +133,13 @@
                     <modifiers read="true" write="true" search="true" optional="true"/>
                     <persistence type="property"/>
                   </attribute>
-
+					
+				  <attribute autocreate="true" qualifier="net" type="java.lang.Boolean" generate="true">
+                    	<persistence type="property"/>
+                    	<modifiers read="true" write="true" search="true" optional="false"/>
+                    	<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+                  </attribute>
+                  
 	            </attributes>
 	        </itemtype>
 	        
