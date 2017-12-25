@@ -84,7 +84,7 @@ public class BaseCommerceController extends BaseController
 	@Resource(name = "orderStatusValueValidator")
 	private EnumValueValidator orderStatusValueValidator;
 
-	@Autowired
+	@Resource(name="defaultOptimizeCartFacade")
 	private DefaultOptimizeCartFacade optimizedCartFacade;
 	@Autowired
 	private DefaultOptimizeCheckoutFacade optimizedCheckoutFacade;

@@ -50,6 +50,7 @@ import de.hybris.platform.commerceservices.service.data.CommerceCheckoutParamete
 import de.hybris.platform.core.model.c2l.CountryModel;
 import de.hybris.platform.core.model.order.AbstractOrderEntryModel;
 import de.hybris.platform.core.model.order.AbstractOrderModel;
+import de.hybris.platform.core.model.order.CartModel;
 import de.hybris.platform.core.model.order.OrderModel;
 import de.hybris.platform.core.model.order.delivery.DeliveryModeModel;
 import de.hybris.platform.core.model.order.payment.CreditCardPaymentInfoModel;
@@ -61,6 +62,8 @@ import de.hybris.platform.order.exceptions.CalculationException;
 import de.hybris.platform.payment.dto.BillingInfo;
 import de.hybris.platform.payment.dto.CardInfo;
 import de.hybris.platform.payment.dto.CardType;
+import de.hybris.platform.payment.dto.TransactionStatus;
+import de.hybris.platform.payment.model.PaymentTransactionEntryModel;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
 import de.hybris.platform.servicelayer.session.SessionService;
 import de.hybris.platform.site.BaseSiteService;
@@ -202,12 +205,21 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 		return false;
 	}
 		
-	// TODO acn
 	@Override
 	public List<AddressData> getSupportedDeliveryAddresses(final boolean visibleAddressesOnly) {
-		// super.getSupportedDeliveryAddresses(visibleAddressesOnly);
-		return Collections.emptyList();
-
+		final OptimizedCartData pptimizedCartData = getOptimizedCart();
+		if(null == pptimizedCartData)
+		{
+			return Collections.emptyList();
+		}
+		else
+		{
+			//
+			CartModel cartModel = new CartModel();
+			cartModel.setUser(getUserService().getUserForUID(pptimizedCartData.getUserId()));
+			return getAddressConverter().convertAll(getDeliveryService().getSupportedDeliveryAddressesForOrder(cartModel, visibleAddressesOnly));
+		}
+		
 	}
 		
 	// TODO acn
@@ -242,6 +254,29 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 		return getDeliveryModeConverter().convert(deliveryModeModel);
 	}
 
+	//TODO acn
+	@Override
+	public boolean authorizePayment(final String securityCode)
+	{
+		return true;
+//		final CartModel cartModel = getCart();
+//		final CreditCardPaymentInfoModel creditCardPaymentInfoModel = cartModel == null ? null
+//				: (CreditCardPaymentInfoModel) cartModel.getPaymentInfo();
+//		if (checkIfCurrentUserIsTheCartUser() && creditCardPaymentInfoModel != null
+//				&& StringUtils.isNotBlank(creditCardPaymentInfoModel.getSubscriptionId()))
+//		{
+//			final CommerceCheckoutParameter parameter = createCommerceCheckoutParameter(cartModel, true);
+//			parameter.setSecurityCode(securityCode);
+//			parameter.setPaymentProvider(getPaymentProvider());
+//			final PaymentTransactionEntryModel paymentTransactionEntryModel = getCommerceCheckoutService()
+//					.authorizePayment(parameter);
+//
+//			return paymentTransactionEntryModel != null
+//					&& (TransactionStatus.ACCEPTED.name().equals(paymentTransactionEntryModel.getTransactionStatus())
+//							|| TransactionStatus.REVIEW.name().equals(paymentTransactionEntryModel.getTransactionStatus()));
+//		}
+//		return false;
+	}
 	@Override
 	public boolean hasValidCart() {
 		final OptimizedCartData optimizeCartData = getOptimizedCart();
@@ -318,6 +353,7 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 		if (orderModel != null)
 		{
 			optimizeModelDealService.removeCurrentSessionCart(cartData);
+			
 		}
 	}
 

@@ -153,8 +153,8 @@
 						<div id="savedpaymentsbody">
 							<c:forEach items="${paymentInfos}" var="paymentInfo" varStatus="status">
 								<div class="saved-payment-entry">
-									<form action="${request.contextPath}/checkout/multi/payment-method/choose" method="GET">
-										<input type="hidden" name="selectedPaymentMethodId" value="${fn:escapeXml(paymentInfo.id)}"/>
+									<%-- <form action="${request.contextPath}/checkout/multi/payment-method/choose" method="GET"> --%>
+										<%-- <input type="hidden" name="selectedPaymentMethodId" value="${fn:escapeXml(paymentInfo.id)}"/> --%>
 											<ul>
 												<strong>${fn:escapeXml(paymentInfo.billingAddress.firstName)}&nbsp; ${fn:escapeXml(paymentInfo.billingAddress.lastName)}</strong><br/>
 												${fn:escapeXml(paymentInfo.cardTypeData.name)}<br/>
@@ -164,8 +164,8 @@
 												${fn:escapeXml(paymentInfo.billingAddress.town)}&nbsp; ${fn:escapeXml(paymentInfo.billingAddress.region.isocodeShort)}<br/>
 												${fn:escapeXml(paymentInfo.billingAddress.postalCode)}&nbsp; ${fn:escapeXml(paymentInfo.billingAddress.country.isocode)}<br/>
 											</ul>
-											<button type="submit" class="btn btn-primary btn-block" tabindex="${(status.count * 2) - 1}"><spring:theme code="checkout.multi.paymentMethod.addPaymentDetails.useThesePaymentDetails"/></button>
-									</form>
+											<button type="button" attr-selectedPaymentMethodId="${fn:escapeXml(paymentInfo.id)}" class="btn btn-primary btn-block" tabindex="${(status.count * 2) - 1}"><spring:theme code="checkout.multi.paymentMethod.addPaymentDetails.useThesePaymentDetails"/></button>
+									<%-- </form> --%>
 								</div>
 							</c:forEach>
 						</div>

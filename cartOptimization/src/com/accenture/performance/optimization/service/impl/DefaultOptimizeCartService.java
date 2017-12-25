@@ -199,7 +199,7 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 	{
 		try
 		{
-			return getSessionService().getAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME) != null;
+			return getSessionService().getAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME) != null  && internalGetSessionOptimizedCart() != null;
 		}
 		catch (final JaloObjectNoLongerValidException ex)
 		{

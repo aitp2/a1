@@ -144,8 +144,9 @@ public class CartsController extends BaseCommerceController
 	@Resource(name = "voucherFacade")
 	private VoucherFacade voucherFacade;
 
-	@Autowired
+	@Resource(name="defaultOptimizeCartFacade")
 	private DefaultOptimizeCartFacade optimizedCartFacade;
+	
 	@Autowired
 	private DefaultOptimizeCheckoutFacade optimizeCheckoutFacade;
 

@@ -39,19 +39,18 @@
 		</div>
 		<div id="i18nAddressForm" class="i18nAddressForm">
 			<c:if test="${not empty country}">
-				<address:addressFormElements regions="${regions}"
-					country="${country}" />
+				<address:addressFormElements regions="${regions}" country="${country}"/>
 			</c:if>
 		</div>
 		<sec:authorize access="!hasAnyRole('ROLE_ANONYMOUS')">
 			<div class="checkbox">
 				<c:choose>
-					<c:when test="${showSaveToAddressBook}">
+					<%-- <c:when test="${showSaveToAddressBook}">
 						<formElement:formCheckbox idKey="saveAddressInMyAddressBook"
 							labelKey="checkout.summary.deliveryAddress.saveAddressInMyAddressBook"
 							path="saveInAddressBook" inputCSS="add-address-left-input"
 							labelCSS="add-address-left-label" mandatory="true" />
-					</c:when>
+					</c:when> --%>
 					<c:when test="${not addressBookEmpty && not isDefaultAddress}">
 						<ycommerce:testId code="editAddress_defaultAddress_box">
 							<formElement:formCheckbox idKey="defaultAddress"

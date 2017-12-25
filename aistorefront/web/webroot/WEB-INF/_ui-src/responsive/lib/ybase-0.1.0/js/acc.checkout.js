@@ -176,14 +176,18 @@ ACC.checkout = {
 		$('#placeOrder').click(function(){
 			var data = {};
 			
-			ACC.checkout.sendRequest(ACC.checkout.placeOrder,data);
+			if($('.place-order-form input[name="termsCheck"]').is(":checked")){
+				ACC.checkout.sendRequest(ACC.checkout.placeOrder,data);
+			}else{
+				//
+			}
 		});
 	},
 	
 	placeOrder:function(result,dataSend){
 		var options = {
 				type : 'POST',
-				url : "/cartOptimizationWebservice/v2/"+ACC.config.siteId+"/users/current/createOrders",
+				url : "/cartOptimizationWebservice/v2/"+ACC.config.siteId+"/users/current/orders",
 				
 				headers : {
 					Authorization : "Bearer " + result.token
@@ -202,7 +206,7 @@ ACC.checkout = {
 				success : function(data) {
 					console.log('data:'+data);
 					if(data.guestCustomer){
-						window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/orderConfirmation/'+guid;
+						window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/orderConfirmation/'+data.guid;
 					}else{
 						window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/orderConfirmation/'+data.code;
 					}

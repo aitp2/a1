@@ -47,7 +47,40 @@ ACC.silentorderpost = {
 		}
 	},
 
-	bindSubmitSilentOrderPostForm: function (result,dataSend)
+	bindSavedPaymentEntryButton:function(result,dataSend)
+	{
+		$(".saved-payment-entry button").click(function(){
+			console.log('cli')
+			var data={
+				'selectedpaymentmethodid':$(this).attr('attr-selectedpaymentmethodid')
+			};
+			
+			ACC.silentorderpost.sendRequest(ACC.silentorderpost.selectPayment,data);
+		});
+	},
+	
+	selectPayment:function(result,dataSend){
+		var options = {
+				type : 'PUT',
+				url : "/cartOptimizationWebservice/v2/"+ACC.config.siteId+"/users/current/carts/"+result.cartUid+"/paymentdetails?paymentDetailsId="+dataSend.selectedpaymentmethodid,
+				headers : {
+					Authorization : "Bearer " + result.token
+				},
+				async : false,
+				error : function(request) {
+					console.log("something wrong for selectDeliveryAddress");
+					console.log(request);
+				},
+				success : function(data) {
+					console.log('data:'+data);
+					window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/multi/summary/view';
+				}
+			};
+			
+			$.ajax(options);
+	},
+	
+	bindSubmitSilentOrderPostForm: function ()
 	{
 		$('.submit_silentOrderPostForm').click(function ()
 		{
@@ -57,7 +90,7 @@ ACC.silentorderpost = {
 			ACC.silentorderpost.enableAddressForm();
 			
 			var data = {};
-			ACC.checkout.sendRequest(ACC.silentorderpost.createPayment,data);
+			ACC.silentorderpost.sendRequest(ACC.silentorderpost.createPayment,data);
 			//$('#silentOrderPostForm').submit();
 		});
 	},
@@ -223,6 +256,7 @@ $(document).ready(function ()
 		bindUseDeliveryAddress()
 		bindSubmitSilentOrderPostForm();
 		bindCreditCardAddressForm();
+		bindSavedPaymentEntryButton();
 	}
 
 	// check the checkbox
