@@ -12,8 +12,12 @@
 package com.accenture.performance.optimization.service;
 
 import de.hybris.platform.basecommerce.model.site.BaseSiteModel;
+import de.hybris.platform.core.model.user.UserModel;
+
+import java.util.List;
 
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
+import com.accenture.performance.optimization.model.OptimizedCartModel;
 
 
 /**
@@ -39,4 +43,6 @@ public interface OptimizeModelDealService
 	public OptimizedCartData createSessionCart();
 
 	public OptimizedCartData getSessionCart(String cartGuid);
+
+	public List<OptimizedCartModel> getCartsDataForSiteAndUser(BaseSiteModel currentBaseSite, UserModel currentUser);
 }

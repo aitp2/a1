@@ -13,13 +13,18 @@ package com.accenture.performance.optimization.service;
 
 import de.hybris.platform.basecommerce.model.site.BaseSiteModel;
 import de.hybris.platform.commercefacades.order.data.AddToCartParams;
+import de.hybris.platform.commerceservices.order.CommerceCartMergingException;
 import de.hybris.platform.commerceservices.order.CommerceCartModification;
 import de.hybris.platform.commerceservices.order.CommerceCartModificationException;
 import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
 import de.hybris.platform.core.model.user.AddressModel;
+import de.hybris.platform.core.model.user.UserModel;
 import de.hybris.platform.order.CartService;
 
+import java.util.List;
+
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
+import com.accenture.performance.optimization.model.OptimizedCartModel;
 
 
 /**
@@ -48,5 +53,9 @@ public interface OptimizeCartService extends CartService
 	public int getCurrentCurrencyDigit();
 
 	public CommerceCartParameter validateCartParameter(final AddToCartParams parameters) throws CommerceCartModificationException;
+
+	public List<OptimizedCartModel> getCartsForSiteAndUser(BaseSiteModel currentBaseSite, UserModel currentUser);
+
+	public List<CommerceCartModification> addToCart(List<CommerceCartParameter> parameterList) throws CommerceCartMergingException;
 
 }
