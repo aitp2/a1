@@ -182,13 +182,14 @@
 	</bean>
 
 	<alias name="defaultOptimizedCartReversePopulator" alias="optimizedCartReversePopulator" />
-	<bean id="defaultOptimizedCartReversePopulator"
-		class="com.accenture.performance.optimization.facades.populators.OptimizedCartReversePopulator" >
+	<bean id="defaultOptimizedCartReversePopulator"	class="com.accenture.performance.optimization.facades.populators.OptimizedCartReversePopulator" >
 		<property name="baseSiteService" ref="baseSiteService" />
 		<property name="baseStoreService" ref="baseStoreService" />
 		<property name="modelService" ref="modelService" />
 		<property name="unitService" ref="unitService" />	
 		<property name="deliveryService" ref="deliveryService" />
+		<property name="customerAccountService" ref="customerAccountService" />
+		<property name="checkoutCustomerStrategy" ref="checkoutCustomerStrategy" />
 	</bean>
 
 	<bean id="cartReverseConverter" parent="abstractPopulatingConverter">
@@ -378,7 +379,11 @@
 	  <property name="optimizedCartEntryConverter" ref="optimizedCartEntryConverter"/>
 	</bean>
 	<alias name="defaultOptimizedCartPopulator" alias="optimizeCartPopulator"/>
-	<bean id="defaultOptimizedCartPopulator" class="com.accenture.performance.optimization.facades.populators.DefaultOptimizedCartPopulator" parent="abstractOptomizedCartPopulator"/>
+	<bean id="defaultOptimizedCartPopulator" class="com.accenture.performance.optimization.facades.populators.DefaultOptimizedCartPopulator" parent="abstractOptomizedCartPopulator">
+		<property name="deliveryService" ref="deliveryService" />
+		<property name="deliveryModeConverter" ref="deliveryModeConverter" />
+	</bean>
+	
 	<alias name="defaultOptimizedMiniCartPopulator" alias="optimizedMiniCartPopulator"/>
 	<bean id="defaultOptimizedMiniCartPopulator" class="com.accenture.performance.optimization.facades.populators.DefaultOptimizedMiniCartPopulator" parent="abstractOptomizedCartPopulator" />
      <bean id="optimizedCartEntryConverter" parent="abstractPopulatingConverter">
@@ -395,6 +400,8 @@
 	 <property name="priceDataFactory" ref="priceDataFactory" />
 	 <property name="commonI18NService" ref="commonI18NService" />
 	 <property name="productService" ref="productService" />
+	 <property name="deliveryService" ref="deliveryService" />
+	 <property name="deliveryModeConverter" ref="deliveryModeConverter" />
 	</bean>
 	<alias name="defaultOptinizedCartModification" alias="cartModificationPopulator"/>
 	<bean id="defaultOptinizedCartModification" class="com.accenture.performance.optimization.facades.populators.DefaultOptinizedCartModification" parent="defaultCartModificationPopulator">

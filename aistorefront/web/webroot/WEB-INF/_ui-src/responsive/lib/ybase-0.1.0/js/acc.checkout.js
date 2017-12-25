@@ -4,7 +4,8 @@ ACC.checkout = {
 		"bindCheckO",
 		"bindForms",
 		"bindSavedPayments",
-		"bindAddressEntryButton"
+		"bindAddressEntryButton",
+		"bindPlaceOrderACN"
 	],
 
 	addDeliveryAddress:function(result) {
@@ -43,7 +44,7 @@ ACC.checkout = {
 			},
 			success : function(data) {
 				console.log(data);
-				window.location = ACC.config.contextPath+'/'+ACC.config.siteId+'/'+ACC.config.language+'/checkout/multi/delivery-method/choose';
+				window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/multi/delivery-method/choose';
 			}
 		};
 		
@@ -64,7 +65,7 @@ ACC.checkout = {
 				},
 				success : function(data) {
 					console.log('data:'+data);
-					window.location = ACC.config.contextPath+'/'+ACC.config.siteId+'/'+ACC.config.language+'/checkout/multi/delivery-method/choose';
+					window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/multi/delivery-method/choose';
 				}
 			};
 			
@@ -85,7 +86,7 @@ ACC.checkout = {
 				},
 				success : function(data) {
 					console.log('data:'+data);
-					window.location = ACC.config.contextPath+'/'+ACC.config.siteId+'/'+ACC.config.language+'/checkout/multi/payment-method/add';
+					window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/multi/payment-method/add';
 				}
 			};
 			
@@ -170,6 +171,47 @@ ACC.checkout = {
 		})
 	},
 
+	bindPlaceOrderACN: function ()
+	{
+		$('#placeOrder').click(function(){
+			var data = {};
+			
+			ACC.checkout.sendRequest(ACC.checkout.placeOrder,data);
+		});
+	},
+	
+	placeOrder:function(result,dataSend){
+		var options = {
+				type : 'POST',
+				url : "/cartOptimizationWebservice/v2/"+ACC.config.siteId+"/users/current/createOrders",
+				
+				headers : {
+					Authorization : "Bearer " + result.token
+				},
+				
+				data : {
+					'cartId':result.cartUid
+				},
+				
+				dataType : "json",
+				async : false,
+				error : function(request) {
+					console.log("something wrong for selectDeliveryAddress");
+					console.log(request);
+				},
+				success : function(data) {
+					console.log('data:'+data);
+					if(data.guestCustomer){
+						window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/orderConfirmation/'+guid;
+					}else{
+						window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/orderConfirmation/'+data.code;
+					}
+				}
+		};
+			
+		$.ajax(options);
+	},
+	
 	bindCheckO: function ()
 	{
 		var cartEntriesError = false;

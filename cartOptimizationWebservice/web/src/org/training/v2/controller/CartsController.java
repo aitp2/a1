@@ -944,7 +944,8 @@ public class CartsController extends BaseCommerceController
 		final AddressData addressData = new AddressData();
 		getHttpRequestAddressDataPopulator().populate(request, addressData);
 
-		validate(addressData, "addressData", getAddressValidator());
+		//TODO acn
+		//validate(addressData, "addressData", getAddressValidator());
 
 		return createAddressInternal(addressData);
 	}

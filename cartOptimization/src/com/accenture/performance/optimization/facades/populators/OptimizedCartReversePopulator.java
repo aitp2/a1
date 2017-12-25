@@ -11,18 +11,21 @@
  */
 package com.accenture.performance.optimization.facades.populators;
 
-import de.hybris.platform.commerceservices.delivery.DeliveryService;
-import de.hybris.platform.converters.Populator;
-import de.hybris.platform.product.UnitService;
-import de.hybris.platform.servicelayer.model.ModelService;
-import de.hybris.platform.site.BaseSiteService;
-import de.hybris.platform.store.services.BaseStoreService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
 import com.accenture.performance.optimization.model.OptimizedCartModel;
+
+import de.hybris.platform.commerceservices.customer.CustomerAccountService;
+import de.hybris.platform.commerceservices.delivery.DeliveryService;
+import de.hybris.platform.commerceservices.strategies.CheckoutCustomerStrategy;
+import de.hybris.platform.converters.Populator;
+import de.hybris.platform.core.model.user.AddressModel;
+import de.hybris.platform.product.UnitService;
+import de.hybris.platform.servicelayer.model.ModelService;
+import de.hybris.platform.site.BaseSiteService;
+import de.hybris.platform.store.services.BaseStoreService;
 
 
 /**
@@ -41,6 +44,10 @@ public class OptimizedCartReversePopulator implements Populator<OptimizedCartDat
 	private UnitService unitService;
 
 	private DeliveryService deliveryService;
+	
+	private CustomerAccountService customerAccountService;
+	
+	private CheckoutCustomerStrategy checkoutCustomerStrategy;
 
 	/*
 	 * From data to model
@@ -63,6 +70,13 @@ public class OptimizedCartReversePopulator implements Populator<OptimizedCartDat
 		{
 			target.setDeliveryMode(getDeliveryService().getDeliveryModeForCode(source.getDeliveryMode()));
 		}
+		
+		if(source.getDeliveryAddress() != null && source.getDeliveryAddress().getId() != null)
+		{
+			final AddressModel address = customerAccountService.getAddressForCode(checkoutCustomerStrategy.getCurrentUserForCheckout(), source.getDeliveryAddress().getId());
+			target.setDeliveryAddress(address);
+		}
+		
 		target.setPaymentCost(source.getPaymentCost());
 		target.setNet(Boolean.valueOf(source.isNet()));
 
@@ -198,6 +212,34 @@ public class OptimizedCartReversePopulator implements Populator<OptimizedCartDat
 	public void setDeliveryService(final DeliveryService deliveryService)
 	{
 		this.deliveryService = deliveryService;
+	}
+
+	/**
+	 * @return the customerAccountService
+	 */
+	public CustomerAccountService getCustomerAccountService() {
+		return customerAccountService;
+	}
+
+	/**
+	 * @param customerAccountService the customerAccountService to set
+	 */
+	public void setCustomerAccountService(CustomerAccountService customerAccountService) {
+		this.customerAccountService = customerAccountService;
+	}
+
+	/**
+	 * @return the checkoutCustomerStrategy
+	 */
+	public CheckoutCustomerStrategy getCheckoutCustomerStrategy() {
+		return checkoutCustomerStrategy;
+	}
+
+	/**
+	 * @param checkoutCustomerStrategy the checkoutCustomerStrategy to set
+	 */
+	public void setCheckoutCustomerStrategy(CheckoutCustomerStrategy checkoutCustomerStrategy) {
+		this.checkoutCustomerStrategy = checkoutCustomerStrategy;
 	}
 
 

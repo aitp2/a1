@@ -124,7 +124,9 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 			abstractOrder.setEntries(createOrderEntriesFromOptimizedCart(optimizedCartData));
 			abstractOrder.setCurrency( getCommonI18NService().getCurrency(optimizedCartModel.getCurrencyCode()));
 			abstractOrder.setStore(optimizedCartModel.getStore());
-			abstractOrder.setDeliveryAddress(optimizedCartModel.getDeliveryAddress());
+			
+			AddressModel address = optimizedCartModel.getDeliveryAddress();
+			abstractOrder.setDeliveryAddress(address);
 			abstractOrder.setNet(optimizedCartModel.getNet());
 			
 			for (final DeliveryModeModel deliveryModeModel : getDeliveryService().getSupportedDeliveryModeListForOrder(abstractOrder))
@@ -146,8 +148,8 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 				if( entry.getDeliveryPointOfService() != null)
 				{
 					orderEntryModel.setDeliveryPointOfService(new PointOfServiceModel());
-					orderEntryList.add(orderEntryModel);
 				}
+				orderEntryList.add(orderEntryModel);
 				
 			}
 		}
