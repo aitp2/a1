@@ -18,11 +18,13 @@ import de.hybris.platform.commercefacades.order.data.CCPaymentInfoData;
 import de.hybris.platform.commercefacades.user.data.AddressData;
 import de.hybris.platform.commercefacades.user.data.RegisterData;
 import de.hybris.platform.commerceservices.constants.CommerceServicesConstants;
+import de.hybris.platform.commerceservices.customer.CustomerAccountService;
 import de.hybris.platform.commerceservices.externaltax.ExternalTaxesService;
 import de.hybris.platform.commerceservices.order.hook.CommercePlaceOrderMethodHook;
 import de.hybris.platform.commerceservices.order.impl.DefaultCommerceCheckoutService;
 import de.hybris.platform.commerceservices.service.data.CommerceCheckoutParameter;
 import de.hybris.platform.commerceservices.service.data.CommerceOrderResult;
+import de.hybris.platform.commerceservices.strategies.CheckoutCustomerStrategy;
 import de.hybris.platform.core.PK;
 import de.hybris.platform.core.enums.OrderStatus;
 import de.hybris.platform.core.model.c2l.CurrencyModel;
@@ -92,6 +94,9 @@ public class DefaultOptimizeCommerceCheckoutService extends DefaultCommerceCheck
 	private UnitService unitService;
 	private KeyGenerator keyGenerator;
 	private ProductService productService;
+	
+	private CheckoutCustomerStrategy checkoutCustomerStrategy;
+	private CustomerAccountService customerAccountService;
 
 
 
@@ -238,10 +243,12 @@ public class DefaultOptimizeCommerceCheckoutService extends DefaultCommerceCheck
 		}
 
 		//-------------------------------------------------paymentInfo---------------------------------
-		if (cartModel.getPaymentInfo() != null)
+		if (cartModel.getPaymentInfo() != null && StringUtils.isNotBlank(cartModel.getPaymentInfo().getId()))
 		{
-			//TODO : set payment info
-			//			target.setPaymentInfo(cartModel.getPaymentInfo());
+			final String paymentInfoId = cartModel.getPaymentInfo().getId();
+			final CustomerModel currentUserForCheckout = getCurrentUserForCheckout();
+			final CreditCardPaymentInfoModel ccPaymentInfoModel = getCustomerAccountService().getCreditCardPaymentInfoForCode(currentUserForCheckout, paymentInfoId);
+			target.setPaymentInfo(ccPaymentInfoModel);
 		}
 
 
@@ -263,6 +270,11 @@ public class DefaultOptimizeCommerceCheckoutService extends DefaultCommerceCheck
 		//		getModelService().save(target);
 		//		getModelService().refresh(target);
 		return target;
+	}
+
+	protected CustomerModel getCurrentUserForCheckout()
+	{
+		return getCheckoutCustomerStrategy().getCurrentUserForCheckout();
 	}
 
 	/**
@@ -689,5 +701,33 @@ public class DefaultOptimizeCommerceCheckoutService extends DefaultCommerceCheck
 			final Converter<CreditCardPaymentInfoModel, CCPaymentInfoData> creditCardPaymentInfoConverter)
 	{
 		this.creditCardPaymentInfoConverter = creditCardPaymentInfoConverter;
+	}
+
+	/**
+	 * @return the checkoutCustomerStrategy
+	 */
+	public CheckoutCustomerStrategy getCheckoutCustomerStrategy() {
+		return checkoutCustomerStrategy;
+	}
+
+	/**
+	 * @param checkoutCustomerStrategy the checkoutCustomerStrategy to set
+	 */
+	public void setCheckoutCustomerStrategy(CheckoutCustomerStrategy checkoutCustomerStrategy) {
+		this.checkoutCustomerStrategy = checkoutCustomerStrategy;
+	}
+
+	/**
+	 * @return the customerAccountService
+	 */
+	public CustomerAccountService getCustomerAccountService() {
+		return customerAccountService;
+	}
+
+	/**
+	 * @param customerAccountService the customerAccountService to set
+	 */
+	public void setCustomerAccountService(CustomerAccountService customerAccountService) {
+		this.customerAccountService = customerAccountService;
 	}
 }
