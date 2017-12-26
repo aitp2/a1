@@ -23,6 +23,9 @@ import de.hybris.platform.product.ProductService;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
 import de.hybris.platform.servicelayer.user.UserService;
 import de.hybris.platform.variants.model.VariantProductModel;
+
+import com.accenture.performance.optimization.facades.data.OptimizedCartEntryData;
+import com.accenture.performance.optimization.service.OptimizeCartService;
 import com.acn.ai.core.suggestion.SimpleSuggestionService;
 import com.acn.ai.facades.suggestion.SimpleSuggestionFacade;
 
@@ -45,7 +48,7 @@ public class DefaultSimpleSuggestionFacade implements SimpleSuggestionFacade
 	private ProductService productService;
 	private Converter<ProductModel, ProductData> productConverter;
 	private SimpleSuggestionService simpleSuggestionService;
-	private CartService cartService;
+	private OptimizeCartService cartService;
 
 	@Override
 	public List<ProductData> getReferencesForPurchasedInCategory(final String categoryCode,
@@ -86,10 +89,16 @@ public class DefaultSimpleSuggestionFacade implements SimpleSuggestionFacade
 		if (getCartService().hasSessionCart())
 		{
 			final Set<ProductModel> products = new HashSet<ProductModel>();
-			for (final AbstractOrderEntryModel entry : getCartService().getSessionCart().getEntries())
+			List<OptimizedCartEntryData> entryList = getCartService().getSessionOptimizedCart().getEntries();
+			if(entryList != null && !entryList.isEmpty())
 			{
-				products.addAll(getAllBaseProducts(entry.getProduct()));
+				for (final OptimizedCartEntryData entry : entryList)
+				{
+					final ProductModel product = getProductService().getProductForCode(entry.getProductCode());
+					products.addAll(getAllBaseProducts(product));
+				}
 			}
+			
 			return Converters.convertAll(
 					getSimpleSuggestionService().getReferencesForProducts(new LinkedList<ProductModel>(products), referenceTypes,
 							getUserService().getCurrentUser(), excludePurchased, limit), getProductConverter());
@@ -188,13 +197,13 @@ public class DefaultSimpleSuggestionFacade implements SimpleSuggestionFacade
 		this.simpleSuggestionService = simpleSuggestionService;
 	}
 
-	protected CartService getCartService()
+	protected OptimizeCartService getCartService()
 	{
 		return cartService;
 	}
 
 	@Required
-	public void setCartService(final CartService cartService)
+	public void setCartService(final OptimizeCartService cartService)
 	{
 		this.cartService = cartService;
 	}
