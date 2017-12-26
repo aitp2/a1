@@ -3,24 +3,154 @@ ACC.checkout = {
 	_autoload: [
 		"bindCheckO",
 		"bindForms",
-		"bindSavedPayments"
+		"bindSavedPayments",
+		"bindAddressEntryButton",
+		"bindPlaceOrderACN"
 	],
 
+	addDeliveryAddress:function(result) {
+		var defaultAddressFlag = $("input[name='defaultAddress']").is(":checked");
+		if(defaultAddressFlag){
+			//
+		}else{
+			defaultAddressFlag = false;
+		}
+		
+		var options = {
+			type : 'POST',
+			url : "/cartOptimizationWebservice/v2/"+ACC.config.siteId+"/users/current/carts/"+result.cartUid+"/addresses/deliveries",
+			
+			headers : {
+				Authorization : "Bearer " + result.token
+			},
+			data : {
+				"id" : $("input[name='addressId']").val(),
+				"titleCode" : $("select[name='titleCode'] option:selected").val(),
+				"firstName" : $("input[name='firstName']").val(),
+				"lastName" : $("input[name='lastName']").val(),
+				"line1" : $("input[name='line1']").val(),
+				"line2" : $("input[name='line2']").val(),
+				"town" : $("input[name='townCity']").val(),
+				"postalCode" : $("input[name='postcode']").val(),
+				"country.isocode" : $("select[name='countryIso'] option:selected").val(),
+				"region.isocode" : $("select[name='regionIso'] option:selected").val(),
+				"defaultAddress" : defaultAddressFlag
+					
+			},
+			dataType : "json",
+			async : false,
+			error : function(request) {
+				console.log("something wrong for addDeliveryAddress");
+			},
+			success : function(data) {
+				console.log(data);
+				window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/multi/delivery-method/choose';
+			}
+		};
+		
+		$.ajax(options);
+	},
 
+	selectDeliveryAddress:function(result,dataSend){
+		var options = {
+				type : 'PUT',
+				url : "/cartOptimizationWebservice/v2/"+ACC.config.siteId+"/users/current/carts/"+result.cartUid+"/addresses/delivery?addressId="+dataSend.addressId,
+				headers : {
+					Authorization : "Bearer " + result.token
+				},
+				async : false,
+				error : function(request) {
+					console.log("something wrong for selectDeliveryAddress");
+					console.log(request);
+				},
+				success : function(data) {
+					console.log('data:'+data);
+					window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/multi/delivery-method/choose';
+				}
+			};
+			
+			$.ajax(options);
+	},
+	
+	selectDeliveryMethod:function(result,dataSend){
+		var options = {
+				type : 'PUT',
+				url : "/cartOptimizationWebservice/v2/"+ACC.config.siteId+"/users/current/carts/"+result.cartUid+"/deliverymode?deliveryModeId="+dataSend.deliveryModeCode,
+				headers : {
+					Authorization : "Bearer " + result.token
+				},
+				async : false,
+				error : function(request) {
+					console.log("something wrong for selectDeliveryAddress");
+					console.log(request);
+				},
+				success : function(data) {
+					console.log('data:'+data);
+					window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/multi/payment-method/add';
+				}
+			};
+			
+			$.ajax(options);
+	},
+	
 	bindForms:function(){
 
 		$(document).on("click","#addressSubmit",function(e){
 			e.preventDefault();
-			$('#addressForm').submit();	
+			var options = {
+				    type : 'GET',
+				    url : ACC.config.contextPath + "/auth/getToken",
+				    dataType:"json",
+				    async:false,
+				    error : function(request) {
+				    	console.log('something wrong');
+				    },
+				    success : function(result) {
+				    	ACC.checkout.addDeliveryAddress(result);
+				    }
+			};
+			$.ajax(options);
 		})
 		
 		$(document).on("click","#deliveryMethodSubmit",function(e){
 			e.preventDefault();
-			$('#selectDeliveryMethodForm').submit();	
+			
+			var deliveryModeCode = $("select[name='delivery_method'] option:selected").val();
+			var data = {'deliveryModeCode':deliveryModeCode};
+				
+			ACC.checkout.sendRequest(ACC.checkout.selectDeliveryMethod,data);
 		})
 
 	},
 
+	bindAddressEntryButton:function(){
+		$('.addressEntry button').click(function(){
+			var addressId = $(this).attr('attr-addressID');
+			var data = {'addressId':addressId};
+			
+			ACC.checkout.sendRequest(ACC.checkout.selectDeliveryAddress,data);
+		});
+		
+	},
+	
+	sendRequest:function(callback,dataSend){
+		var options = {
+			    type : 'GET',
+			    url : ACC.config.contextPath + "/auth/getToken",
+			    dataType:"json",
+			    async:false,
+			    error : function(request) {
+			    	console.log('something wrong');
+			    	console.log(request);
+			    },
+			    success : function(result) {
+			    	callback(result,dataSend);
+			    }
+		};
+		
+		$.ajax(options);
+	},
+	
 	bindSavedPayments:function(){
 		$(document).on("click",".js-saved-payments",function(e){
 			e.preventDefault();
@@ -41,6 +171,51 @@ ACC.checkout = {
 		})
 	},
 
+	bindPlaceOrderACN: function ()
+	{
+		$('#placeOrder').click(function(){
+			var data = {};
+			
+			if($('.place-order-form input[name="termsCheck"]').is(":checked")){
+				ACC.checkout.sendRequest(ACC.checkout.placeOrder,data);
+			}else{
+				//
+			}
+		});
+	},
+	
+	placeOrder:function(result,dataSend){
+		var options = {
+				type : 'POST',
+				url : "/cartOptimizationWebservice/v2/"+ACC.config.siteId+"/users/current/orders",
+				
+				headers : {
+					Authorization : "Bearer " + result.token
+				},
+				
+				data : {
+					'cartId':result.cartUid
+				},
+				
+				dataType : "json",
+				async : false,
+				error : function(request) {
+					console.log("something wrong for selectDeliveryAddress");
+					console.log(request);
+				},
+				success : function(data) {
+					console.log('data:'+data);
+					if(data.guestCustomer){
+						window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/orderConfirmation/'+data.guid;
+					}else{
+						window.location = ACC.config.contextPath+'/'+ACC.config.language+'/checkout/orderConfirmation/'+data.code;
+					}
+				}
+		};
+			
+		$.ajax(options);
+	},
+	
 	bindCheckO: function ()
 	{
 		var cartEntriesError = false;

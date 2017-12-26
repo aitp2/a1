@@ -194,7 +194,7 @@
 		<property name="requestCache" ref="httpSessionRequestCache" />
 		<property name="uiExperienceService" ref="uiExperienceService"/>
 		<property name="cartFacade" ref="cartFacade"/>
-		<property name="cartRestorationStrategy" ref="cartRestorationStrategy"/>
+		<property name="cartRestorationStrategy" ref="mergingCartRestorationStrategy"/>
 		<property name="forceDefaultTargetForUiExperienceLevel">
 			<map key-type="de.hybris.platform.commerceservices.enums.UiExperienceLevel" value-type="java.lang.Boolean">
 				<entry key="DESKTOP" value="false"/>
@@ -222,7 +222,7 @@
 		<property name="defaultTargetUrl" value="/checkout"/>
 		<property name="uiExperienceService" ref="uiExperienceService"/>
 		<property name="cartFacade" ref="cartFacade"/>
-		<property name="cartRestorationStrategy" ref="cartRestorationStrategy"/>
+		<property name="cartRestorationStrategy" ref="mergingCartRestorationStrategy"/>
 		<property name="forceDefaultTargetForUiExperienceLevel">
 			<map key-type="de.hybris.platform.commerceservices.enums.UiExperienceLevel" value-type="java.lang.Boolean">
 				<entry key="DESKTOP" value="true"/>

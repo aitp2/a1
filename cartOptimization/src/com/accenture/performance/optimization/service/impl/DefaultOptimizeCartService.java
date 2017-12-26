@@ -18,6 +18,7 @@ import de.hybris.platform.catalog.CatalogVersionService;
 import de.hybris.platform.commercefacades.order.data.AddToCartParams;
 import de.hybris.platform.commerceservices.constants.CommerceServicesConstants;
 import de.hybris.platform.commerceservices.customer.CustomerAccountService;
+import de.hybris.platform.commerceservices.order.CommerceCartMergingException;
 import de.hybris.platform.commerceservices.order.CommerceCartModification;
 import de.hybris.platform.commerceservices.order.CommerceCartModificationException;
 import de.hybris.platform.commerceservices.order.CommerceCartModificationStatus;
@@ -45,9 +46,13 @@ import de.hybris.platform.storelocator.pos.PointOfServiceService;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.beanutils.BeanComparator;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.comparators.ComparableComparator;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -56,6 +61,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
 import com.accenture.performance.optimization.facades.data.OptimizedCartEntryData;
+import com.accenture.performance.optimization.model.OptimizedCartModel;
 import com.accenture.performance.optimization.service.OptimizeCartService;
 import com.accenture.performance.optimization.service.OptimizeModelDealService;
 
@@ -221,7 +227,7 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 		{
 			final OptimizedCartData sessionCart = getSessionOptimizedCart();
 			sessionCart.setUserId(user.getUid());
-			optimizeModelDealService.removePersistentCart(sessionCart.getGuid(), user.getUid());
+			//		optimizeModelDealService.removePersistentCart(sessionCart.getGuid(), user.getUid());
 			setSessionOptimizedCart(sessionCart);
 		}
 	}
@@ -278,7 +284,8 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 		final String productCode = productModel.getCode();
 		final long quantityToAdd = parameter.getQuantity();
 		//final PointOfServiceModel deliveryPointOfService = parameter.getPointOfService();
-		final OptimizedCartData cartData = this.getSessionOptimizedCart();
+		final OptimizedCartData cartData = parameter.getOptimizeCart() != null ? parameter.getOptimizeCart()
+				: this.getSessionOptimizedCart();
 		// So now work out what the maximum allowed to be added is (note that this may be negative!)
 		//		if (cartData == null)
 		//		{
@@ -623,6 +630,50 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 
 	}
 
+	@Override
+	public List<OptimizedCartModel> getCartsForSiteAndUser(final BaseSiteModel currentBaseSite, final UserModel currentUser)
+	{
+		return optimizeModelDealService.getCartsDataForSiteAndUser(currentBaseSite, currentUser);
+	}
+
+	@Override
+	public List<CommerceCartModification> addToCart(final List<CommerceCartParameter> parameterList)
+			throws CommerceCartMergingException
+	{
+		final List<CommerceCartModification> modifications = new ArrayList<>();
+		try
+		{
+			if (!CollectionUtils.isEmpty(parameterList))
+			{
+				// add items to cart
+				final Map<CommerceCartParameter, CommerceCartModification> paramModificationMap = new HashMap<>();
+				for (final CommerceCartParameter parameter : parameterList)
+				{
+					final CommerceCartModification modification = doAddToCart(parameter);
+					paramModificationMap.put(parameter, modification);
+					modifications.add(modification);
+				}
+
+				// calculate the cart. Using recalculateCart() to force calculate the entries
+				//		getCommerceCartCalculationStrategy().recalculateCart(parameterList.get(0));
+
+				// after add to cart
+				for (final Entry<CommerceCartParameter, CommerceCartModification> entry : paramModificationMap.entrySet())
+				{
+					final CommerceCartParameter storedParameter = entry.getKey();
+					final CommerceCartModification storedModification = entry.getValue();
+					afterAddToCart(storedParameter, storedModification);
+					//		mergeEntry(storedModification, storedParameter);
+				}
+			}
+		}
+		catch (final CommerceCartModificationException e)
+		{
+			throw new CommerceCartMergingException(e.getMessage(), e);
+		}
+		return modifications;
+	}
+
 	/**
 	 * @return the sessionService
 	 */
@@ -868,6 +919,5 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 	{
 		this.commonI18NService = commonI18NService;
 	}
-
 
 }

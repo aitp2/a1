@@ -49,6 +49,7 @@ import de.hybris.platform.site.BaseSiteService;
 import de.hybris.platform.store.services.BaseStoreService;
 import de.hybris.platform.storelocator.pos.PointOfServiceService;
 
+import java.util.List;
 
 /**
  *
@@ -63,7 +64,7 @@ public class DefatulOptimizeModelDealService implements OptimizeModelDealService
 	protected final static String ORDERBYCLAUSE = " ORDER BY {" + OptimizedCartModel.MODIFIEDTIME + "} DESC";
 
 	protected final static String FIND_CART_FOR_GUID_AND_USER_AND_SITE = SELECTCLAUSE + "AND  {" + OptimizedCartModel.GUID
-			+ "} = ?guid" + " AND {" + OptimizedCartModel.USERID + "} = ?user " + ORDERBYCLAUSE;
+			+ "} = ?guid" + ORDERBYCLAUSE;
 
 
 	protected static final String FIND_PRODUCT_BY_CODE = "SELECT {" + ProductModel.PK + "} FROM {" + ProductModel._TYPECODE
@@ -129,7 +130,8 @@ public class DefatulOptimizeModelDealService implements OptimizeModelDealService
 	{
 		if (cartData != null && cartData.getGuid() != null)
 		{
-			return this.getCartForGuidAndSiteAndUser(cartData.getGuid(), baseSiteService.getBaseSiteForUID(cartData.getBaseSite()), cartData.getUserId());
+			return this.getCartForGuidAndSiteAndUser(cartData.getGuid(), baseSiteService.getBaseSiteForUID(cartData.getBaseSite()),
+					cartData.getUserId());
 		}
 		else
 		{
@@ -427,7 +429,7 @@ public class DefatulOptimizeModelDealService implements OptimizeModelDealService
 		}
 		final FlexibleSearchQuery fQuery = new FlexibleSearchQuery(FIND_CART_FOR_GUID_AND_USER_AND_SITE);
 		fQuery.addQueryParameter("guid", cartguid);
-		fQuery.addQueryParameter("user", currentUser);
+		//fQuery.addQueryParameter("user", currentUser);
 		//fQuery.addQueryParameter("site", cartData.getBaseSite());
 		final SearchResult<OptimizedCartModel> optimizedCartModelSearchResult = flexibleSearchService.search(fQuery);
 		if (optimizedCartModelSearchResult.getResult() != null && !optimizedCartModelSearchResult.getResult().isEmpty())
@@ -462,6 +464,30 @@ public class DefatulOptimizeModelDealService implements OptimizeModelDealService
 	{
 		//
 		return null;
+	}
+
+	@Override
+	public List<OptimizedCartModel> getCartsDataForSiteAndUser(final BaseSiteModel currentBaseSite, final UserModel currentUser)
+	{
+		if (currentUser != null && currentUser.getUid() != null)
+		{
+			final FlexibleSearchQuery fQuery = new FlexibleSearchQuery(FIND_CART_FOR_USER_AND_SITE);
+			fQuery.addQueryParameter("user", currentUser.getUid());
+			fQuery.addQueryParameter("site", currentBaseSite);
+			final SearchResult<OptimizedCartModel> optimizedCartModelSearchResult = flexibleSearchService.search(fQuery);
+			if (optimizedCartModelSearchResult.getResult() != null && !optimizedCartModelSearchResult.getResult().isEmpty())
+			{
+				return optimizedCartModelSearchResult.getResult();
+			}
+			else
+			{
+				return null;
+			}
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	/**

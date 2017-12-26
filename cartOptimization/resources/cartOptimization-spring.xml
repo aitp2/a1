@@ -76,6 +76,7 @@
 		<property name="cartService" ref="cartService" />
 		<property name="optimizeCartConverter" ref="optimizeCartConverter"/>
 		<property name="optimizeMiniCartConverter" ref="optimizeMiniCartConverter"/>
+		<property name="commerceCartMergingStrategy" ref="commerceCartMergingStrategy"/>
 	</bean>
 
 
@@ -450,4 +451,16 @@
 	 property name="optimizeCommerceCartService" ref="defaultOptimizeCommerceCartService"/> 
 		 </bean>
 -->
+
+	<alias name="defaultOptimizeCommerceCartMergingStrategy" alias="commerceCartMergingStrategy"/>
+	<bean id="defaultOptimizeCommerceCartMergingStrategy"
+			class="com.accenture.performance.optimization.strategies.impl.DefaultOptimizeCommerceCartMergingStrategy"
+			parent="defaultCommerceCartMergingStrategy">
+		<property name="cartService" ref="cartService"/>
+		<property name="unitService" ref="unitService"/>
+		<property name="productService" ref="productService"/>
+		<property name="optimizeModelDealService" ref="optimizeModelDealService"/>
+	</bean>
+
+
 </beans>
