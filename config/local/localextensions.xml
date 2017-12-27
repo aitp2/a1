@@ -43,5 +43,6 @@
      <extension name='aifulfilmentprocess' />
      <extension name='aiinitialdata' />
     <extension name='aicockpits' />
+	<extension name='aiutil' />
   </extensions>
 </hybrisconfig>

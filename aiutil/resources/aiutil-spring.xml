@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+	
+    <bean id="aiutilSystemSetup" class="com.acn.ai.util.setup.AiutilSystemSetup">
+        <!-- constructor arg injection example -->
+        <constructor-arg ref="aiutilService"/>
+    </bean>
+
+    <bean id="aiutilService" class="com.acn.ai.util.service.impl.DefaultAiutilService">
+        <!-- setter injection example -->
+        <property name="modelService" ref="modelService"/>
+        <property name="mediaService" ref="mediaService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+	
+	<bean id="httpProtocolHandler" class="com.acn.ai.util.httpclient.impl.HttpProtocolHandlerImpl" >
+		<property name="defaultConnectionTimeout" value="${http.client.connection.timeout}"/>
+		<property name="defaultSoTimeout" value="${http.client.so.timeout}"/>
+		<property name="defaultIdleConnTimeout" value="${http.client.idle.conn.timeout}"/>
+		<property name="defaultMaxConnPerHost" value="${http.client.max.conn.per.host}"/>
+		<property name="defaultMaxTotalConn" value="${http.client.max.total.conn}"/>
+		<property name="defaultHttpConnectionManagerTimeout" value="${http.client.connection.manager.timeout}"/>
+		<property name="defaultThreadPoolCoreSize" value="${http.client.connection.thread.pool.core.size}"/>
+	</bean>
+	
+	<bean id="aiHystrixThreadPoolTenantListener" class="com.acn.ai.util.hystrix.AiHystrixThreadPoolTenantListener" init-method="init" />
+			
+	<bean id="aiJackonAnnotationIntrospector" class="com.acn.ai.util.json.AiJackonAnnotationIntrospector" >
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+  
+	<!--  charles. for bytter .  00097 -->
+	<bean id="aiSoapClient" abstract="true" class="com.acn.ai.util.client.AiSoapClient">
+		<property name="httpProtocolHandler" ref="httpProtocolHandler" />
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+	
+	<!-- add by k.c.liu for nc sap  -->
+	<bean id="aiRestfulClient" abstract="true" class="com.acn.ai.util.client.AiRestfulClient">
+		<property name="httpProtocolHandler" ref="httpProtocolHandler" />
+		<property name="configurationService" ref="configurationService"/>
+		<property name="defaultConnectionTimeout" value="${http.client.connection.timeout}"/>
+		<property name="defaultSoTimeout" value="${http.client.so.timeout}"/>
+	</bean>
+	
+	<bean id="aiWSDLClient" abstract="true" class="com.acn.ai.util.client.AiWSDLClient">
+		<property name="httpProtocolHandler" ref="httpProtocolHandler" />
+		<property name="configurationService" ref="configurationService"/>
+		<property name="defaultConnectionTimeout" value="${http.client.connection.timeout}"/>
+		<property name="defaultSoTimeout" value="${http.client.so.timeout}"/>
+	</bean>
+	
+	<!-- add by k.c.liu  -->
+	
+<!-- 	<bean id="aiSMSClient" class="com.acn.ai.util.client.AiSMSClient">
+		<property name="httpProtocolHandler" ref="httpProtocolHandler" />
+		<property name="url" value="${liby.sms.url}" />
+		<property name="password" value="${liby.sms.password}" />
+		<property name="loginName" value="${liby.sms.loginname}" />
+		<property name="spCode" value="${liby.sms.spCode}"/>
+		<property name="configurationService" ref="configurationService"/>
+	</bean> -->
+			
+</beans>

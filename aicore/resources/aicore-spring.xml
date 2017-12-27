@@ -553,6 +553,14 @@
 	<property name="userDetailsService" ref="wsUserDetailsService" />
 	<property name="userService" ref="userService"/>
 	</bean>
+	
+	<alias alias="aiLoginSuccess" name="aiLoginSuccessImpl"/>
+	<bean id="aiLoginSuccessImpl" class="com.acn.ai.core.outbound.cart.impl.AiLoginSuccessImpl" >
+		<property name="tokenService" ref="aiTokenService" />
+		<property name="userService" ref="userService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
 
 	<import resource="/aicore/processes/quote/quote-buyer-process-spring.xml"/>
 	<import resource="/aicore/processes/quote/quote-salesrep-process-spring.xml"/>

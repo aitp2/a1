@@ -186,6 +186,10 @@
 		<property name="authenticationSuccessHandler" ref="loginAuthenticationSuccessHandler" />
 		<property name="guidCookieStrategy" ref="guidCookieStrategy" />
 	</bean>
+	
+	<bean id="aiMergingCartRestorationStrategy" class="com.acn.ai.storefront.strategy.impl.MergingCartRestorationStrategy" parent="defaultCartRestorationStrategy">
+		<property name="aiLoginSuccess" ref="aiLoginSuccess" />
+	</bean>
 
 	<bean id="loginAuthenticationSuccessHandler" class="de.hybris.platform.acceleratorstorefrontcommons.security.StorefrontAuthenticationSuccessHandler" >
 		<property name="customerFacade" ref="customerFacade" />
@@ -194,7 +198,7 @@
 		<property name="requestCache" ref="httpSessionRequestCache" />
 		<property name="uiExperienceService" ref="uiExperienceService"/>
 		<property name="cartFacade" ref="cartFacade"/>
-		<property name="cartRestorationStrategy" ref="mergingCartRestorationStrategy"/>
+		<property name="cartRestorationStrategy" ref="aiMergingCartRestorationStrategy"/>
 		<property name="forceDefaultTargetForUiExperienceLevel">
 			<map key-type="de.hybris.platform.commerceservices.enums.UiExperienceLevel" value-type="java.lang.Boolean">
 				<entry key="DESKTOP" value="false"/>
@@ -222,7 +226,7 @@
 		<property name="defaultTargetUrl" value="/checkout"/>
 		<property name="uiExperienceService" ref="uiExperienceService"/>
 		<property name="cartFacade" ref="cartFacade"/>
-		<property name="cartRestorationStrategy" ref="mergingCartRestorationStrategy"/>
+		<property name="cartRestorationStrategy" ref="aiMergingCartRestorationStrategy"/>
 		<property name="forceDefaultTargetForUiExperienceLevel">
 			<map key-type="de.hybris.platform.commerceservices.enums.UiExperienceLevel" value-type="java.lang.Boolean">
 				<entry key="DESKTOP" value="true"/>

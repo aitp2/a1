@@ -185,7 +185,7 @@ public class DefaultOptimizeCartFacade extends DefaultCartFacade implements Opti
 		//parameter.setCart(getCartService().getSessionCart());
 		parameter.setOptimizeCart(optimizeCartService.getSessionOptimizedCart());
 
-		//commerceCartService.mergeCarts(fromCart, parameter.getCart(), restoration.getModifications());
+		commerceCartMergingStrategy.mergeCarts(fromCart, parameter.getOptimizeCart(), restoration.getModifications());
 
 		final CommerceCartRestoration commerceCartRestoration = getCommerceCartService().restoreCart(parameter);
 

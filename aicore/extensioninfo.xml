@@ -16,7 +16,7 @@
 			extensions which are automatically required -->
 		<requires-extension name="acceleratorcms"/>
 		<requires-extension name="solrserver"/>
-
+    	  <requires-extension name="aiutil"/>
 		<coremodule generated="true" manager="com.acn.ai.core.jalo.AiCoreManager" packageroot="com.acn.ai.core"/>
 
 		
