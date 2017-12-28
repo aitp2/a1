@@ -69,6 +69,7 @@ public class HttpRequestAddressDataPopulator extends AbstractHttpRequestDataPopu
 	private static final String COUNTRY = "country.isocode";
 	private static final String REGION = "region.isocode";
 	private static final String DEFAULT_ADDRESS = "defaultAddress";
+	private static final String PHONE = "phone";
 
 	private String addressPrefix;
 
@@ -95,6 +96,7 @@ public class HttpRequestAddressDataPopulator extends AbstractHttpRequestDataPopu
 		addressData.setCountry(updateCountryFromRequest(request, addressData.getCountry()));
 		addressData.setRegion(updateRegionFromRequest(request, addressData.getRegion()));
 		addressData.setDefaultAddress(updateBooleanValueFromRequest(request, DEFAULT_ADDRESS, addressData.isDefaultAddress()));
+		addressData.setId(updateStringValueFromRequest(request, PHONE, addressData.getPhone()));
 	}
 
 	protected CheckoutFacade getCheckoutFacade()

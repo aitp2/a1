@@ -244,7 +244,6 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 	@Override
 	public CommerceCartModification addToCart(final AddToCartParams parameter) throws CommerceCartModificationException
 	{
-
 		final CommerceCartParameter cartParameterData = beforeAddToCart(parameter);
 
 		final CommerceCartModification modification = doAddToCart(cartParameterData);
@@ -260,6 +259,8 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 		}
 		final long newNumber = normalizeEntryNumbers(cartData, parameter.getProductCode());
 		cartParameterData.setEntryNumber(newNumber);
+		cartParameterData.setOptimizeCart(cartData);
+		
 		afterAddToCart(cartParameterData, modification);
 		// Here the entry is fully populated, so we can search for a similar one and merge.
 		//mergeEntry(modification, cartParameterData);

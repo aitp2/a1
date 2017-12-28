@@ -24,6 +24,7 @@
       <requires-extension name="ruleengineservices"/>
       <requires-extension name="ruleengine"/>
       <requires-extension name="commercewebservicescommons"/>
+      <requires-extension name="couponfacades"/>
       <coremodule generated="true" manager="com.accenture.performance.optimization.jalo.CartOptimizationManager" packageroot="com.accenture.performance.optimization"/>
 
       <webmodule jspcompile="false" webroot="/cartOptimization"/>

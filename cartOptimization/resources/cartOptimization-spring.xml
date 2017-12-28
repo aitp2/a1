@@ -291,6 +291,15 @@
 	</bean>
 	
 	<!-- new -->
+	<bean id="abstractOptimizeRuleActionStrategy" abstract="true" class="com.accenture.performance.optimization.ruleengineservices.strategy.AbstractOptimizeRuleActionStrategy">
+		<property name="extendedOrderDao" ref="extendedOrderDao" />
+		<property name="modelService" ref="modelService"/>
+		<property name="promotionActionService" ref="promotionActionService"/>
+		<property name="calculationService" ref="calculationService" />
+		<property name="forceImmediateRecalculation" value="false" />
+		<property name="ruleActionMetadataHandlers" ref="ruleActionMetadataHandlers"/>
+	</bean>
+	
 	<alias name="optimizeOrderAdjustTotalActionStrategy" alias="orderTotalAdjustActionStrategy"/>
 	<bean id="optimizeOrderAdjustTotalActionStrategy" class="com.accenture.performance.optimization.ruleengineservices.strategy.OptimizeOrderAdjustTotalActionStrategy" >
 		<property name="promotionAction" value="com.accenture.performance.optimization.data.OptimizedPromotionOrderAdjustTotalAction"></property>
@@ -301,6 +310,31 @@
 		<property name="extendedOrderDao" ref="extendedOrderDao" />
 		<property name="forceImmediateRecalculation" value="false" />
 		<property name="ruleActionMetadataHandlers" ref="ruleActionMetadataHandlers"/>
+	</bean>
+	
+	<alias name="defaultOptimizePotentialPromotionMessageActionStrategy" alias="potentialPromotionMessageActionStrategy"/>
+	<bean id="defaultOptimizePotentialPromotionMessageActionStrategy" class="com.accenture.performance.optimization.ruleengineservices.strategy.DefaultOptimizePotentialPromotionMessageActionStrategy" parent="abstractOptimizeRuleActionStrategy">
+		<property name="promotionAction" value="com.accenture.performance.optimization.data.OptimizedRuleBasedPotentialPromotionMessageAction" />
+	</bean>
+	
+	<!-- <alias name="defaultOptimizeAddProductToCartActionStrategy" alias="addProductToCartActionStrategy"/>
+	<bean id="defaultOptimizeAddProductToCartActionStrategy" parent="abstractOptimizeRuleActionStrategy" class="com.accenture.performance.optimization.ruleengineservices.strategy.DefaultOptimizeAddProductToCartActionStrategy">
+		<property name="productService" ref="productService"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="orderService" ref="orderService"/>
+		<property name="orderUtils" ref="orderUtils"/>
+		<property name="ruleEngineCalculationService" ref="ruleEngineCalculationService"/>
+		<property name="promotionAction" value="com.accenture.performance.optimization.data.OptimizedRuleBasedOrderAddProductAction"/>
+	</bean> -->
+	
+	<alias name="defaultOptimizeShippingActionStrategy" alias="shippingActionStrategy"/>
+	<bean id="defaultOptimizeShippingActionStrategy" parent="abstractOptimizeRuleActionStrategy" class="com.accenture.performance.optimization.ruleengineservices.strategy.DefaultOptimizeShippingActionStrategy" >
+		<property name="deliveryModeDao" ref="deliveryModeDao"/>
+		<property name="promotionAction" value="com.accenture.performance.optimization.data.OptimizedRuleBasedOrderChangeDeliveryModeAction"/>
+	</bean>
+	
+	<alias name="defaultOptimizeCouponFacadeImpl" alias="voucherFacade"/>
+	<bean id="defaultOptimizeCouponFacadeImpl" parent="defaultCouponFacade" class="com.accenture.performance.optimization.facades.impl.DefaultOptimizeCouponFacadeImpl">
 	</bean>
 	
 	<alias name="optimizePromotionResultServiceImpl" alias="promotionResultService" />

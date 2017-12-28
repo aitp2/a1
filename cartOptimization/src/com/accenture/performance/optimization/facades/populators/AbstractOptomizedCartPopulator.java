@@ -17,13 +17,21 @@ import de.hybris.platform.commercefacades.order.data.OrderEntryData;
 import de.hybris.platform.commercefacades.product.PriceDataFactory;
 import de.hybris.platform.commercefacades.product.data.PriceData;
 import de.hybris.platform.commercefacades.product.data.PriceDataType;
+import de.hybris.platform.commercefacades.product.data.PromotionResultData;
 import de.hybris.platform.commerceservices.constants.CommerceServicesConstants;
+import de.hybris.platform.commerceservices.enums.DiscountType;
 import de.hybris.platform.converters.Populator;
 import de.hybris.platform.core.enums.GroupType;
 import de.hybris.platform.core.model.c2l.CurrencyModel;
+import de.hybris.platform.core.model.order.AbstractOrderEntryModel;
+import de.hybris.platform.core.model.order.AbstractOrderModel;
+import de.hybris.platform.promotions.jalo.PromotionResult;
+import de.hybris.platform.promotions.model.PromotionResultModel;
+import de.hybris.platform.promotions.result.PromotionOrderResults;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
 import de.hybris.platform.servicelayer.i18n.CommonI18NService;
 import de.hybris.platform.util.DiscountValue;
+
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -32,7 +40,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
 
+import com.accenture.performance.optimization.data.OptimizedPromotionResultData;
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
 import com.accenture.performance.optimization.facades.data.OptimizedCartEntryData;
 import com.google.common.math.DoubleMath;
@@ -44,7 +55,7 @@ import com.google.common.math.DoubleMath;
 public abstract class AbstractOptomizedCartPopulator<SOURCE extends OptimizedCartData, TARGET extends AbstractOrderData>
 		implements Populator<SOURCE, TARGET>
 {
-
+	private static final Logger LOG = Logger.getLogger(AbstractOptomizedCartPopulator.class);
 	private static final double EPSILON = 0.01d;
 
 	private CommonI18NService commonI18NService;
@@ -83,7 +94,126 @@ public abstract class AbstractOptomizedCartPopulator<SOURCE extends OptimizedCar
 	protected void addPromotions(final OptimizedCartData source, final AbstractOrderData prototype)
 	{
 		//addPromotions(source, getPromotionsService().getPromotionResults(source), prototype);
+		addPromotions(source, source.getAllPromotionResults(), prototype);
 	}
+	
+	protected void addPromotions(final OptimizedCartData source, final List<OptimizedPromotionResultData> promoOrderResults,
+			final AbstractOrderData prototype)
+	{
+		final double quoteDiscountsAmount = getQuoteDiscountsAmount(source);
+		prototype.setQuoteDiscounts(createPrice(source, Double.valueOf(quoteDiscountsAmount)));
+
+		final Pair<DiscountType, Double> quoteDiscountsTypeAndRate = getQuoteDiscountsTypeAndRate(source);
+		prototype.setQuoteDiscountsType(quoteDiscountsTypeAndRate.getKey().getCode());
+		prototype.setQuoteDiscountsRate(quoteDiscountsTypeAndRate.getValue());
+
+		if (promoOrderResults != null)
+		{
+			final double productsDiscountsAmount = getProductsDiscountsAmount(source);
+			final double orderDiscountsAmount = getOrderDiscountsAmount(source);
+
+			prototype.setProductDiscounts(createPrice(source, Double.valueOf(productsDiscountsAmount)));
+			prototype.setOrderDiscounts(createPrice(source, Double.valueOf(orderDiscountsAmount)));
+			prototype.setTotalDiscounts(createPrice(source, Double.valueOf(productsDiscountsAmount + orderDiscountsAmount)));
+			prototype.setTotalDiscountsWithQuoteDiscounts(createPrice(source,
+					Double.valueOf(productsDiscountsAmount + orderDiscountsAmount + quoteDiscountsAmount)));
+			//TODO acn
+			//prototype.setAppliedOrderPromotions();
+			//prototype.setAppliedProductPromotions();
+		}
+	}
+	
+
+	protected double getProductsDiscountsAmount(final OptimizedCartData source)
+	{
+		double discounts = 0.0d;
+
+		final List<OptimizedCartEntryData> entries = source.getEntries();
+		if (entries != null)
+		{
+			for (final OptimizedCartEntryData entry : entries)
+			{
+				final List<DiscountValue> discountValues = entry.getDiscountList();
+				if (discountValues != null)
+				{
+					for (final DiscountValue dValue : discountValues)
+					{
+						discounts += dValue.getAppliedValue();
+					}
+				}
+			}
+		}
+		return discounts;
+	}
+
+	protected double getOrderDiscountsAmount(final AbstractOrderModel source)
+	{
+		double discounts = 0.0d;
+		final List<DiscountValue> discountList = source.getGlobalDiscountValues(); // discounts on the cart itself
+		if (discountList != null && !discountList.isEmpty())
+		{
+			for (final DiscountValue discount : discountList)
+			{
+				final double value = discount.getAppliedValue();
+				if (DoubleMath.fuzzyCompare(value, 0, EPSILON) > 0
+						&& !CommerceServicesConstants.QUOTE_DISCOUNT_CODE.equals(discount.getCode()))
+				{
+					discounts += value;
+				}
+			}
+		}
+		return discounts;
+	}
+
+	protected double getQuoteDiscountsAmount(final OptimizedCartData source)
+	{
+		double discounts = 0.0d;
+		final List<DiscountValue> discountList = source.getGlobalDiscountValues(); // discounts on the cart itself
+		if (discountList != null && !discountList.isEmpty())
+		{
+			for (final DiscountValue discount : discountList)
+			{
+				final double value = discount.getAppliedValue();
+				if (DoubleMath.fuzzyCompare(value, 0, EPSILON) > 0
+						&& CommerceServicesConstants.QUOTE_DISCOUNT_CODE.equals(discount.getCode()))
+				{
+					discounts += value;
+				}
+			}
+		}
+		return discounts;
+	}
+
+	protected Pair<DiscountType, Double> getQuoteDiscountsTypeAndRate(final OptimizedCartData source)
+	{
+		double discounts = 0.0d;
+		DiscountType discountType = DiscountType.PERCENT;
+		final List<DiscountValue> discountList = source.getGlobalDiscountValues(); // discounts on the cart itself
+		if (discountList != null && !discountList.isEmpty())
+		{
+			for (final DiscountValue discount : discountList)
+			{
+				final double value = discount.getAppliedValue();
+				if (DoubleMath.fuzzyCompare(value, 0, EPSILON) > 0
+						&& CommerceServicesConstants.QUOTE_DISCOUNT_CODE.equals(discount.getCode()))
+				{
+					// for now there is only one quote discount entry
+					discounts = discount.getValue();
+					if (discount.isAsTargetPrice())
+					{
+						discountType = DiscountType.TARGET;
+					}
+					else if (discount.isAbsolute())
+					{
+						discountType = DiscountType.ABSOLUTE;
+					}
+					break;
+				}
+			}
+		}
+		return Pair.of(discountType, Double.valueOf(discounts));
+	}
+
 
 	protected void addTotals(final OptimizedCartData source, final AbstractOrderData prototype)
 	{

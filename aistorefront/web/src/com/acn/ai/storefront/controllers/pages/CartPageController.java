@@ -338,7 +338,9 @@ public class CartPageController extends AbstractCartPageController
 		{
 			model.addAttribute(VOUCHER_FORM, new VoucherForm());
 		}
-
+		
+		model.addAttribute("optimizedCartData", cartFacade.getSessionCartData());
+		
 		// Because DefaultSiteConfigService.getProperty() doesn't set default boolean value for undefined property,
 		// this property key was generated to use Config.getBoolean() method
 		final String siteQuoteProperty = SITE_QUOTES_ENABLED.concat(getBaseSiteService().getCurrentBaseSite().getUid());

@@ -137,5 +137,27 @@
 	 
 	 <bean class="com.accenture.performance.optimization.data.OptimizedPromotionOrderAdjustTotalAction" extends="com.accenture.performance.optimization.data.AbstractOptimizedRuleBasedPromotionActionData">
 		<property name="amount" type="java.lang.Double"/>
+	 </bean>
+	 
+	 <bean class="com.accenture.performance.optimization.data.OptimizedPromotionActionParameterData" >
+	 	<property name="uuid" type="java.lang.String"/>
+	 	<property name="value" type="java.lang.Object" />
+	 </bean>
+	 
+	 <bean class="com.accenture.performance.optimization.data.OptimizedRuleBasedPotentialPromotionMessageAction" extends="com.accenture.performance.optimization.data.AbstractOptimizedRuleBasedPromotionActionData">
+		<property name="parameters" type="java.util.Collection&lt;com.accenture.performance.optimization.data.OptimizedPromotionActionParameterData>"/>
+	 </bean>
+	 
+	 <bean class="com.accenture.performance.optimization.data.OptimizedRuleBasedOrderAddProductAction" extends="com.accenture.performance.optimization.data.AbstractOptimizedRuleBasedPromotionActionData">
+		<property name="parameters" type="java.util.Collection&lt;com.accenture.performance.optimization.data.OptimizedPromotionActionParameterData>"/>
+	 </bean>
+	 
+	 <bean class="com.accenture.performance.optimization.data.OptimizedRuleBasedOrderChangeDeliveryModeAction" extends="com.accenture.performance.optimization.data.AbstractOptimizedRuleBasedPromotionActionData">
+		<property name="deliveryMode" type="java.lang.String"/>
+		<property name="deliveryCost" type="java.math.BigDecimal"/>
+		<property name="replacedDeliveryMode" type="java.lang.String"/>
+		<property name="replacedDeliveryCost" type="java.math.BigDecimal"/>
 	 </bean>	
+	 
+	
 </beans>

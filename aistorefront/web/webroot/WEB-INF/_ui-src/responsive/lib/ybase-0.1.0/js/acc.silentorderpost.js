@@ -127,6 +127,7 @@ ACC.silentorderpost = {
 					"billingAddress.town" :  $("input[name='billTo_city']").val(),//billTo_city
 					"billingAddress.postalCode" : $("input[name='billTo_postalCode']").val(),//billTo_postalCode
 					"billingAddress.country.isocode" : $("select[name='billTo_country'] option:selected").val(),//billTo_country
+					"billingAddress.phone" : $("input[name='billTo_phoneNumber']").val()
 					//"region.isocode" : defaultAddressFlag,
 					//"defaultAddress":
 						
