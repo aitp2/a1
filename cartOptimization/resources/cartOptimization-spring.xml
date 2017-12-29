@@ -242,7 +242,14 @@
 	</bean>
 	
 	<alias name="optimizeCouponRaoPopulator" alias="couponRaoPopulator" />
-	<bean id="optimizeCouponRaoPopulator" class="com.accenture.performance.optimization.ruleengineservices.converts.populator.OptimizeCouponRaoPopulator" />
+	<bean id="optimizeCouponRaoPopulator" class="com.accenture.performance.optimization.ruleengineservices.converts.populator.OptimizeCouponRaoPopulator" >
+		<property name="couponService" ref="couponService" />
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+	  <property name="list" ref="cartRaoConverter" />
+	  <property name="add" ref="couponRaoPopulator" />	
+ 	</bean>	
 	
 	<bean id="optimizePromotionOrderRaoProvidersMapping" depends-on="raoProviders" parent="mapMergeDirective" >
 		<property name="key" value="PROMOTION_ORDER"/>
@@ -310,6 +317,7 @@
 		<property name="extendedOrderDao" ref="extendedOrderDao" />
 		<property name="forceImmediateRecalculation" value="false" />
 		<property name="ruleActionMetadataHandlers" ref="ruleActionMetadataHandlers"/>
+		<property name="optimizeModelDealService" ref="optimizeModelDealService" />
 	</bean>
 	
 	<alias name="defaultOptimizePotentialPromotionMessageActionStrategy" alias="potentialPromotionMessageActionStrategy"/>
@@ -331,10 +339,6 @@
 	<bean id="defaultOptimizeShippingActionStrategy" parent="abstractOptimizeRuleActionStrategy" class="com.accenture.performance.optimization.ruleengineservices.strategy.DefaultOptimizeShippingActionStrategy" >
 		<property name="deliveryModeDao" ref="deliveryModeDao"/>
 		<property name="promotionAction" value="com.accenture.performance.optimization.data.OptimizedRuleBasedOrderChangeDeliveryModeAction"/>
-	</bean>
-	
-	<alias name="defaultOptimizeCouponFacadeImpl" alias="voucherFacade"/>
-	<bean id="defaultOptimizeCouponFacadeImpl" parent="defaultCouponFacade" class="com.accenture.performance.optimization.facades.impl.DefaultOptimizeCouponFacadeImpl">
 	</bean>
 	
 	<alias name="optimizePromotionResultServiceImpl" alias="promotionResultService" />
@@ -496,5 +500,18 @@
 		<property name="optimizeModelDealService" ref="optimizeModelDealService"/>
 	</bean>
 
-
+	<alias name="defaultOptimizeCouponManagementService" alias="couponManagementService" />
+	<bean id="defaultOptimizeCouponManagementService" parent="defaultCouponManagementService" class="com.accenture.performance.optimization.service.impl.DefaultOptimizeCouponManagementService">
+		<property name="userService" ref="userService" />
+	</bean>
+	
+	<alias name="defaultOptimizeCouponService" alias="couponService" />
+	<bean id="defaultOptimizeCouponService" parent="defaultCouponService" class="com.accenture.performance.optimization.service.impl.DefaultOptimizeCouponService" >
+		<property name="timeService" ref="timeService" /> 
+		<property name="optimizeModelDealService" ref="optimizeModelDealService" />
+	</bean>
+	
+	<alias name="defaultOptimizeCouponFacadeImpl" alias="voucherFacade"/>
+	<bean id="defaultOptimizeCouponFacadeImpl" parent="defaultCouponFacade" class="com.accenture.performance.optimization.facades.impl.DefaultOptimizeCouponFacadeImpl" />
+	
 </beans>

@@ -42,6 +42,7 @@
 		<property name="allPromotionResults" type="java.util.List&lt;com.accenture.performance.optimization.data.OptimizedPromotionResultData>"/>
 		<property name="currencyCode" type="java.lang.String"/>
 		<property name="net" type="boolean"/>
+		<property name="appliedCouponCodes" type="java.util.Collection&lt;java.lang.String>" />
 	 </bean>
 	 
 	 <bean class="com.accenture.performance.optimization.facades.data.OptimizedCartEntryData">

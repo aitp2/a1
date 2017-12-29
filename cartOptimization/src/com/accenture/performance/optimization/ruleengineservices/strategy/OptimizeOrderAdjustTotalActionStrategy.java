@@ -30,6 +30,7 @@ import com.accenture.performance.optimization.data.OptimizedPromotionResultData;
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
 import com.accenture.performance.optimization.ruleengineservices.service.OptimizePromotionActionService;
 import com.accenture.performance.optimization.service.OptimizeCalculateService;
+import com.accenture.performance.optimization.service.OptimizeModelDealService;
 
 
 /**
@@ -40,6 +41,7 @@ public class OptimizeOrderAdjustTotalActionStrategy
 {
 	private static final Logger LOG = LoggerFactory.getLogger(OptimizeOrderEntryAdjustActionStrategy.class);
 	private RuleActionStrategy oldStrategy;
+	private OptimizeModelDealService optimizeModelDealService;
 
 	@Override
 	public List<OptimizedPromotionResultData> apply(final AbstractRuleActionRAO action)
@@ -77,6 +79,8 @@ public class OptimizeOrderAdjustTotalActionStrategy
 					//					this.getModelService().saveAll(new Object[]
 					//					{ promoResult, actionData, order });
 					this.recalculateIfNeeded(order);
+					optimizeModelDealService.persistCart(order);
+					
 					return Collections.singletonList(promoResult);
 				}
 			}
@@ -141,6 +145,20 @@ public class OptimizeOrderAdjustTotalActionStrategy
 	public void setOldStrategy(final RuleActionStrategy oldStrategy)
 	{
 		this.oldStrategy = oldStrategy;
+	}
+
+	/**
+	 * @return the optimizeModelDealService
+	 */
+	public OptimizeModelDealService getOptimizeModelDealService() {
+		return optimizeModelDealService;
+	}
+
+	/**
+	 * @param optimizeModelDealService the optimizeModelDealService to set
+	 */
+	public void setOptimizeModelDealService(OptimizeModelDealService optimizeModelDealService) {
+		this.optimizeModelDealService = optimizeModelDealService;
 	}
 
 }
