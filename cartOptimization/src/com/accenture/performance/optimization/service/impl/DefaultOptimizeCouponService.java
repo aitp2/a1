@@ -102,11 +102,10 @@ public class DefaultOptimizeCouponService extends DefaultCouponService implement
 	{
 		CouponResponse response = new CouponResponse();
 		response.setSuccess(Boolean.TRUE);
-		//TODO uncomment after test wei.f.zhang
-//		if (this.containsCouponCode(couponCode, order)) {
-//			response.setMessage("coupon.already.exists.cart");
-//			response.setSuccess(Boolean.FALSE);
-//		}
+		if (this.containsCouponCode(couponCode, order)) {
+			response.setMessage("coupon.already.exists.cart");
+			response.setSuccess(Boolean.FALSE);
+		}
 		return response;
 	}
 	
