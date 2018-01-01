@@ -146,11 +146,12 @@ public class DefaultOptimizeCartFacade extends DefaultCartFacade implements Opti
 	public CartModificationData updateCartEntry(final long entryNumber, final long quantity)
 			throws CommerceCartModificationException
 	{
-		final AddToCartParams dto = new AddToCartParams();
-		dto.setQuantity(quantity);
-		final CommerceCartParameter parameter = getCommerceCartParameterConverter().convert(dto);
+		//final AddToCartParams dto = new AddToCartParams();
+		//dto.setQuantity(quantity);
+		final CommerceCartParameter parameter = new CommerceCartParameter();//getCommerceCartParameterConverter().convert(dto);
 		parameter.setEnableHooks(true);
 		parameter.setEntryNumber(entryNumber);
+		parameter.setQuantity(quantity);
 		final CommerceCartModification modification = optimizeCartService.updateQuantityForCartEntry(parameter);
 		return getCartModificationConverter().convert(modification);
 	}

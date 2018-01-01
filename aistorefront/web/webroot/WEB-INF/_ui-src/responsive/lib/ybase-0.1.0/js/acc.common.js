@@ -46,6 +46,23 @@ jQuery.extend({
 	}
 });
 
+window.getAuthToken =function(){
+	var resultData;
+	 var options = {
+			    type : 'GET',
+			    url : "/auth/getToken",
+			    dataType:"json",
+			    async:false,
+			    error : function(request) {
+			    },
+			    success : function(result) {
+			    	resultData = result;
+			    }
+			  };
+			  $.ajax(options);
+    return resultData;
+}
+
 // add a CSRF request token to POST ajax request if its not available
 $.ajaxPrefilter(function (options, originalOptions, jqXHR)
 {

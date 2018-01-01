@@ -51,20 +51,8 @@ ACC.product = {
     bindToAddToCartForm: function () {
         //var addToCartForm = $('.add_to_cart_form');
         ACC.product.showRequest;
-       var options = {
-			    type : 'GET',
-			    url : "/auth/getToken",
-			    dataType:"json",
-			    async:false,
-			    error : function(request) {
-			    },
-			    success : function(result) {
-			    	ACC.product.doAddToCart(result);
-			    }
-			  };
-			  $.ajax(options);
-        
-        
+		var result = getAuthToken();
+		
         //addToCartForm.ajaxForm({
         //	beforeSubmit:,
         //	success: ACC.product.displayAddToCartPopup
@@ -76,7 +64,7 @@ ACC.product = {
      doAddToCart:function(result){
     	 var options = {
  			    type : 'POST',
- 			    url : "/cartOptimizationWebservice/v2/apparel-uk/users/current/carts/"+result.cartUid+"/entries",
+ 			    url : "/cartOptimizationWebservice/v2/"+result.siteId+"/users/current/carts/"+result.cartUid+"/entries",
  			   headers: {Authorization: "Bearer "+result.token },
  			   data:{
  				   "code":$(".add_to_cart_form input[name='productCodePost']").val(),
