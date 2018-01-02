@@ -10,12 +10,13 @@ import org.slf4j.LoggerFactory;
 import com.accenture.performance.optimization.data.OptimizedPromotionResultData;
 import com.accenture.performance.optimization.data.OptimizedRuleBasedOrderAddProductAction;
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
+import com.accenture.performance.optimization.facades.data.OptimizedCartEntryData;
 import com.accenture.performance.optimization.ruleengineservices.service.OptimizePromotionActionService;
+import com.accenture.performance.optimization.service.OptimizeCartService;
+import com.accenture.performance.optimization.service.OptimizeModelDealService;
 
 import de.hybris.platform.core.model.ItemModel;
-import de.hybris.platform.core.model.order.AbstractOrderEntryModel;
 import de.hybris.platform.core.model.product.ProductModel;
-import de.hybris.platform.order.CartService;
 import de.hybris.platform.order.OrderService;
 import de.hybris.platform.product.ProductService;
 import de.hybris.platform.promotions.model.PromotionResultModel;
@@ -34,11 +35,12 @@ public class DefaultOptimizeAddProductToCartActionStrategy
 
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultOptimizeAddProductToCartActionStrategy.class);
 	
-	private CartService cartService;
+	private OptimizeCartService cartService;
 	private OrderService orderService;
 	private ProductService productService;
 	private RuleEngineCalculationService ruleEngineCalculationService;
 	private OrderUtils orderUtils;
+	private OptimizeModelDealService optimizeModelDealService;
 	
 	@Override
 	public List<OptimizedPromotionResultData> apply(AbstractRuleActionRAO action) 
@@ -81,46 +83,43 @@ public class DefaultOptimizeAddProductToCartActionStrategy
 		if (Objects.isNull((Object) order)) {
 			LOG.error("cannot apply {}, order or cart not found: {}", (Object) this.getClass().getSimpleName(),
 					(Object) order);
-			if (this.getModelService().isNew((Object) promoResult)) {
+			/*if (this.getModelService().isNew((Object) promoResult)) {
 				this.getModelService().detach((Object) promoResult);
-			}
+			}*/
 			return Collections.emptyList();
 		}
-		AbstractOrderEntryModel abstractOrderEntry = null;
+		OptimizedCartEntryData abstractOrderEntry = null;
 		if(order instanceof OptimizedCartData)
 		{
-			//TODO acn
-//			abstractOrderEntry = this.getCartService().addNewEntry((AbstractOrderModel) ((CartModel) order), product,
-//					(long) addedOrderEntryRao.getQuantity(), null, -1, false);
+			abstractOrderEntry = this.getCartService().addNewEntry(order, product,
+					(long) addedOrderEntryRao.getQuantity(), null, -1, false);
 		}else
 		{
-			//TODO
-//			
+			//TODO acn
 //			abstractOrderEntry = this.getOrderService().addNewEntry((OrderModel) order, product,
 //					(long) addedOrderEntryRao.getQuantity(), null, -1, false);
 		}
 				
 				
-		abstractOrderEntry.setGiveAway(Boolean.TRUE);
+		abstractOrderEntry.setPromomtionGiftEntry(Boolean.TRUE);
 		addedOrderEntryRao.setEntryNumber(abstractOrderEntry.getEntryNumber());
 		
-	//TODO acn	
-//		OptimizedRuleBasedOrderAddProductAction actionModel = this.createOrderAddProductAction(action,
-//				addedOrderEntryRao.getQuantity(), product, promoResult);
-//		this.handleActionMetadata(action, (OptimizedRuleBasedOrderAddProductAction) actionModel);
+		OptimizedRuleBasedOrderAddProductAction actionModel = this.createOrderAddProductAction(action,
+				addedOrderEntryRao.getQuantity(), product, promoResult);
+		this.handleActionMetadata(action, actionModel);
+		
+		optimizeModelDealService.persistCart(order);//TODO acn
 		////this.getModelService().saveAll(new Object[]{promoResult, actionModel, order, abstractOrderEntry});
 		return Collections.singletonList(promoResult);
 	}
 	
 	protected OptimizedRuleBasedOrderAddProductAction createOrderAddProductAction(AbstractRuleActionRAO action,
-			int quantity, ProductModel product, PromotionResultModel promoResult) {
-		//TODO acn
-//		OptimizedRuleBasedOrderAddProductAction actionModel = (OptimizedRuleBasedOrderAddProductAction) this
-//				.createPromotionAction(promoResult, action);
-		//actionModel.setProduct(product);
-		//actionModel.setQuantity(Long.valueOf(quantity));
-//		return actionModel;
-		return null;
+			int quantity, ProductModel product, OptimizedPromotionResultData promoResult) {
+		OptimizedRuleBasedOrderAddProductAction actionModel = (OptimizedRuleBasedOrderAddProductAction) this
+				.createPromotionAction(promoResult, action);
+		actionModel.setProductCode(product.getCode());
+		actionModel.setQuantity(Long.valueOf(quantity));
+		return actionModel;
 	}
 
 	@Override
@@ -130,19 +129,6 @@ public class DefaultOptimizeAddProductToCartActionStrategy
 		LOG.error("TODO: no implement of undo!");
 	}
 
-	/**
-	 * @return the cartService
-	 */
-	public CartService getCartService() {
-		return cartService;
-	}
-
-	/**
-	 * @param cartService the cartService to set
-	 */
-	public void setCartService(CartService cartService) {
-		this.cartService = cartService;
-	}
 
 	/**
 	 * @return the orderService
@@ -198,6 +184,34 @@ public class DefaultOptimizeAddProductToCartActionStrategy
 	 */
 	public void setOrderUtils(OrderUtils orderUtils) {
 		this.orderUtils = orderUtils;
+	}
+
+	/**
+	 * @return the cartService
+	 */
+	public OptimizeCartService getCartService() {
+		return cartService;
+	}
+
+	/**
+	 * @param cartService the cartService to set
+	 */
+	public void setCartService(OptimizeCartService cartService) {
+		this.cartService = cartService;
+	}
+
+	/**
+	 * @return the optimizeModelDealService
+	 */
+	public OptimizeModelDealService getOptimizeModelDealService() {
+		return optimizeModelDealService;
+	}
+
+	/**
+	 * @param optimizeModelDealService the optimizeModelDealService to set
+	 */
+	public void setOptimizeModelDealService(OptimizeModelDealService optimizeModelDealService) {
+		this.optimizeModelDealService = optimizeModelDealService;
 	}
 
 }

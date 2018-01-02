@@ -150,7 +150,8 @@
 	 </bean>
 	 
 	 <bean class="com.accenture.performance.optimization.data.OptimizedRuleBasedOrderAddProductAction" extends="com.accenture.performance.optimization.data.AbstractOptimizedRuleBasedPromotionActionData">
-		<property name="parameters" type="java.util.Collection&lt;com.accenture.performance.optimization.data.OptimizedPromotionActionParameterData>"/>
+		<property name="productCode" type="java.lang.String"/>
+		<property name="quantity" type="java.lang.Long"/>
 	 </bean>
 	 
 	 <bean class="com.accenture.performance.optimization.data.OptimizedRuleBasedOrderChangeDeliveryModeAction" extends="com.accenture.performance.optimization.data.AbstractOptimizedRuleBasedPromotionActionData">

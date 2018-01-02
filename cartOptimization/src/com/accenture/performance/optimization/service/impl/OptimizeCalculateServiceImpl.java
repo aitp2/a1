@@ -103,23 +103,27 @@ public class OptimizeCalculateServiceImpl extends DefaultCalculationService impl
 
 			for (final OptimizedCartEntryData entry : entries)
 			{
-				calculateEntryTotals(entry, recalculate);
-				final double entryTotal = entry.getTotalPrice().doubleValue();
-				subtotal += entryTotal;
-				// use un-applied version of tax values!!!
-				//				final Collection<TaxValue> allTaxValues = entry.getTaxValues();
-				//				final Set<TaxValue> relativeTaxGroupKey = getUnappliedRelativeTaxValues(allTaxValues);
-				//				for (final TaxValue taxValue : allTaxValues)
-				//				{
-				//					if (taxValue.isAbsolute())
-				//					{
-				//						addAbsoluteEntryTaxValue(entry.getQuantity().longValue(), taxValue.unapply(), taxValueMap);
-				//					}
-				//					else
-				//					{
-				//						addRelativeEntryTaxValue(entryTotal, taxValue.unapply(), relativeTaxGroupKey, taxValueMap);
-				//					}
-				//				}
+				if(!Boolean.TRUE.equals(entry.getPromomtionGiftEntry()))
+				{
+					calculateEntryTotals(entry, recalculate);
+					final double entryTotal = entry.getTotalPrice().doubleValue();
+					subtotal += entryTotal;
+					// use un-applied version of tax values!!!
+					//				final Collection<TaxValue> allTaxValues = entry.getTaxValues();
+					//				final Set<TaxValue> relativeTaxGroupKey = getUnappliedRelativeTaxValues(allTaxValues);
+					//				for (final TaxValue taxValue : allTaxValues)
+					//				{
+					//					if (taxValue.isAbsolute())
+					//					{
+					//						addAbsoluteEntryTaxValue(entry.getQuantity().longValue(), taxValue.unapply(), taxValueMap);
+					//					}
+					//					else
+					//					{
+					//						addRelativeEntryTaxValue(entryTotal, taxValue.unapply(), relativeTaxGroupKey, taxValueMap);
+					//					}
+					//				}
+				}
+				
 			}
 			// store subtotal
 			subtotal = commonI18NService.roundCurrency(subtotal,

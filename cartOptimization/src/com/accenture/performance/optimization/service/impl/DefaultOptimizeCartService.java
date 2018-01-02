@@ -12,40 +12,11 @@
 package com.accenture.performance.optimization.service.impl;
 
 import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParameterNotNull;
-
-import de.hybris.platform.basecommerce.model.site.BaseSiteModel;
-import de.hybris.platform.catalog.CatalogVersionService;
-import de.hybris.platform.commercefacades.order.data.AddToCartParams;
-import de.hybris.platform.commerceservices.constants.CommerceServicesConstants;
-import de.hybris.platform.commerceservices.customer.CustomerAccountService;
-import de.hybris.platform.commerceservices.order.CommerceCartMergingException;
-import de.hybris.platform.commerceservices.order.CommerceCartModification;
-import de.hybris.platform.commerceservices.order.CommerceCartModificationException;
-import de.hybris.platform.commerceservices.order.CommerceCartModificationStatus;
-import de.hybris.platform.commerceservices.order.hook.CommerceAddToCartMethodHook;
-import de.hybris.platform.commerceservices.order.hook.CommerceUpdateCartEntryHook;
-import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
-import de.hybris.platform.core.model.c2l.CurrencyModel;
-import de.hybris.platform.core.model.product.ProductModel;
-import de.hybris.platform.core.model.user.AddressModel;
-import de.hybris.platform.core.model.user.CustomerModel;
-import de.hybris.platform.core.model.user.UserModel;
-import de.hybris.platform.jalo.JaloObjectNoLongerValidException;
-import de.hybris.platform.order.exceptions.CalculationException;
-import de.hybris.platform.order.impl.DefaultCartService;
-import de.hybris.platform.product.ProductService;
-import de.hybris.platform.servicelayer.config.ConfigurationService;
-import de.hybris.platform.servicelayer.i18n.CommonI18NService;
-import de.hybris.platform.servicelayer.session.SessionService;
-import de.hybris.platform.servicelayer.session.SessionService.SessionAttributeLoader;
-import de.hybris.platform.servicelayer.user.UserService;
-import de.hybris.platform.site.BaseSiteService;
-import de.hybris.platform.store.services.BaseStoreService;
-import de.hybris.platform.storelocator.model.PointOfServiceModel;
-import de.hybris.platform.storelocator.pos.PointOfServiceService;
+import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParameterNotNullStandardMessage;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +36,40 @@ import com.accenture.performance.optimization.model.OptimizedCartModel;
 import com.accenture.performance.optimization.service.OptimizeCartService;
 import com.accenture.performance.optimization.service.OptimizeModelDealService;
 
+import de.hybris.platform.basecommerce.model.site.BaseSiteModel;
+import de.hybris.platform.catalog.CatalogVersionService;
+import de.hybris.platform.commercefacades.order.data.AddToCartParams;
+import de.hybris.platform.commerceservices.constants.CommerceServicesConstants;
+import de.hybris.platform.commerceservices.customer.CustomerAccountService;
+import de.hybris.platform.commerceservices.order.CommerceCartMergingException;
+import de.hybris.platform.commerceservices.order.CommerceCartModification;
+import de.hybris.platform.commerceservices.order.CommerceCartModificationException;
+import de.hybris.platform.commerceservices.order.CommerceCartModificationStatus;
+import de.hybris.platform.commerceservices.order.hook.CommerceAddToCartMethodHook;
+import de.hybris.platform.commerceservices.order.hook.CommerceUpdateCartEntryHook;
+import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
+import de.hybris.platform.core.model.c2l.CurrencyModel;
+import de.hybris.platform.core.model.order.AbstractOrderEntryModel;
+import de.hybris.platform.core.model.order.AbstractOrderModel;
+import de.hybris.platform.core.model.product.ProductModel;
+import de.hybris.platform.core.model.product.UnitModel;
+import de.hybris.platform.core.model.user.AddressModel;
+import de.hybris.platform.core.model.user.CustomerModel;
+import de.hybris.platform.core.model.user.UserModel;
+import de.hybris.platform.jalo.JaloObjectNoLongerValidException;
+import de.hybris.platform.order.exceptions.CalculationException;
+import de.hybris.platform.order.impl.DefaultCartService;
+import de.hybris.platform.product.ProductService;
+import de.hybris.platform.servicelayer.config.ConfigurationService;
+import de.hybris.platform.servicelayer.i18n.CommonI18NService;
+import de.hybris.platform.servicelayer.session.SessionService;
+import de.hybris.platform.servicelayer.session.SessionService.SessionAttributeLoader;
+import de.hybris.platform.servicelayer.user.UserService;
+import de.hybris.platform.site.BaseSiteService;
+import de.hybris.platform.store.services.BaseStoreService;
+import de.hybris.platform.storelocator.model.PointOfServiceModel;
+import de.hybris.platform.storelocator.pos.PointOfServiceService;
+
 
 /**
  *
@@ -72,6 +77,8 @@ import com.accenture.performance.optimization.service.OptimizeModelDealService;
 public class DefaultOptimizeCartService extends DefaultCartService implements OptimizeCartService
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultOptimizeCartService.class);
+	private static final int APPEND_AS_LAST = -1;
+	
 	@Autowired
 	private OptimizeCartFactory cartFactory;
 	private SessionService sessionService;
@@ -673,6 +680,152 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 			throw new CommerceCartMergingException(e.getMessage(), e);
 		}
 		return modifications;
+	}
+
+	@Override
+	public OptimizedCartEntryData addNewEntry(OptimizedCartData order, ProductModel product, long qty, UnitModel unit,
+			int number, boolean addToPresent) {
+		validateParameterNotNullStandardMessage("product", product);
+		validateParameterNotNullStandardMessage("order", order);
+		checkQuantity(qty, number);
+		UnitModel usedUnit = unit;
+		if (usedUnit == null)
+		{
+			LOG.debug("No unit passed, trying to get product unit");
+			usedUnit = product.getUnit();
+			validateParameterNotNullStandardMessage("usedUnit", usedUnit);
+		}
+
+		OptimizedCartEntryData ret = getAbstractOrderEntryModel(order, product, qty, number, addToPresent, usedUnit);
+
+		if (ret == null)
+		{
+			ret = new OptimizedCartEntryData();
+			ret.setQuantity(Long.valueOf(qty));
+			ret.setProductCode(product.getCode());
+			ret.setUnit(usedUnit.getCode());
+			addEntryAtPosition(order, ret, number);
+			ret.setCartData(order);
+		}
+		order.setCalculated(Boolean.FALSE);
+		return ret;
+	}
+	
+	protected void checkQuantity(final long qty, final int number)
+	{
+		if (qty <= 0)
+		{
+			throw new IllegalArgumentException("Quantity must be a positive non-zero value");
+		}
+		if (number < APPEND_AS_LAST)
+		{
+			throw new IllegalArgumentException("Number must be greater or equal -1");
+		}
+	}
+	
+	protected OptimizedCartEntryData getAbstractOrderEntryModel(final OptimizedCartData order, final ProductModel product, final long qty,
+			final int number, final boolean addToPresent, final UnitModel usedUnit)
+	{
+		OptimizedCartEntryData ret = null;
+		// search for present entries for this product if needed
+		if (addToPresent)
+		{
+			OptimizedCartEntryData entryData = getEntriesForProduct(order, product.getCode());
+			if(entryData != null)
+			{
+				/*
+				 * Check if the entrymodel has Point of service and if "Yes" then compare the entry number as we might have
+				 * multiple POS for same product and update should happen for right entry model with right POS. Else if the
+				 * POS is null and since we always pass -1 from DefaultCommerceCartService, we pass -1 only for addnew for
+				 * POS, which means it's a shipping mode entry.
+				 *
+				 * Ensure that order entry is not a 'give away', and has same units
+				 */
+				if ((isPOSNullAndAppendAsLast(entryData, number) || isPOSNotNullAndHasEqualEntryNumber(entryData, number))
+						&& isNotGiveAwayAndHasEqualUnit(entryData, usedUnit))
+				{
+					entryData.setQuantity(Long.valueOf(entryData.getQuantity().longValue() + qty));
+					ret = entryData;
+				}
+			}
+		}
+		return ret;
+	}
+	
+	protected boolean isPOSNotNullAndHasEqualEntryNumber(final OptimizedCartEntryData cartEntry, final int number)
+	{
+		return cartEntry.getDeliveryPointOfService() != null && number == cartEntry.getEntryNumber().intValue();
+	}
+
+	protected boolean isPOSNullAndAppendAsLast(final OptimizedCartEntryData cartEntry, final int number)
+	{
+		return cartEntry.getDeliveryPointOfService() == null && number == APPEND_AS_LAST;
+	}
+
+	protected boolean isNotGiveAwayAndHasEqualUnit(final OptimizedCartEntryData cartEntry, final UnitModel usedUnit)
+	{
+		return !Boolean.TRUE.equals(cartEntry.getPromomtionGiftEntry()) && usedUnit.equals(cartEntry.getUnit());
+	}
+	
+	
+	protected int addEntryAtPosition(final OptimizedCartData order, final OptimizedCartEntryData entry, final int requested)
+	{
+		int ret = requested;
+		final List<OptimizedCartEntryData> all = order.getEntries();
+		/*
+		 * just append ?
+		 */
+		final int lastIndex = all.isEmpty() ? 0 : all.size() - 1;
+		final int lastIndexEntryNumberValue = all.isEmpty() ? 0 : (all.get(lastIndex)).getEntryNumber().intValue();
+
+		if (requested < 0)
+		{
+
+			ret = all.isEmpty() ? 0 : lastIndexEntryNumberValue + 1;
+		}
+		/*
+		 * need shuffling other entries
+		 */
+		else
+		{
+			boolean foundEntryWithNumber = false;
+			for (int i = 0, s = all.size(); i < s; i++) //NOPMD
+			{
+				final OptimizedCartEntryData currentEntry = all.get(i);
+				final int enr = currentEntry.getEntryNumber().intValue();
+				// other entry got this number -> we need to shift numbers now
+				if (foundEntryWithNumber)
+				{
+					currentEntry.setEntryNumber(Integer.valueOf(enr + 1));
+				}
+				// found it now?
+				else if (enr == requested)
+				{
+					foundEntryWithNumber = true;
+					currentEntry.setEntryNumber(Integer.valueOf(currentEntry.getEntryNumber().intValue() + 1));
+				}
+				// no other entry got this number -> dont need to shift other entry numbers
+				else if (enr > requested)
+				{
+					break;
+				}
+			}
+		}
+		entry.setEntryNumber(Integer.valueOf(ret));
+
+		final List<OptimizedCartEntryData> newEntries = new ArrayList<OptimizedCartEntryData>(all);
+		newEntries.add(entry);
+		Collections.sort(newEntries, new Comparator<OptimizedCartEntryData>()
+		{
+			@Override
+			public int compare(final OptimizedCartEntryData order1, final OptimizedCartEntryData order2)
+			{
+				return order1.getEntryNumber().compareTo(order2.getEntryNumber());
+			}
+		});
+
+		order.setEntries(newEntries);
+		return ret;
 	}
 
 	/**
