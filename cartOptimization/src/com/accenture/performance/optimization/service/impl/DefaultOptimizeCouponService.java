@@ -65,6 +65,7 @@ public class DefaultOptimizeCouponService extends DefaultCouponService implement
 				}
 				codes.add(clearedCouponCode);
 				cart.setAppliedCouponCodes(codes);
+				optimizeModelDealService.persistCart(cart);
 				////this.getModelService().save((Object) cart);
 				
 				PromotionOrderResults result = this.recalculateOrder(cart);
@@ -129,8 +130,6 @@ public class DefaultOptimizeCouponService extends DefaultCouponService implement
 		ServicesUtil.validateParameterNotNullStandardMessage((String) "order", optimizedCartData);
 		this.getCouponManagementService().releaseCouponCode(couponCode);
 		this.removeCouponAndTriggerCalculation(couponCode, optimizedCartData);
-		
-		//persist or not TODO acn
 	}
 	
 	protected void removeCouponAndTriggerCalculation(String couponCode, OptimizedCartData order)
@@ -145,6 +144,7 @@ public class DefaultOptimizeCouponService extends DefaultCouponService implement
 			order.setAppliedCouponCodes(couponCodesFiltered);
 			order.setCalculated(Boolean.FALSE);
 			
+			optimizeModelDealService.persistCart(order);
 			////this.getModelService().save((Object) order);
 			this.recalculateOrder(order);
 		}

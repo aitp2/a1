@@ -11,6 +11,10 @@
  */
 package com.accenture.performance.optimization.facades.populators;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
 
 import de.hybris.platform.commercefacades.order.data.CartData;
@@ -47,6 +51,9 @@ public class DefaultOptimizedCartPopulator<T extends CartData> extends AbstractO
 			target.setDeliveryMode(getDeliveryMode(source.getDeliveryMode()));
 		}
 		target.setPaymentInfo(source.getPaymentInfo());
+		
+		Collection<String> vouchers = source.getAppliedCouponCodes();
+		target.setAppliedVouchers( vouchers == null ? Collections.emptyList():new ArrayList<>(vouchers));
 	}
 
 	private DeliveryModeData getDeliveryMode(final String deliveryModeCode)
