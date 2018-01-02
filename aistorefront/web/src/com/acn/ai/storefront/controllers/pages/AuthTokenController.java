@@ -8,6 +8,7 @@ import de.hybris.platform.cms2.exceptions.CMSItemNotFoundException;
 import de.hybris.platform.core.model.user.UserModel;
 import de.hybris.platform.servicelayer.session.SessionService;
 import de.hybris.platform.servicelayer.user.UserService;
+import de.hybris.platform.site.BaseSiteService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +43,8 @@ public class AuthTokenController extends AbstractPageController
 	private UserService userService;
 	@Resource(name = "cartFacade")
 	private OptimizedCartFacade cartFacade;
+	@Resource(name = "baseSiteService")
+	private BaseSiteService baseSiteService;
 
 	@RequestMapping(value = "/getToken", method = RequestMethod.GET)
 	public @ResponseBody Map<String, String> getAccessToken() throws CMSItemNotFoundException
@@ -52,7 +55,9 @@ public class AuthTokenController extends AbstractPageController
 		final String token = tokenService.getAccessToken();
 		final OptimizedCartData cart = cartFacade.getSessionCartData();
 		result.put("token", token);
+		result.put("siteId", baseSiteService.getCurrentBaseSite().getUid());
 		result.put("cartUid", userService.isAnonymousUser(userModel) ? cart.getGuid() : cart.getCode());
+
 		return result;
 	}
 }

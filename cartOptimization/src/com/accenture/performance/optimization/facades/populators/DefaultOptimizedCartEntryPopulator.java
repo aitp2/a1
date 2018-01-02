@@ -29,6 +29,7 @@ import de.hybris.platform.servicelayer.i18n.CommonI18NService;
 
 import java.math.BigDecimal;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.springframework.util.Assert;
 
 import com.accenture.performance.optimization.facades.data.OptimizedCartEntryData;
@@ -96,7 +97,7 @@ public class DefaultOptimizedCartEntryPopulator implements Populator<OptimizedCa
 	{
 		entry.setEntryNumber(orderEntry.getEntryNumber());
 		entry.setQuantity(orderEntry.getQuantity());
-		//	adjustUpdateable(entry, orderEntry);
+		entry.setUpdateable(BooleanUtils.isNotTrue(orderEntry.getPromomtionGiftEntry()));
 	}
 
 

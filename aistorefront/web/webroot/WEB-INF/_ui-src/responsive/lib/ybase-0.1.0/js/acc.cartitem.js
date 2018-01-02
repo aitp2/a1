@@ -75,11 +75,30 @@ ACC.cartitem = {
 		var productCode = form.find('input[name=productCode]').val();
 		var initialCartQuantity = form.find('input[name=initialQuantity]').val();
 		var newCartQuantity = form.find('input[name=quantity]').val();
+		var entryNumber = form.find('input[name=entryNumber]').val();
 
 		if(initialCartQuantity != newCartQuantity)
 		{
 			ACC.track.trackUpdateCart(productCode, initialCartQuantity, newCartQuantity);
-			form.submit();
+			var result = getAuthToken();
+			//form.submit();
+			 var options = {
+		 			    type : 'PUT',
+		 			    url : "/cartOptimizationWebservice/v2/"+result.siteId+"/users/current/carts/"+result.cartUid+"/entries/"+entryNumber,
+		 			   headers: {Authorization: "Bearer "+result.token },
+		 			   data:{
+		 				   "qty":newCartQuantity
+		 			   },
+		 			    dataType:"json",
+		 			    async:false,
+		 			    error : function(request) {
+		 			    },
+		 			    success : function(data) {
+		 			    	window.location.reload(true);
+		 			    }
+		 			  };
+		 			  $.ajax(options);
+			
 
 			return true;
 		}

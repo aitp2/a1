@@ -41,7 +41,7 @@
 		<script type="text/javascript" src="${commonResourcePath}/js/jquery.slideviewer.custom.1.2.js"></script>
 		
 		<%-- Custom ACC JS --%>
-		
+		<script type="text/javascript" src="${commonResourcePath}/js/acc.common.js"></script>
 		<script type="text/javascript" src="${commonResourcePath}/js/acc.address.js"></script>
 		<script type="text/javascript" src="${commonResourcePath}/js/acc.autocomplete.js"></script>
 		<script type="text/javascript" src="${commonResourcePath}/js/acc.carousel.js"></script>
@@ -52,7 +52,6 @@
 		<script type="text/javascript" src="${commonResourcePath}/js/acc.checkoutsteps.js"></script>
 		<script type="text/javascript" src="${commonResourcePath}/js/acc.cms.js"></script>
 		<script type="text/javascript" src="${commonResourcePath}/js/acc.colorbox.js"></script>
-		<script type="text/javascript" src="${commonResourcePath}/js/acc.common.js"></script>
 		<script type="text/javascript" src="${commonResourcePath}/js/acc.forgottenpassword.js"></script>
 		<script type="text/javascript" src="${commonResourcePath}/js/acc.global.js"></script>
 		<script type="text/javascript" src="${commonResourcePath}/js/acc.hopdebug.js"></script>
