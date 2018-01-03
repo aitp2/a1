@@ -42,14 +42,10 @@
 <ul id="js-applied-vouchers" class="selected_product_ids clearfix voucher-list">
     <c:forEach items="${cartData.appliedVouchers}" var="voucher" varStatus="loop">
         <li class="voucher-list__item">
-            <form:form id="removeVoucherForm${loop.index}" action="${removeVoucherAction}" method="post"
-                       commandName="voucherForm">
                 <span class="js-release-voucher voucher-list__item-box" id="voucher-code-${fn:escapeXml(voucher)}">
                      ${fn:escapeXml(voucher)}
-                     <form:input hidden="hidden" value="${fn:escapeXml(voucher)}" path="voucherCode"/>
-                    <span class="glyphicon glyphicon-remove js-release-voucher-remove-btn voucher-list__item-remove"></span>
+                    <span class="glyphicon glyphicon-remove js-release-voucher-remove-btn voucher-list__item-remove" attr_voucher_code="${fn:escapeXml(voucher)}"></span>
                 </span>
-            </form:form>
         </li>
     </c:forEach>
 </ul>

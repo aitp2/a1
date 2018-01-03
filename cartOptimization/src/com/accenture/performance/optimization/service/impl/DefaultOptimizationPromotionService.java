@@ -104,11 +104,18 @@ public class DefaultOptimizationPromotionService extends DefaultPromotionEngineS
 					// optimized action process: OptimizedPromotionResultData
 					final List applyAllActionList = ((OptimizeRuleActionService) this.getRuleActionService())
 							.applyAllActionsForData(rere.getResult());
-					actionApplicationResults = applyAllActionList.stream().filter((item) -> {
-						return item instanceof OptimizedPromotionResultData;
-					}).map((item) -> {
-						return (OptimizedPromotionResultData) item;
-					}).collect(Collectors.toList());
+					
+					actionApplicationResults = applyAllActionList
+							.stream()
+							.filter((item) -> {
+								return item instanceof OptimizedPromotionResultData;
+							})
+							.map((item) -> {
+								return (OptimizedPromotionResultData) item;
+							})
+							.collect(Collectors.toList());
+					
+					//TODO acn
 					order.setAllPromotionResults((List<OptimizedPromotionResultData>) actionApplicationResults);
 				}
 				else

@@ -384,13 +384,59 @@ ACC.cart = {
     handleApplyVoucher: function (e) {
         var voucherCode = $.trim($("#js-voucher-code-text").val());
         if (voucherCode != '' && voucherCode.length > 0) {
-            $("#applyVoucherForm").submit();
+        	var result = getAuthToken();
+        	var url = "/cartOptimizationWebservice/v2/"+result.siteId+"/users/current/carts/"+result.cartUid+"/vouchers";
+        	
+        	var options = {
+        			type : 'POST',
+     			    url : url,
+     			    headers: {Authorization: "Bearer "+result.token },
+     			    data:{
+     				   "voucherId":voucherCode
+     			    },
+     			    async:false,
+     			    
+     			    error : function(request) {
+     			    	console.log(request);
+     			    },
+     			    
+     			    success : function(data) {
+     			    	//redirect cart
+     			    	window.location=ACC.config.contextPath+'/'+ACC.config.language+'/cart';
+     			    	//TODO fragement later
+     			    }
+        	};
+        	
+        	$.ajax(options);
         }
     },
 
     bindToReleaseVoucher: function () {
         $('.js-release-voucher-remove-btn').on("click", function (event) {
-            $(this).closest('form').submit();
+        	 var voucherCode = $.trim($(this).attr('attr_voucher_code'));
+        	 if (voucherCode != '' && voucherCode.length > 0) {
+        		 var result = getAuthToken();
+             	 var url = "/cartOptimizationWebservice/v2/"+result.siteId+"/users/current/carts/"+result.cartUid+"/vouchers/"+voucherCode;
+             	 
+             	var options = {
+            			type : 'DELETE',
+         			    url : url,
+         			    headers: {Authorization: "Bearer "+result.token },
+         			    async:false,
+         			    
+         			    error : function(request) {
+         			    	console.log(request);
+         			    },
+         			    
+         			    success : function(data) {
+         			    	//redirect cart
+         			    	window.location=ACC.config.contextPath+'/'+ACC.config.language+'/cart';
+         			    	//TODO fragement later
+         			    }
+            	};
+            	
+            	$.ajax(options);
+        	 }
         });
     }
 
