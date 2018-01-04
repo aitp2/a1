@@ -12,20 +12,8 @@
 package com.accenture.performance.optimization.ruleengineservices.service.impl;
 
 
-import de.hybris.platform.order.exceptions.CalculationException;
-import de.hybris.platform.promotionengineservices.model.RuleBasedPromotionModel;
-import de.hybris.platform.promotionengineservices.promotionengine.impl.DefaultPromotionActionService;
-import de.hybris.platform.ruleengine.model.AbstractRuleEngineRuleModel;
-import de.hybris.platform.ruleengineservices.rao.AbstractOrderRAO;
-import de.hybris.platform.ruleengineservices.rao.AbstractRuleActionRAO;
-import de.hybris.platform.ruleengineservices.rao.DiscountRAO;
-import de.hybris.platform.ruleengineservices.rao.DisplayMessageRAO;
-import de.hybris.platform.ruleengineservices.rao.OrderEntryConsumedRAO;
-import de.hybris.platform.ruleengineservices.rao.OrderEntryRAO;
-import de.hybris.platform.servicelayer.util.ServicesUtil;
-import de.hybris.platform.util.DiscountValue;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -38,6 +26,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.accenture.performance.optimization.data.AbstractOptimizedPromotionActionData;
+import com.accenture.performance.optimization.data.AbstractOptimizedRuleBasedPromotionActionData;
 import com.accenture.performance.optimization.data.OptimizedPromotionOrderEntryConsumedData;
 import com.accenture.performance.optimization.data.OptimizedPromotionResultData;
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
@@ -47,6 +37,23 @@ import com.accenture.performance.optimization.ruleengineservices.service.Optimiz
 import com.accenture.performance.optimization.ruleengineservices.service.PromtionOrderNotFoundExcetpion;
 import com.accenture.performance.optimization.service.OptimizeCalculateService;
 import com.accenture.performance.optimization.service.OptimizeCartService;
+
+import de.hybris.platform.core.model.order.AbstractOrderModel;
+import de.hybris.platform.order.exceptions.CalculationException;
+import de.hybris.platform.promotionengineservices.model.AbstractRuleBasedPromotionActionModel;
+import de.hybris.platform.promotionengineservices.model.RuleBasedPromotionModel;
+import de.hybris.platform.promotionengineservices.promotionengine.impl.DefaultPromotionActionService;
+import de.hybris.platform.promotions.model.AbstractPromotionActionModel;
+import de.hybris.platform.promotions.model.PromotionResultModel;
+import de.hybris.platform.ruleengine.model.AbstractRuleEngineRuleModel;
+import de.hybris.platform.ruleengineservices.rao.AbstractOrderRAO;
+import de.hybris.platform.ruleengineservices.rao.AbstractRuleActionRAO;
+import de.hybris.platform.ruleengineservices.rao.DiscountRAO;
+import de.hybris.platform.ruleengineservices.rao.DisplayMessageRAO;
+import de.hybris.platform.ruleengineservices.rao.OrderEntryConsumedRAO;
+import de.hybris.platform.ruleengineservices.rao.OrderEntryRAO;
+import de.hybris.platform.servicelayer.util.ServicesUtil;
+import de.hybris.platform.util.DiscountValue;
 
 
 /**
@@ -113,6 +120,8 @@ public class OptimizePromotionActionServiceImpl extends DefaultPromotionActionSe
 			}
 
 			cartData.setCalculated(Boolean.FALSE);
+			
+			optimizeCartService.setSessionOptimizedCart(cartData);//TODO acn
 			//this.getModelService().save(order);
 		}
 	}
@@ -164,11 +173,11 @@ public class OptimizePromotionActionServiceImpl extends DefaultPromotionActionSe
 		}
 
 		final AbstractRuleEngineRuleModel engineRule1 = this.getRule(actionRao);
-		//OptimizedPromotionResultData promoResult = this.findExistingPromotionResultModel(engineRule1, order);
-		//if (Objects.isNull(promoResult))
-		//{
-		final OptimizedPromotionResultData promoResult = new OptimizedPromotionResultData();
-		//}
+		OptimizedPromotionResultData promoResult = this.findExistingPromotionResultModel(engineRule1, order);
+		if (Objects.isNull(promoResult))
+		{
+			promoResult = new OptimizedPromotionResultData();
+		}
 
 		promoResult.setCart(order);
 		final RuleBasedPromotionModel ruleBaseP = this.getPromotion(actionRao);
@@ -208,6 +217,35 @@ public class OptimizePromotionActionServiceImpl extends DefaultPromotionActionSe
 		}
 
 		return promoResult;
+	}
+	
+	//TODO acn
+	protected OptimizedPromotionResultData findExistingPromotionResultModel(AbstractRuleEngineRuleModel rule,
+			OptimizedCartData order) {
+		if (rule != null && order != null) {
+			List<OptimizedPromotionResultData> results = order.getAllPromotionResults();
+			if(CollectionUtils.isEmpty(results)) {
+				return null;
+			}
+			
+			for (OptimizedPromotionResultData result : results) 
+			{
+				Collection actions = result.getActions();
+				if (!actions.stream()
+						.filter(a -> a instanceof AbstractOptimizedRuleBasedPromotionActionData)
+						.map(a -> (AbstractOptimizedRuleBasedPromotionActionData) a)
+						.anyMatch(a -> {
+							AbstractOptimizedRuleBasedPromotionActionData action = (AbstractOptimizedRuleBasedPromotionActionData)a;
+							return action.getRulePK() != null && rule.getPk().toString().equals(action.getRulePK());
+						}))
+				{
+					continue;
+				}
+				
+				return result;
+			}//end for
+		}
+		return null;
 	}
 
 	/**
