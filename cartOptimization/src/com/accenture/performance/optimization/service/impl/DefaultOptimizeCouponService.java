@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
-import com.accenture.performance.optimization.ruleengineservices.result.OptimizedPromotionOrderResults;
+import com.accenture.performance.optimization.service.OptimizeCalculateService;
 import com.accenture.performance.optimization.service.OptimizeCouponManagementService;
 import com.accenture.performance.optimization.service.OptimizeCouponService;
 import com.accenture.performance.optimization.service.OptimizeModelDealService;
@@ -30,7 +30,7 @@ public class DefaultOptimizeCouponService extends DefaultCouponService implement
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultOptimizeCouponService.class);
 	
-	private OptimizeCalculateServiceImpl calculationService;
+	private OptimizeCalculateService calculationService;
 	private DefaultOptimizationPromotionService promotionsService;
 	private OptimizeCouponManagementService couponManagementService;
 	private OptimizeModelDealService optimizeModelDealService;
@@ -68,13 +68,7 @@ public class DefaultOptimizeCouponService extends DefaultCouponService implement
 				optimizeModelDealService.persistCart(cart);
 				////this.getModelService().save((Object) cart);
 				
-				PromotionOrderResults result = this.recalculateOrder(cart);
-				if(result != null && result instanceof OptimizedPromotionOrderResults)
-				{
-					final OptimizedCartData cartResult = ((OptimizedPromotionOrderResults)result).getOptimizedCart();
-					LOG.info("GlobalDiscountValues is empty:"+CollectionUtils.isEmpty(cartResult.getGlobalDiscountValues()));
-					////optimizeModelDealService.persistCart();
-				}
+				this.recalculateOrder(cart);
 			}
 		} 
 		catch (CouponServiceException ex) 
@@ -164,14 +158,14 @@ public class DefaultOptimizeCouponService extends DefaultCouponService implement
 	 * @return the calculationService
 	 */
 	@Override
-	public OptimizeCalculateServiceImpl getCalculationService() {
+	public OptimizeCalculateService getCalculationService() {
 		return calculationService;
 	}
 
 	/**
 	 * @param calculationService the calculationService to set
 	 */
-	public void setCalculationService(OptimizeCalculateServiceImpl calculationService) {
+	public void setCalculationService(OptimizeCalculateService calculationService) {
 		super.setCalculationService(calculationService);
 		this.calculationService = calculationService;
 	}
