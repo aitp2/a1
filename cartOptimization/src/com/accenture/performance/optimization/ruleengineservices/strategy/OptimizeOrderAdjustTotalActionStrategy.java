@@ -79,7 +79,6 @@ public class OptimizeOrderAdjustTotalActionStrategy
 					//					this.getModelService().saveAll(new Object[]
 					//					{ promoResult, actionData, order });
 					this.recalculateIfNeeded(order);
-					optimizeModelDealService.persistCart(order);
 					
 					return Collections.singletonList(promoResult);
 				}
