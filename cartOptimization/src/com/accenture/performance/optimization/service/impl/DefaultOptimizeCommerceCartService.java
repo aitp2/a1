@@ -13,17 +13,6 @@ package com.accenture.performance.optimization.service.impl;
 
 import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParameterNotNull;
 
-import de.hybris.platform.commerceservices.order.CommerceCartModification;
-import de.hybris.platform.commerceservices.order.CommerceCartRestoration;
-import de.hybris.platform.commerceservices.order.CommerceCartRestorationException;
-import de.hybris.platform.commerceservices.order.impl.DefaultCommerceCartService;
-import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
-import de.hybris.platform.order.CalculationService;
-import de.hybris.platform.order.exceptions.CalculationException;
-import de.hybris.platform.promotions.model.PromotionGroupModel;
-import de.hybris.platform.servicelayer.i18n.CommonI18NService;
-import de.hybris.platform.servicelayer.time.TimeService;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +26,18 @@ import com.accenture.performance.optimization.facades.data.OptimizedCartEntryDat
 import com.accenture.performance.optimization.service.OptimizeCartService;
 import com.accenture.performance.optimization.service.OptimizeCommerceCartService;
 import com.accenture.performance.optimization.service.OptimizePromotionService;
+
+import de.hybris.platform.commerceservices.order.CommerceCartModification;
+import de.hybris.platform.commerceservices.order.CommerceCartRestoration;
+import de.hybris.platform.commerceservices.order.CommerceCartRestorationException;
+import de.hybris.platform.commerceservices.order.impl.DefaultCommerceCartService;
+import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
+import de.hybris.platform.order.CalculationService;
+import de.hybris.platform.order.exceptions.CalculationException;
+import de.hybris.platform.promotions.model.PromotionGroupModel;
+import de.hybris.platform.servicelayer.i18n.CommonI18NService;
+import de.hybris.platform.servicelayer.time.TimeService;
+import de.hybris.platform.util.DiscountValue;
 
 
 /**
@@ -173,10 +174,14 @@ public class DefaultOptimizeCommerceCartService extends DefaultCommerceCartServi
 		double totalPrice = 0.0;
 		for (final OptimizedCartEntryData e : order.getEntries())
 		{
-			totalPrice = calculateOneEntries(e, e.getCalculated().booleanValue());
+			if(!Boolean.TRUE.equals(e.getPromomtionGiftEntry()))
+			{
+				totalPrice = calculateOneEntries(e, e.getCalculated().booleanValue());
 
-			//recalculateOrderEntryIfNeeded(e, forceRecalculate);
-			subtotal += totalPrice;
+				//recalculateOrderEntryIfNeeded(e, forceRecalculate);
+				subtotal += totalPrice;
+			}
+			
 		}
 		order.setTotalPrice(Double.valueOf(subtotal));
 		order.setSubtotal(Double.valueOf(subtotal));
