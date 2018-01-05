@@ -36,6 +36,7 @@ public class DefaultOptimizePotentialPromotionMessageActionStrategy	extends Abst
 		}
 		
 		OptimizedPromotionResultData promoResult = this.getPromotionActionService().createPromotionResultData(action);
+		
 		if (promoResult == null) {
 			LOG.error("cannot apply {}, promotionResult could not be created.",
 					(Object) this.getClass().getSimpleName());

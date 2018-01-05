@@ -72,6 +72,7 @@ public class DefaultOptimizeAddProductToCartActionStrategy
 			return Collections.emptyList();
 		}
 		OptimizedPromotionResultData promoResult = ((OptimizePromotionActionService)getPromotionActionService()).createPromotionResultData(action);
+		
 		if (promoResult == null) {
 			LOG.error("cannot apply {}, promotionResult could not be created.",
 					(Object) this.getClass().getSimpleName());

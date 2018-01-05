@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -33,7 +34,6 @@ import com.accenture.performance.optimization.facades.data.OptimizedCartData;
 import com.accenture.performance.optimization.facades.data.OptimizedCartEntryData;
 import com.accenture.performance.optimization.ruleengineservices.service.OptimizePromotionActionService;
 import com.accenture.performance.optimization.ruleengineservices.service.OptimizePromotionResultService;
-import com.accenture.performance.optimization.ruleengineservices.service.PromtionOrderNotFoundExcetpion;
 import com.accenture.performance.optimization.service.OptimizeCalculateService;
 import com.accenture.performance.optimization.service.OptimizeCartService;
 
@@ -171,6 +171,11 @@ public class OptimizePromotionActionServiceImpl extends DefaultPromotionActionSe
 		if (Objects.isNull(promoResult))
 		{
 			promoResult = new OptimizedPromotionResultData();
+			if(null == order.getAllPromotionResults())
+			{
+				order.setAllPromotionResults(new LinkedList<OptimizedPromotionResultData>());
+			}
+			order.getAllPromotionResults().add(promoResult);
 		}
 
 		promoResult.setCart(order);
