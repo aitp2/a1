@@ -49,8 +49,6 @@ import de.hybris.platform.commerceservices.order.hook.CommerceAddToCartMethodHoo
 import de.hybris.platform.commerceservices.order.hook.CommerceUpdateCartEntryHook;
 import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
 import de.hybris.platform.core.model.c2l.CurrencyModel;
-import de.hybris.platform.core.model.order.AbstractOrderEntryModel;
-import de.hybris.platform.core.model.order.AbstractOrderModel;
 import de.hybris.platform.core.model.product.ProductModel;
 import de.hybris.platform.core.model.product.UnitModel;
 import de.hybris.platform.core.model.user.AddressModel;
@@ -212,7 +210,23 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 	{
 		try
 		{
-			return getSessionService().getAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME) != null  && internalGetSessionOptimizedCart() != null;
+			boolean flag = getSessionService().getAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME) != null  ;
+			if(flag) 
+			{
+				if(internalGetSessionOptimizedCart() != null)
+				{
+					return flag;
+				}
+				else
+				{
+					throw new JaloObjectNoLongerValidException(null,null,"Session Cart no longer valid.",0);
+				}
+			}
+			else
+			{
+				return flag;
+			}
+			
 		}
 		catch (final JaloObjectNoLongerValidException ex)
 		{
