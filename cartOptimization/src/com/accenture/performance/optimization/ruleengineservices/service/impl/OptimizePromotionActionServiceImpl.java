@@ -26,7 +26,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.accenture.performance.optimization.data.AbstractOptimizedPromotionActionData;
 import com.accenture.performance.optimization.data.AbstractOptimizedRuleBasedPromotionActionData;
 import com.accenture.performance.optimization.data.OptimizedPromotionOrderEntryConsumedData;
 import com.accenture.performance.optimization.data.OptimizedPromotionResultData;
@@ -38,13 +37,9 @@ import com.accenture.performance.optimization.ruleengineservices.service.Promtio
 import com.accenture.performance.optimization.service.OptimizeCalculateService;
 import com.accenture.performance.optimization.service.OptimizeCartService;
 
-import de.hybris.platform.core.model.order.AbstractOrderModel;
 import de.hybris.platform.order.exceptions.CalculationException;
-import de.hybris.platform.promotionengineservices.model.AbstractRuleBasedPromotionActionModel;
 import de.hybris.platform.promotionengineservices.model.RuleBasedPromotionModel;
 import de.hybris.platform.promotionengineservices.promotionengine.impl.DefaultPromotionActionService;
-import de.hybris.platform.promotions.model.AbstractPromotionActionModel;
-import de.hybris.platform.promotions.model.PromotionResultModel;
 import de.hybris.platform.ruleengine.model.AbstractRuleEngineRuleModel;
 import de.hybris.platform.ruleengineservices.rao.AbstractOrderRAO;
 import de.hybris.platform.ruleengineservices.rao.AbstractRuleActionRAO;
@@ -69,16 +64,16 @@ public class OptimizePromotionActionServiceImpl extends DefaultPromotionActionSe
 	{
 		ServicesUtil.validateParameterNotNull(action, "action must not be null");
 		return !(action.getAppliedToObject() instanceof OrderEntryRAO) ? null
-				: this.getOrderEntryData((OrderEntryRAO) action.getAppliedToObject());
+				: this.getOrderEntryData((OrderEntryRAO) action.getAppliedToObject(),action);
 	}
 
-	protected OptimizedCartEntryData getOrderEntryData(final OrderEntryRAO orderEntryRao)
+	protected OptimizedCartEntryData getOrderEntryData(final OrderEntryRAO orderEntryRao,final AbstractRuleActionRAO action)
 	{
 		ServicesUtil.validateParameterNotNull(orderEntryRao, "orderEntryRao must not be null");
 		ServicesUtil.validateParameterNotNull(orderEntryRao.getEntryNumber(), "orderEntryRao.entryNumber must not be null");
 		ServicesUtil.validateParameterNotNull(orderEntryRao.getProduct(), "orderEntryRao.product must not be null");
 		ServicesUtil.validateParameterNotNull(orderEntryRao.getProduct().getCode(), "orderEntryRao.product.code must not be null");
-		final OptimizedCartData order = this.getOrderData(orderEntryRao.getOrder());
+		final OptimizedCartData order = action.getCart();
 		if (order == null)
 		{
 			return null;
@@ -121,7 +116,6 @@ public class OptimizePromotionActionServiceImpl extends DefaultPromotionActionSe
 
 			cartData.setCalculated(Boolean.FALSE);
 			
-			optimizeCartService.setSessionOptimizedCart(cartData);//TODO acn
 			//this.getModelService().save(order);
 		}
 	}
@@ -237,7 +231,8 @@ public class OptimizePromotionActionServiceImpl extends DefaultPromotionActionSe
 						.anyMatch(a -> {
 							AbstractOptimizedRuleBasedPromotionActionData action = (AbstractOptimizedRuleBasedPromotionActionData)a;
 							return action.getRulePK() != null && rule.getPk().toString().equals(action.getRulePK());
-						}))
+						})
+					)
 				{
 					continue;
 				}
@@ -267,7 +262,7 @@ public class OptimizePromotionActionServiceImpl extends DefaultPromotionActionSe
 
 		if (orderRao != null)
 		{
-			return this.getOrderData(orderRao);
+			return actionRao.getCart();
 		}
 
 		return null;
@@ -289,7 +284,7 @@ public class OptimizePromotionActionServiceImpl extends DefaultPromotionActionSe
 			{
 				final OrderEntryConsumedRAO orderEntryConsumedRAO = (OrderEntryConsumedRAO) arg4.next();
 				promotionOrderEntryConsumed = new OptimizedPromotionOrderEntryConsumedData();
-				promotionOrderEntryConsumed.setOrderEntry(this.getOrderEntryData(orderEntryConsumedRAO.getOrderEntry()));
+				promotionOrderEntryConsumed.setOrderEntry(this.getOrderEntryData(orderEntryConsumedRAO.getOrderEntry(),action));
 				promotionOrderEntryConsumed.setQuantity(Integer.valueOf(orderEntryConsumedRAO.getQuantity()));
 				if (orderEntryConsumedRAO.getAdjustedUnitPrice() != null)
 				{
@@ -302,19 +297,19 @@ public class OptimizePromotionActionServiceImpl extends DefaultPromotionActionSe
 		return promotionOrderEntriesConsumed;
 	}
 
-	protected OptimizedCartData getOrderData(final AbstractOrderRAO orderRao)
-	{
-		OptimizedCartData order = null;
-		final String orderCode = orderRao.getCode();
-
-		order = this.getOptimizeCartService().getSessionOptimizedCart();
-		if (!orderCode.equals(order.getCode()))
-		{
-			LOG.error("Can\'t apply promotion since failed to find order instance by it code {}.", orderCode);
-			throw new PromtionOrderNotFoundExcetpion("can't apply promotion to order, as no found", orderCode);
-		}
-		return order;
-	}
+//	protected OptimizedCartData getOrderData(final AbstractOrderRAO orderRao)
+//	{
+//		OptimizedCartData order = null;
+//		final String orderCode = orderRao.getCode();
+//
+//		order = this.getOptimizeCartService().getSessionOptimizedCart();
+//		if (!orderCode.equals(order.getCode()))
+//		{
+//			LOG.error("Can\'t apply promotion since failed to find order instance by it code {}.", orderCode);
+//			throw new PromtionOrderNotFoundExcetpion("can't apply promotion to order, as no found", orderCode);
+//		}
+//		return order;
+//	}
 
 	@Override
 	public OptimizedCartData getOrderData(final AbstractRuleActionRAO action)

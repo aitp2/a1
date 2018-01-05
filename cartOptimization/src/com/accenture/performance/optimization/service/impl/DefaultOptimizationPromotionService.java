@@ -115,7 +115,6 @@ public class DefaultOptimizationPromotionService extends DefaultPromotionEngineS
 							})
 							.collect(Collectors.toList());
 					
-					//TODO acn
 					order.setAllPromotionResults((List<OptimizedPromotionResultData>) actionApplicationResults);
 				}
 				else
@@ -160,7 +159,9 @@ public class DefaultOptimizationPromotionService extends DefaultPromotionEngineS
 			final RuleEvaluationContext e = this.prepareContext(
 					this.getFactContextFactory().createFactContext(FactContextType.PROMOTION_ORDER, facts),
 					this.determineRuleEngineContext(order));
-			return this.getCommerceRuleEngineService().evaluate(e);
+			RuleEvaluationResult resultReturn = this.getCommerceRuleEngineService().evaluate(e);
+			resultReturn.getResult().setCart(order);
+			return resultReturn;
 		}
 		catch (final IllegalStateException arg6)
 		{

@@ -161,5 +161,13 @@
 		<property name="replacedDeliveryCost" type="java.math.BigDecimal"/>
 	 </bean>	
 	 
+	 <bean class="de.hybris.platform.ruleengineservices.rao.RuleEngineResultRAO">
+		<property name="cart" type="com.accenture.performance.optimization.facades.data.OptimizedCartData" />
+	</bean>
+	
+	<bean class="de.hybris.platform.ruleengineservices.rao.AbstractRuleActionRAO">
+		<property name="cart" type="com.accenture.performance.optimization.facades.data.OptimizedCartData" />
+	</bean>
+	 
 	
 </beans>

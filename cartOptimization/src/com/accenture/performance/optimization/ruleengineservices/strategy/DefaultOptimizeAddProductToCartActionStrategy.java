@@ -19,7 +19,6 @@ import de.hybris.platform.core.model.ItemModel;
 import de.hybris.platform.core.model.product.ProductModel;
 import de.hybris.platform.order.OrderService;
 import de.hybris.platform.product.ProductService;
-import de.hybris.platform.promotions.model.PromotionResultModel;
 import de.hybris.platform.ruleengineservices.calculation.RuleEngineCalculationService;
 import de.hybris.platform.ruleengineservices.rao.AbstractRuleActionRAO;
 import de.hybris.platform.ruleengineservices.rao.CartRAO;
@@ -108,7 +107,6 @@ public class DefaultOptimizeAddProductToCartActionStrategy
 				addedOrderEntryRao.getQuantity(), product, promoResult);
 		this.handleActionMetadata(action, actionModel);
 		
-		optimizeModelDealService.persistCart(order);//TODO acn
 		////this.getModelService().saveAll(new Object[]{promoResult, actionModel, order, abstractOrderEntry});
 		return Collections.singletonList(promoResult);
 	}

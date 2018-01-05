@@ -60,6 +60,7 @@ public class OptimizeRuleActionServiceImpl extends DefaultPromotionRuleActionSer
 			while (actionIter.hasNext())
 			{
 				final AbstractRuleActionRAO action = (AbstractRuleActionRAO) actionIter.next();
+				action.setCart(ruleEngineResultRAO.getCart());
 				final RuleActionStrategy strategy = this.getRuleActionStrategy(action.getActionStrategyKey());
 				if (Objects.isNull(strategy))
 				{
