@@ -70,7 +70,7 @@ public class OptimizeRuleActionServiceImpl extends DefaultPromotionRuleActionSer
 				else if (!(action instanceof DiscountRAO) || ((DiscountRAO) action).getValue() == null
 						|| ((DiscountRAO) action).getValue().compareTo(BigDecimal.ZERO) > 0)
 				{
-					final Object result = strategy.apply(action);
+					final Object result = strategy.apply(action).get(0);////////
 					if(result instanceof OptimizedPromotionResultData)
 					{
 						List<String> promoPKList = (List<String>) actionResults.stream()
@@ -83,14 +83,13 @@ public class OptimizeRuleActionServiceImpl extends DefaultPromotionRuleActionSer
 						.collect(Collectors.toList());
 						
 						if(!promoPKList.contains(((OptimizedPromotionResultData)result).getPromotionPK())) {
-							actionResults.add(result);
+							actionResults.add(result);////////
 						}
 					}
 					else 
 					{
-						actionResults.add(result);
+						actionResults.add(result);////////
 					}
-					
 				}
 			}
 			// TODO: calculate cart again.

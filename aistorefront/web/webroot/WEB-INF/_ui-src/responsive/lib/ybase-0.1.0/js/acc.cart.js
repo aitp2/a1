@@ -401,8 +401,7 @@ ACC.cart = {
      			    },
      			    
      			    success : function(data) {
-     			    	//redirect cart
-     			    	window.location=ACC.config.contextPath+'/'+ACC.config.language+'/cart';
+     			    	window.location.reload(true);
      			    	//TODO fragement later
      			    }
         	};
@@ -429,8 +428,7 @@ ACC.cart = {
          			    },
          			    
          			    success : function(data) {
-         			    	//redirect cart
-         			    	window.location=ACC.config.contextPath+'/'+ACC.config.language+'/cart';
+         			    	window.location.reload(true);
          			    	//TODO fragement later
          			    }
             	};

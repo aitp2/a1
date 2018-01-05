@@ -65,10 +65,9 @@ public class DefaultOptimizeCouponService extends DefaultCouponService implement
 				}
 				codes.add(clearedCouponCode);
 				cart.setAppliedCouponCodes(codes);
-				optimizeModelDealService.persistCart(cart);
 				////this.getModelService().save((Object) cart);
-				
 				this.recalculateOrder(cart);
+				optimizeModelDealService.persistCart(cart);
 			}
 		} 
 		catch (CouponServiceException ex) 
@@ -138,9 +137,9 @@ public class DefaultOptimizeCouponService extends DefaultCouponService implement
 			order.setAppliedCouponCodes(couponCodesFiltered);
 			order.setCalculated(Boolean.FALSE);
 			
-			optimizeModelDealService.persistCart(order);
 			////this.getModelService().save((Object) order);
 			this.recalculateOrder(order);
+			optimizeModelDealService.persistCart(order);
 		}
 	}
 
