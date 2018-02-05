@@ -68,33 +68,35 @@ public class OccTokenFilter extends OncePerRequestFilter {
 			}
 		}
 		
+		final int sessionMaxInactiveInterval = request.getSession().getMaxInactiveInterval();
+		
 		if(occToken == null)
 		{
 			occToken = new Cookie("ai-occ-token",token);
+			occToken.setPath("/");
+			occToken.setMaxAge(sessionMaxInactiveInterval);
+			response.addCookie(occToken);
 		}
 		
 		if(siteIDCookie == null)
 		{
 			siteIDCookie = new Cookie("siteId",siteID);
+			siteIDCookie.setPath("/");
+			occToken.setMaxAge(sessionMaxInactiveInterval);
+			response.addCookie(siteIDCookie);
+			
 		}
 		
 		if(cartIDCookie == null)
 		{
 			cartIDCookie = new Cookie("cartUid",cartID);
+			cartIDCookie.setPath("/");
+			occToken.setMaxAge(sessionMaxInactiveInterval);
+			response.addCookie(cartIDCookie);
 		}
 		
-		occToken.setValue(token);
-		occToken.setPath("/");
 		
-		siteIDCookie.setValue(siteID);
-		siteIDCookie.setPath("/");
 		
-		cartIDCookie.setValue(cartID);
-		cartIDCookie.setPath("/");
-		
-		response.addCookie(occToken);
-		response.addCookie(siteIDCookie);
-		response.addCookie(cartIDCookie);
 		
 		filterChain.doFilter(request, response);
 	}
