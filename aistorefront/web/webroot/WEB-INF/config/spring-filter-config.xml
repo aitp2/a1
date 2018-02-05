@@ -75,6 +75,8 @@
 
 		<!-- filter to restore customer preferred location -->
 		<ref bean="customerLocationRestorationFilter"/>
+		
+		<ref bean="occTokenFilter" />
 
 	</util:list>
 	
@@ -218,5 +220,9 @@
 
 	<bean id="importCSVMultipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 		<property name="maxUploadSize" value="#{configurationService.configuration.getProperty('import.csv.max.upload.size.bytes')}" />
+	</bean>
+	
+	<bean id="occTokenFilter" class="com.acn.ai.storefront.filters.OccTokenFilter">
+		<property name="tokenService" ref="aiTokenService" />
 	</bean>
 </beans>

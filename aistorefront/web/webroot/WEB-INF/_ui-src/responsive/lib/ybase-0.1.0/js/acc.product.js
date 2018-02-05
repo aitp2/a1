@@ -56,7 +56,8 @@ ACC.product = {
         //addToCartForm.ajaxForm({
         //	beforeSubmit:,
         //	success: ACC.product.displayAddToCartPopup
-        // });    
+        // }); 
+		ACC.product.doAddToCart(result);
         setTimeout(function(){
         	$ajaxCallEvent  = true;
          }, 2000);

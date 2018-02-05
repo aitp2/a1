@@ -48,7 +48,11 @@ jQuery.extend({
 
 window.getAuthToken =function(){
 	var resultData;
-	 var options = {
+	var occToken = $.cookie('ai-occ-token');
+	var siteId = $.cookie('siteId');
+	var cartUid = $.cookie('cartUid');
+	
+	var options = {
 			    type : 'GET',
 			    url : "/auth/getToken",
 			    dataType:"json",
@@ -58,8 +62,17 @@ window.getAuthToken =function(){
 			    success : function(result) {
 			    	resultData = result;
 			    }
-			  };
-			  $.ajax(options);
+			   };
+	if(occToken && cartUid && siteId ){
+		resultData={
+				"token":occToken,
+				"siteId":siteId,
+				"cartUid":cartUid
+		};
+	}else{
+		$.ajax(options);
+	}
+	
     return resultData;
 }
 
