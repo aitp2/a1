@@ -35,68 +35,27 @@ public class OccTokenFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException 
 	{
-		final String token = tokenService.getAccessToken();
-		
-		final UserModel userModel = userService.getCurrentUser();
-		final OptimizedCartData cart = cartFacade.getSessionCartData();
-		final String siteID = baseSiteService.getCurrentBaseSite().getUid();
-		final String cartID = userService.isAnonymousUser(userModel) ? cart.getGuid() : cart.getCode();
-		
-		Cookie[] cookies = request.getCookies();
-		Cookie occToken = null;
-		Cookie siteIDCookie = null;
-		Cookie cartIDCookie = null;
-		
-		if(cookies != null)
-		{
-			for(Cookie item:cookies)
-			{
-				switch (item.getName()) 
-				{
-				case "ai-occ-token":
-					occToken = item;
-					break;
-				case "siteId":
-					siteIDCookie = item;
-					break;
-				case "cartUid":
-					cartIDCookie = item;
-					break;
-				default:
-				}
-				
-			}
-		}
-		
 		final int sessionMaxInactiveInterval = request.getSession().getMaxInactiveInterval();
 		
-		if(occToken == null)
-		{
-			occToken = new Cookie("ai-occ-token",token);
-			occToken.setPath("/");
-			occToken.setMaxAge(sessionMaxInactiveInterval);
-			response.addCookie(occToken);
-		}
-		
-		if(siteIDCookie == null)
-		{
-			siteIDCookie = new Cookie("siteId",siteID);
-			siteIDCookie.setPath("/");
-			occToken.setMaxAge(sessionMaxInactiveInterval);
-			response.addCookie(siteIDCookie);
-			
-		}
-		
-		if(cartIDCookie == null)
-		{
-			cartIDCookie = new Cookie("cartUid",cartID);
-			cartIDCookie.setPath("/");
-			occToken.setMaxAge(sessionMaxInactiveInterval);
-			response.addCookie(cartIDCookie);
-		}
-		
-		
-		
+		final String token = tokenService.getAccessToken();
+		Cookie occToken = new Cookie("ai-occ-token", token);
+		occToken.setPath("/");
+		occToken.setMaxAge(sessionMaxInactiveInterval);
+		response.addCookie(occToken);
+
+		final String siteID = baseSiteService.getCurrentBaseSite().getUid();
+		Cookie siteIDCookie = new Cookie("siteId", siteID);
+		siteIDCookie.setPath("/");
+		occToken.setMaxAge(sessionMaxInactiveInterval);
+		response.addCookie(siteIDCookie);
+
+		final UserModel userModel = userService.getCurrentUser();
+		final OptimizedCartData cart = cartFacade.getSessionCartData();
+		final String cartID = userService.isAnonymousUser(userModel) ? cart.getGuid() : cart.getCode();
+		Cookie cartIDCookie = new Cookie("cartUid", cartID);
+		cartIDCookie.setPath("/");
+		occToken.setMaxAge(sessionMaxInactiveInterval);
+		response.addCookie(cartIDCookie);
 		
 		filterChain.doFilter(request, response);
 	}

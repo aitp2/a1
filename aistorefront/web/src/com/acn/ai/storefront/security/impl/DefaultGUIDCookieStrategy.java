@@ -11,26 +11,12 @@
 package com.acn.ai.storefront.security.impl;
 
 import de.hybris.platform.acceleratorstorefrontcommons.security.GUIDCookieStrategy;
-import de.hybris.platform.core.model.user.UserModel;
-import de.hybris.platform.servicelayer.session.SessionService;
-import de.hybris.platform.servicelayer.user.UserService;
-import de.hybris.platform.site.BaseSiteService;
-
-import com.accenture.performance.optimization.facades.OptimizedCartFacade;
-import com.accenture.performance.optimization.facades.data.OptimizedCartData;
-import com.acn.ai.core.oauth.AiTokenService;
 import com.acn.ai.storefront.interceptors.beforecontroller.RequireHardLoginBeforeControllerHandler;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
-import javax.annotation.Resource;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -48,18 +34,6 @@ public class DefaultGUIDCookieStrategy implements GUIDCookieStrategy
 {
 	private static final Logger LOG = Logger.getLogger(DefaultGUIDCookieStrategy.class);
 
-	@Resource(name="aiTokenService")
-	private AiTokenService tokenService;
-	
-	@Resource(name = "userService")
-	private UserService userService;
-	
-	@Resource(name = "cartFacade")
-	private OptimizedCartFacade cartFacade;
-	
-	@Resource(name = "baseSiteService")
-	private BaseSiteService baseSiteService;
-	
 	private final SecureRandom random;
 	private final MessageDigest sha;
 
@@ -76,33 +50,6 @@ public class DefaultGUIDCookieStrategy implements GUIDCookieStrategy
 	@Override
 	public void setCookie(final HttpServletRequest request, final HttpServletResponse response)
 	{
-		//// added by wei.f.zhang
-		final int sessionMaxInactiveInterval = request.getSession().getMaxInactiveInterval();
-		
-		final String token = tokenService.getAccessToken();
-		
-		final UserModel userModel = userService.getCurrentUser();
-		final OptimizedCartData cart = cartFacade.getSessionCartData();
-		final String cartID = userService.isAnonymousUser(userModel) ? cart.getGuid() : cart.getCode();
-		
-		final String siteID = baseSiteService.getCurrentBaseSite().getUid();
-
-		Cookie occToken = new Cookie("ai-occ-token", token);
-		occToken.setPath("/");
-		occToken.setMaxAge(sessionMaxInactiveInterval);
-		response.addCookie(occToken);
-		
-		Cookie cartIDCookie = new Cookie("cartUid", cartID);
-		cartIDCookie.setPath("/");
-		cartIDCookie.setMaxAge(sessionMaxInactiveInterval);
-		response.addCookie(cartIDCookie);
-		
-		Cookie siteIDCookie = new Cookie("siteId",siteID);
-		siteIDCookie.setPath("/");
-		siteIDCookie.setMaxAge(sessionMaxInactiveInterval);
-		response.addCookie(siteIDCookie);
-		////////////////////////////////////
-		
 		if (!request.isSecure())
 		{
 			// We must not generate the cookie for insecure requests, otherwise there is not point doing this at all
@@ -110,7 +57,7 @@ public class DefaultGUIDCookieStrategy implements GUIDCookieStrategy
 		}
 
 		final String guid = createGUID();
-		
+
 		getCookieGenerator().addCookie(response, guid);
 		request.getSession().setAttribute(RequireHardLoginBeforeControllerHandler.SECURE_GUID_SESSION_KEY, guid);
 
