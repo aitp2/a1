@@ -49,6 +49,7 @@ import de.hybris.platform.commerceservices.order.hook.CommerceAddToCartMethodHoo
 import de.hybris.platform.commerceservices.order.hook.CommerceUpdateCartEntryHook;
 import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
 import de.hybris.platform.core.model.c2l.CurrencyModel;
+import de.hybris.platform.core.model.order.CartModel;
 import de.hybris.platform.core.model.product.ProductModel;
 import de.hybris.platform.core.model.product.UnitModel;
 import de.hybris.platform.core.model.user.AddressModel;
@@ -258,8 +259,29 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 	@Override
 	public void setSessionOptimizedCart(final OptimizedCartData cartData)
 	{
-		getSessionService().setAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME, cartData.getGuid());
-		optimizeModelDealService.persistCart(cartData);
+		if (cartData == null)
+		{
+			removeSessionCart();
+		}
+		else
+		{
+			getSessionService().setAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME, cartData.getGuid());
+			optimizeModelDealService.persistCart(cartData);
+		}
+		
+	}
+	
+	@Override
+	public void removeSessionCart()
+	{
+		if (hasSessionCart())
+		{
+//			final CartModel sessionCart = getSessionCart();
+//			getModelService().remove(sessionCart);
+//			getSessionService().removeAttribute(SESSION_CART_PARAMETER_NAME);
+			
+			getSessionService().removeAttribute(SESSION_OPTIMIZED_CART_PARAMETER_NAME);
+		}
 	}
 
 	@Override

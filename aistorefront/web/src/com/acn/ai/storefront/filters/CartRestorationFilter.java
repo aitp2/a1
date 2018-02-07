@@ -56,7 +56,12 @@ public class CartRestorationFilter extends OncePerRequestFilter
 	{
 		if (getUserService().isAnonymousUser(getUserService().getCurrentUser()))
 		{
-			processAnonymousUser(request, response);
+			//after logout, the restoration cart will be the cart before logout
+			//and this makes error when add product after logout
+			//remove the operation temporarily
+			
+			//TODO ai
+			//processAnonymousUser(request, response);
 		}
 		else
 		{

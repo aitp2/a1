@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.accenture.performance.optimization.facades.OptimizedCartFacade;
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
 import com.acn.ai.core.oauth.AiTokenService;
+import com.acn.ai.storefront.security.cookie.CartRestoreCookieGenerator;
 
 import de.hybris.platform.core.model.user.UserModel;
 import de.hybris.platform.servicelayer.user.UserService;
@@ -31,6 +32,9 @@ public class OccTokenFilter extends OncePerRequestFilter {
 	@Resource(name = "baseSiteService")
 	private BaseSiteService baseSiteService;
 	
+	@Resource(name = "cartRestoreCookieGenerator")
+	private CartRestoreCookieGenerator cartRestoreCookieGenerator;
+	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException 
@@ -46,7 +50,7 @@ public class OccTokenFilter extends OncePerRequestFilter {
 		final String siteID = baseSiteService.getCurrentBaseSite().getUid();
 		Cookie siteIDCookie = new Cookie("siteId", siteID);
 		siteIDCookie.setPath("/");
-		occToken.setMaxAge(sessionMaxInactiveInterval);
+		siteIDCookie.setMaxAge(sessionMaxInactiveInterval);
 		response.addCookie(siteIDCookie);
 
 		final UserModel userModel = userService.getCurrentUser();
@@ -54,7 +58,7 @@ public class OccTokenFilter extends OncePerRequestFilter {
 		final String cartID = userService.isAnonymousUser(userModel) ? cart.getGuid() : cart.getCode();
 		Cookie cartIDCookie = new Cookie("cartUid", cartID);
 		cartIDCookie.setPath("/");
-		occToken.setMaxAge(sessionMaxInactiveInterval);
+		cartIDCookie.setMaxAge(sessionMaxInactiveInterval);
 		response.addCookie(cartIDCookie);
 		
 		filterChain.doFilter(request, response);
@@ -114,6 +118,20 @@ public class OccTokenFilter extends OncePerRequestFilter {
 	 */
 	public void setBaseSiteService(BaseSiteService baseSiteService) {
 		this.baseSiteService = baseSiteService;
+	}
+
+	/**
+	 * @return the cartRestoreCookieGenerator
+	 */
+	public CartRestoreCookieGenerator getCartRestoreCookieGenerator() {
+		return cartRestoreCookieGenerator;
+	}
+
+	/**
+	 * @param cartRestoreCookieGenerator the cartRestoreCookieGenerator to set
+	 */
+	public void setCartRestoreCookieGenerator(CartRestoreCookieGenerator cartRestoreCookieGenerator) {
+		this.cartRestoreCookieGenerator = cartRestoreCookieGenerator;
 	}
 
 }

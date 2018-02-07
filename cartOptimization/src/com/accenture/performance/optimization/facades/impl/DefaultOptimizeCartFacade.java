@@ -201,7 +201,7 @@ public class DefaultOptimizeCartFacade extends DefaultCartFacade implements Opti
 	{
 		if (!hasEntries() && !hasEntryGroups())
 		{
-			getCartService().setSessionCart(null);
+			optimizeCartService.setSessionOptimizedCart(null);
 		}
 
 		final OptimizedCartData cartForGuidAndSiteAndUser = optimizeCartService.getCartForGuidAndSiteAndUser(guid,
