@@ -11,16 +11,27 @@
 package com.acn.ai.storefront.security.impl;
 
 import de.hybris.platform.acceleratorstorefrontcommons.security.GUIDCookieStrategy;
+import de.hybris.platform.core.model.user.UserModel;
+import de.hybris.platform.servicelayer.session.SessionService;
+import de.hybris.platform.servicelayer.user.UserService;
+import de.hybris.platform.site.BaseSiteService;
+
+import com.accenture.performance.optimization.facades.OptimizedCartFacade;
+import com.accenture.performance.optimization.facades.data.OptimizedCartData;
+import com.acn.ai.core.oauth.AiTokenService;
 import com.acn.ai.storefront.interceptors.beforecontroller.RequireHardLoginBeforeControllerHandler;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.Assert;
@@ -38,6 +49,18 @@ public class DefaultGUIDCookieStrategy implements GUIDCookieStrategy
 	private final MessageDigest sha;
 
 	private CookieGenerator cookieGenerator;
+	
+	@Resource(name = "aiTokenService")
+	private AiTokenService tokenService;
+	@Resource(name = "sessionService")
+	private SessionService sessionService;
+	@Resource(name = "userService")
+	private UserService userService;
+	@Resource(name = "cartFacade")
+	private OptimizedCartFacade cartFacade;
+	@Resource(name = "baseSiteService")
+	private BaseSiteService baseSiteService;
+
 
 	public DefaultGUIDCookieStrategy() throws NoSuchAlgorithmException
 	{
@@ -56,8 +79,16 @@ public class DefaultGUIDCookieStrategy implements GUIDCookieStrategy
 			throw new IllegalStateException("Cannot set GUIDCookie on an insecure request!");
 		}
 
+		//added by wei.f.zhang
+		final String restarationCartCookieName = StringUtils.deleteWhitespace(getBaseSiteService().getCurrentBaseSite().getUid()) + "-cart";
+		Cookie restarationCartCookie = new Cookie(restarationCartCookieName,"");
+		restarationCartCookie.setPath("/");
+		restarationCartCookie.setMaxAge(0);
+		response.addCookie(restarationCartCookie);
+		//////////////////////////
+		
 		final String guid = createGUID();
-
+		
 		getCookieGenerator().addCookie(response, guid);
 		request.getSession().setAttribute(RequireHardLoginBeforeControllerHandler.SECURE_GUID_SESSION_KEY, guid);
 
@@ -76,6 +107,16 @@ public class DefaultGUIDCookieStrategy implements GUIDCookieStrategy
 		}
 		else
 		{
+			Cookie siteIDCookie = new Cookie("siteId", "");
+			siteIDCookie.setPath("/");
+			siteIDCookie.setMaxAge(0);
+			response.addCookie(siteIDCookie);
+			
+			Cookie cartIDCookie = new Cookie("cartUid", "");
+			cartIDCookie.setPath("/");
+			cartIDCookie.setMaxAge(0);
+			response.addCookie(cartIDCookie);
+			
 			// Its a secure page, we can delete the cookie
 			getCookieGenerator().removeCookie(response);
 		}
@@ -112,5 +153,75 @@ public class DefaultGUIDCookieStrategy implements GUIDCookieStrategy
 	protected MessageDigest getSha()
 	{
 		return sha;
+	}
+
+	/**
+	 * @return the tokenService
+	 */
+	public AiTokenService getTokenService() {
+		return tokenService;
+	}
+
+	/**
+	 * @param tokenService the tokenService to set
+	 */
+	public void setTokenService(AiTokenService tokenService) {
+		this.tokenService = tokenService;
+	}
+
+	/**
+	 * @return the sessionService
+	 */
+	public SessionService getSessionService() {
+		return sessionService;
+	}
+
+	/**
+	 * @param sessionService the sessionService to set
+	 */
+	public void setSessionService(SessionService sessionService) {
+		this.sessionService = sessionService;
+	}
+
+	/**
+	 * @return the userService
+	 */
+	public UserService getUserService() {
+		return userService;
+	}
+
+	/**
+	 * @param userService the userService to set
+	 */
+	public void setUserService(UserService userService) {
+		this.userService = userService;
+	}
+
+	/**
+	 * @return the cartFacade
+	 */
+	public OptimizedCartFacade getCartFacade() {
+		return cartFacade;
+	}
+
+	/**
+	 * @param cartFacade the cartFacade to set
+	 */
+	public void setCartFacade(OptimizedCartFacade cartFacade) {
+		this.cartFacade = cartFacade;
+	}
+
+	/**
+	 * @return the baseSiteService
+	 */
+	public BaseSiteService getBaseSiteService() {
+		return baseSiteService;
+	}
+
+	/**
+	 * @param baseSiteService the baseSiteService to set
+	 */
+	public void setBaseSiteService(BaseSiteService baseSiteService) {
+		this.baseSiteService = baseSiteService;
 	}
 }

@@ -269,7 +269,7 @@
 		<value>/quote</value>
 	</util:list>
 
-	<bean id="logoutSuccessHandler" class="de.hybris.platform.acceleratorstorefrontcommons.security.StorefrontLogoutSuccessHandler" >
+	<bean id="logoutSuccessHandler" class="com.acn.ai.storefront.security.StorefrontLogoutSuccessHandler" >
 		<property name="defaultTargetUrl" value="/?logout=true"/>
 		<property name="guidCookieStrategy" ref="guidCookieStrategy"/>
 		<property name="useReferer" value="true"/>

@@ -22,6 +22,7 @@ import com.accenture.performance.optimization.service.OptimizeCartService;
 import com.acn.ai.storefront.security.cookie.CartRestoreCookieGenerator;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -56,12 +57,7 @@ public class CartRestorationFilter extends OncePerRequestFilter
 	{
 		if (getUserService().isAnonymousUser(getUserService().getCurrentUser()))
 		{
-			//after logout, the restoration cart will be the cart before logout
-			//and this makes error when add product after logout
-			//remove the operation temporarily
-			
-			//TODO ai
-			//processAnonymousUser(request, response);
+			processAnonymousUser(request, response);
 		}
 		else
 		{
@@ -98,17 +94,18 @@ public class CartRestorationFilter extends OncePerRequestFilter
                         getBaseSiteService().getBaseSiteForUID(getCartService().getSessionOptimizedCart().getBaseSite())))
         {
             final String guid = getCartService().getSessionOptimizedCart().getGuid();
-
+            
             if (!StringUtils.isEmpty(guid))
             {
                 getCartRestoreCookieGenerator().addCookie(response, guid);
             }
         }
+		//logout or first access the site, request.getSession().isNew() return true
         else if (request.getSession().isNew()
                 || (getCartService().hasSessionCart() && !getBaseSiteService().getCurrentBaseSite().equals(
                         getBaseSiteService().getBaseSiteForUID(getCartService().getSessionOptimizedCart().getBaseSite()))))
         {
-			processRestoration(request);
+        	processRestoration(request);
         }
 	}
 
