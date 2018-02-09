@@ -93,6 +93,7 @@ public class AuthTokenController extends AbstractPageController
 			final String restarationCartCookieName = StringUtils.deleteWhitespace(baseSiteService.getCurrentBaseSite().getUid()) + "-cart";
 			Cookie restarationCartCookie = new Cookie(restarationCartCookieName,"");
 			restarationCartCookie.setPath("/");
+			restarationCartCookie.setMaxAge(7*24*60*60);//7 days
 			response.addCookie(restarationCartCookie);
 		}
 		
