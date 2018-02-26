@@ -610,9 +610,9 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 		LOG.info("========entryNewQuantity=======" + entryNewQuantity);
 		try
 		{
-			defaultOptimizeCommerceCartService.calculate(cartData);
+			defaultOptimizeCommerceCartService.calculateCart(cartData,true);
 		}
-		catch (final CalculationException ex)
+		catch (final IllegalStateException ex)
 		{
 			LOG.info("[Calculate entries failed. The entryNumber is{0}, the error message is {1}", entryToUpdate.getEntryNumber(),
 					ex.getMessage());

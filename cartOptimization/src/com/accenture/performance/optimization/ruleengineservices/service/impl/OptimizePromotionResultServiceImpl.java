@@ -22,15 +22,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.accenture.performance.optimization.data.OptimizedPromotionActionParameterData;
 import com.accenture.performance.optimization.data.OptimizedPromotionResultData;
+import com.accenture.performance.optimization.data.OptimizedRuleBasedPotentialPromotionMessageAction;
 import com.accenture.performance.optimization.ruleengineservices.service.OptimizePromotionResultService;
 
 
@@ -75,7 +79,7 @@ public class OptimizePromotionResultServiceImpl extends DefaultPromotionEngineRe
 				}
 				else
 				{
-					List parameters = null;
+					List<RuleParameterData> parameters = null;
 					final String paramString = e.getRuleParameters();
 					if (Objects.nonNull(paramString))
 					{
@@ -91,31 +95,33 @@ public class OptimizePromotionResultServiceImpl extends DefaultPromotionEngineRe
 					}
 					else
 					{
-						LOG.error("TODO: get meessage logic");
-						// TODO: implement the logic
-						//						if (Objects.nonNull(promotionResult.getActions()))
-						//						{
-						//							final Map messageActionValues = promotionResult.getActions().stream().filter((action) -> {
-						//								return action instanceof RuleBasedPotentialPromotionMessageActionModel;
-						//							}).flatMap((action) -> {
-						//								return ((RuleBasedPotentialPromotionMessageActionModel) action).getParameters().stream();
-						//							}).collect(
-						//									Collectors.toMap(PromotionActionParameterModel::getUuid, PromotionActionParameterModel::getValue));
-						//							if (LOG.isWarnEnabled())
-						//							{
-						//								parameters.stream().filter((parameter) -> {
-						//									return messageActionValues.containsKey(parameter.getUuid())
-						//											&& !this.getResolutionStrategies().containsKey(parameter.getType());
-						//								}).forEach((parameter) -> {
-						//									LOG.warn("Parameter {} has to be replaced but resolution strategy for type {} is not defined",
-						//											parameter.getUuid(), parameter.getType());
-						//								});
-						//							}
-						//
-						//							parameters = (List) parameters.stream().map((parameter) -> {
-						//								return this.replaceRuleParameterValue(promotionResult, messageActionValues, parameter);
-						//							}).collect(Collectors.toList());
-						//						}
+												if (Objects.nonNull(promotionResult.getActions()))
+												{
+													final Map<String,Object> messageActionValues = promotionResult.getActions().stream().filter(action -> {
+														return action instanceof OptimizedRuleBasedPotentialPromotionMessageAction;
+													}).flatMap(action ->{
+														OptimizedRuleBasedPotentialPromotionMessageAction messageAction = (OptimizedRuleBasedPotentialPromotionMessageAction)action;
+														return messageAction.getParameters().stream();
+													}).collect(Collectors.toMap(OptimizedPromotionActionParameterData::getUuid,  OptimizedPromotionActionParameterData::getValue));
+													
+													if (LOG.isWarnEnabled())
+													{
+														parameters.stream().filter((parameter) -> {
+															return messageActionValues.containsKey(parameter.getUuid())
+																	&& !this.getResolutionStrategies().containsKey(parameter.getType());
+														}).forEach((parameter) -> {
+															LOG.warn("Parameter {} has to be replaced but resolution strategy for type {} is not defined",
+																	parameter.getUuid(), parameter.getType());
+														});
+													}
+						
+//													//LOG.error("TODO: get meessage logic");
+//													
+//													// TODO: implement the logic
+//													parameters = parameters.stream().map((parameter) -> {
+//														return this.replaceRuleParameterValue(promotionResult, messageActionValues, parameter);
+//													}).collect(Collectors.toList());
+												}
 
 						return this.getMessageWithResolvedParameters(promotionResult, localeToUse, messageFiredPositional, parameters);
 					}
@@ -128,6 +134,14 @@ public class OptimizePromotionResultServiceImpl extends DefaultPromotionEngineRe
 			return messageFiredPositional;
 		}
 	}
+	
+//	protected RuleParameterData replaceRuleParameterValue(final OptimizedPromotionResultData promotionResult,
+//			Map<String, Object> messageActionValues, RuleParameterData parameter) {
+//		return messageActionValues.containsKey(parameter.getUuid())
+//				&& this.getResolutionStrategies().containsKey(parameter.getType()) ? 
+//						this.getResolutionStrategies().get(parameter.getType()).getReplacedParameter(parameter,promotionResult, messageActionValues.get(parameter.getUuid()))
+//						: parameter;
+//	}
 
 
 	protected String getMessageWithResolvedParameters(final OptimizedPromotionResultData promotionResult, final Locale locale,

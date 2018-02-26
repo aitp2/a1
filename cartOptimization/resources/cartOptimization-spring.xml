@@ -420,6 +420,7 @@
 	  <property name="commonI18NService" ref="commonI18NService"/>
 	  <property name="priceDataFactory" ref="priceDataFactory"/>
 	  <property name="optimizedCartEntryConverter" ref="optimizedCartEntryConverter"/>
+	  <property name="optimizedPromotionResultConverter" ref="optimizedPromotionResultConverter" />
 	</bean>
 	<alias name="defaultOptimizedCartPopulator" alias="optimizeCartPopulator"/>
 	<bean id="defaultOptimizedCartPopulator" class="com.accenture.performance.optimization.facades.populators.DefaultOptimizedCartPopulator" parent="abstractOptomizedCartPopulator">
@@ -446,6 +447,34 @@
 	 <property name="deliveryService" ref="deliveryService" />
 	 <property name="deliveryModeConverter" ref="deliveryModeConverter" />
 	</bean>
+	
+	<bean id="defaultOptimizedPromotionResultPopulator" class="com.accenture.performance.optimization.facades.populators.DefaultOptimizedPromotionResultPopulator" >
+		<property name="optimizePromotionResultService" ref="optimizePromotionResultServiceImpl" />
+		<property name="optimizedOrderEntryConsumedConverter" ref="defaultOptimizedOrderEntryConsumedConverter" />
+	</bean>
+	
+	<bean id="optimizedPromotionResultConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.product.data.PromotionResultData"/>
+		<property name="populators">
+			<list>
+				<ref bean="defaultOptimizedPromotionResultPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="defaultOptimizedPromotionOrderEntryConsumedPopulator" class="com.accenture.performance.optimization.facades.populators.DefaultOptimizedPromotionOrderEntryConsumedPopulator" />
+	<bean id="defaultOptimizedOrderEntryConsumedConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.order.data.PromotionOrderEntryConsumedData"/>
+		<property name="populators">
+			<list>
+				<ref bean="defaultOptimizedPromotionOrderEntryConsumedPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultOptimizedPromotionsPopulator" alias="promotionsPopulator" />
+	<bean id="defaultOptimizedPromotionsPopulator" class="com.accenture.performance.optimization.facades.populators.DefaultOptimizedPromotionsPopulator" parent="defaultPromotionsPopulator"/>
+	
 	<alias name="defaultOptinizedCartModification" alias="cartModificationPopulator"/>
 	<bean id="defaultOptinizedCartModification" class="com.accenture.performance.optimization.facades.populators.DefaultOptinizedCartModification" parent="defaultCartModificationPopulator">
 	  <property name="optimizedOrderEntryConverter" ref="optimizedCartEntryConverter"/>

@@ -20,6 +20,7 @@ import de.hybris.platform.commercefacades.product.data.PriceDataType;
 import de.hybris.platform.commercefacades.product.data.PromotionResultData;
 import de.hybris.platform.commerceservices.constants.CommerceServicesConstants;
 import de.hybris.platform.commerceservices.enums.DiscountType;
+import de.hybris.platform.converters.Converters;
 import de.hybris.platform.converters.Populator;
 import de.hybris.platform.core.enums.GroupType;
 import de.hybris.platform.core.model.c2l.CurrencyModel;
@@ -46,6 +47,7 @@ import org.apache.log4j.Logger;
 import com.accenture.performance.optimization.data.OptimizedPromotionResultData;
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
 import com.accenture.performance.optimization.facades.data.OptimizedCartEntryData;
+import com.accenture.performance.optimization.ruleengineservices.result.OptimizedPromotionOrderResults;
 import com.google.common.math.DoubleMath;
 
 
@@ -61,6 +63,7 @@ public abstract class AbstractOptomizedCartPopulator<SOURCE extends OptimizedCar
 	private CommonI18NService commonI18NService;
 	private PriceDataFactory priceDataFactory;
 	private Converter<OptimizedCartEntryData, OrderEntryData> optimizedCartEntryConverter;
+	private Converter<OptimizedPromotionResultData,PromotionResultData> optimizedPromotionResultConverter;
 	private final Map<String, PriceData> priceData = new HashMap<String, PriceData>();
 
 	protected Map<String, PriceData> getPriceData()
@@ -91,10 +94,8 @@ public abstract class AbstractOptomizedCartPopulator<SOURCE extends OptimizedCar
 	/*
 	 * Adds applied and potential promotions.
 	 */
-	//TODO acn
 	protected void addPromotions(final OptimizedCartData source, final AbstractOrderData prototype)
 	{
-		//addPromotions(source, getPromotionsService().getPromotionResults(source), prototype);
 		addPromotions(source, source.getAllPromotionResults(), prototype);
 	}
 	
@@ -118,10 +119,12 @@ public abstract class AbstractOptomizedCartPopulator<SOURCE extends OptimizedCar
 			prototype.setTotalDiscounts(createPrice(source, Double.valueOf(productsDiscountsAmount + orderDiscountsAmount)));
 			prototype.setTotalDiscountsWithQuoteDiscounts(createPrice(source,
 					Double.valueOf(productsDiscountsAmount + orderDiscountsAmount + quoteDiscountsAmount)));
-			//TODO acn
-			//prototype.setAppliedOrderPromotions();
-			//prototype.setAppliedProductPromotions();
+			
+			OptimizedPromotionOrderResults optPromoOrderResults = new OptimizedPromotionOrderResults(null, null, null, source, promoOrderResults,0.0D);
+			prototype.setAppliedOrderPromotions( Converters.convertAll( optPromoOrderResults.getOptimizedAppliedOrderPromotions(), getOptimizedPromotionResultConverter()) );
+			prototype.setAppliedProductPromotions(Converters.convertAll(optPromoOrderResults.getOptimizedAppliedProductPromotions(),getOptimizedPromotionResultConverter()));
 		}
+		
 	}
 	
 
@@ -369,6 +372,21 @@ public abstract class AbstractOptomizedCartPopulator<SOURCE extends OptimizedCar
 	public void setOptimizedCartEntryConverter(final Converter<OptimizedCartEntryData, OrderEntryData> optimizedCartEntryConverter)
 	{
 		this.optimizedCartEntryConverter = optimizedCartEntryConverter;
+	}
+
+	/**
+	 * @return the optimizedPromotionResultConverter
+	 */
+	public Converter<OptimizedPromotionResultData, PromotionResultData> getOptimizedPromotionResultConverter() {
+		return optimizedPromotionResultConverter;
+	}
+
+	/**
+	 * @param optimizedPromotionResultConverter the optimizedPromotionResultConverter to set
+	 */
+	public void setOptimizedPromotionResultConverter(
+			Converter<OptimizedPromotionResultData, PromotionResultData> optimizedPromotionResultConverter) {
+		this.optimizedPromotionResultConverter = optimizedPromotionResultConverter;
 	}
 
 }
