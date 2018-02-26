@@ -14,13 +14,19 @@ package com.accenture.performance.optimization.facades.populators;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
+import com.accenture.performance.optimization.data.OptimizedPromotionResultData;
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
+import com.accenture.performance.optimization.ruleengineservices.result.OptimizedPromotionOrderResults;
 
+import de.hybris.platform.commercefacades.order.data.AbstractOrderData;
 import de.hybris.platform.commercefacades.order.data.CartData;
 import de.hybris.platform.commercefacades.order.data.DeliveryModeData;
 import de.hybris.platform.commerceservices.delivery.DeliveryService;
+import de.hybris.platform.core.model.order.AbstractOrderModel;
 import de.hybris.platform.core.model.order.delivery.DeliveryModeModel;
+import de.hybris.platform.promotions.result.PromotionOrderResults;
 import de.hybris.platform.servicelayer.dto.converter.ConversionException;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
 
@@ -54,6 +60,19 @@ public class DefaultOptimizedCartPopulator<T extends CartData> extends AbstractO
 		
 		Collection<String> vouchers = source.getAppliedCouponCodes();
 		target.setAppliedVouchers( vouchers == null ? Collections.emptyList():new ArrayList<>(vouchers));
+	}
+	
+	@Override
+	protected void addPromotions(final OptimizedCartData source, OptimizedPromotionOrderResults optPromoOrderResults, final AbstractOrderData target)
+	{
+		super.addPromotions(source, optPromoOrderResults,target);
+
+		if (optPromoOrderResults != null)
+		{
+			final CartData cartData = (CartData) target;
+			cartData.setPotentialOrderPromotions(getPromotions(optPromoOrderResults.getOptimizedPotentialOrderPromotions()));
+			cartData.setPotentialProductPromotions(getPromotions(optPromoOrderResults.getOptimizedPotentialProductPromotions()));
+		}
 	}
 
 	private DeliveryModeData getDeliveryMode(final String deliveryModeCode)

@@ -36,6 +36,7 @@ import de.hybris.platform.util.DiscountValue;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,11 +97,11 @@ public abstract class AbstractOptomizedCartPopulator<SOURCE extends OptimizedCar
 	 */
 	protected void addPromotions(final OptimizedCartData source, final AbstractOrderData prototype)
 	{
-		addPromotions(source, source.getAllPromotionResults(), prototype);
+		OptimizedPromotionOrderResults optPromoOrderResults = new OptimizedPromotionOrderResults(null, null, null, source, source.getAllPromotionResults(),0.0D);
+		addPromotions(source,optPromoOrderResults , prototype);
 	}
 	
-	protected void addPromotions(final OptimizedCartData source, final List<OptimizedPromotionResultData> promoOrderResults,
-			final AbstractOrderData prototype)
+	protected void addPromotions(final OptimizedCartData source, OptimizedPromotionOrderResults optPromoOrderResults, final AbstractOrderData prototype)
 	{
 		final double quoteDiscountsAmount = getQuoteDiscountsAmount(source);
 		prototype.setQuoteDiscounts(createPrice(source, Double.valueOf(quoteDiscountsAmount)));
@@ -109,7 +110,7 @@ public abstract class AbstractOptomizedCartPopulator<SOURCE extends OptimizedCar
 		prototype.setQuoteDiscountsType(quoteDiscountsTypeAndRate.getKey().getCode());
 		prototype.setQuoteDiscountsRate(quoteDiscountsTypeAndRate.getValue());
 
-		if (promoOrderResults != null)
+		if (optPromoOrderResults != null)
 		{
 			final double productsDiscountsAmount = getProductsDiscountsAmount(source);
 			final double orderDiscountsAmount = getOrderDiscountsAmount(source);
@@ -120,14 +121,17 @@ public abstract class AbstractOptomizedCartPopulator<SOURCE extends OptimizedCar
 			prototype.setTotalDiscountsWithQuoteDiscounts(createPrice(source,
 					Double.valueOf(productsDiscountsAmount + orderDiscountsAmount + quoteDiscountsAmount)));
 			
-			OptimizedPromotionOrderResults optPromoOrderResults = new OptimizedPromotionOrderResults(null, null, null, source, promoOrderResults,0.0D);
-			prototype.setAppliedOrderPromotions( Converters.convertAll( optPromoOrderResults.getOptimizedAppliedOrderPromotions(), getOptimizedPromotionResultConverter()) );
-			prototype.setAppliedProductPromotions(Converters.convertAll(optPromoOrderResults.getOptimizedAppliedProductPromotions(),getOptimizedPromotionResultConverter()));
+			prototype.setAppliedOrderPromotions( getPromotions( optPromoOrderResults.getOptimizedAppliedOrderPromotions() ) );
+			prototype.setAppliedProductPromotions( getPromotions(optPromoOrderResults.getOptimizedAppliedProductPromotions() ) );
 		}
 		
 	}
 	
-
+	protected List<PromotionResultData> getPromotions(final List<OptimizedPromotionResultData> optimizedPromotionResultDataList)
+	{
+		return getOptimizedPromotionResultConverter().convertAll(optimizedPromotionResultDataList);
+	}
+	
 	protected double getProductsDiscountsAmount(final OptimizedCartData source)
 	{
 		double discounts = 0.0d;

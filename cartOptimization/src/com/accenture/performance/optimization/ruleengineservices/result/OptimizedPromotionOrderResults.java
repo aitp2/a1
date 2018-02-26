@@ -35,6 +35,8 @@ public class OptimizedPromotionOrderResults extends PromotionOrderResults
 	private final OptimizedCartData optimizedCart;
 	private volatile List<OptimizedPromotionResultData> appliedProductPromotions;
 	private volatile List<OptimizedPromotionResultData> appliedOrderPromotions;
+	private volatile List<OptimizedPromotionResultData> potentialProductPromotions;
+	private volatile List<OptimizedPromotionResultData> potentialOrderPromotions;
 
 	public OptimizedPromotionOrderResults(final SessionContext ctx, final AbstractOrder order,
 			final List<PromotionResult> promotionResults, final double changeFromLastResults)
@@ -66,6 +68,20 @@ public class OptimizedPromotionOrderResults extends PromotionOrderResults
 		return this.appliedOrderPromotions;
 	}
 	
+	public List<OptimizedPromotionResultData> getOptimizedPotentialOrderPromotions() {
+		if (this.potentialOrderPromotions == null) {
+			PromotionOrderResults promotionOrderResults = this;
+			synchronized (promotionOrderResults) {
+				if (this.potentialOrderPromotions == null) {
+					this.potentialOrderPromotions = this.getOptimizedPromotionResults(PromotionResultStatus.CouldFireOnly,
+							PromotionResultProducts.NoConsumedProducts);
+				}
+			}
+		}
+		return this.potentialOrderPromotions;
+	}
+
+	
 	public List<OptimizedPromotionResultData> getOptimizedAppliedProductPromotions() {
 		if (this.appliedProductPromotions == null) {
 			PromotionOrderResults promotionOrderResults = this;
@@ -77,6 +93,19 @@ public class OptimizedPromotionOrderResults extends PromotionOrderResults
 			}
 		}
 		return this.appliedProductPromotions;
+	}
+	
+	public List<OptimizedPromotionResultData> getOptimizedPotentialProductPromotions() {
+		if (this.potentialProductPromotions == null) {
+			PromotionOrderResults promotionOrderResults = this;
+			synchronized (promotionOrderResults) {
+				if (this.potentialProductPromotions == null) {
+					this.potentialProductPromotions = this.getOptimizedPromotionResults(PromotionResultStatus.CouldFireOnly,
+							PromotionResultProducts.RequireConsumedProducts);
+				}
+			}
+		}
+		return this.potentialProductPromotions;
 	}
 	
 	protected List<OptimizedPromotionResultData> getOptimizedPromotionResults(PromotionResultStatus statusFlag,

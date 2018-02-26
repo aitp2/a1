@@ -50,9 +50,6 @@ public class DefaultOptimizePotentialPromotionMessageActionStrategy	extends Abst
 		}
 		
 		OptimizedRuleBasedPotentialPromotionMessageAction actionModel = (OptimizedRuleBasedPotentialPromotionMessageAction) this.createPromotionAction(promoResult, action);
-		
-		 this.createPromotionAction(promoResult, action);
-		
 		this.handleActionMetadata(action, actionModel);
 		this.supplementMessageActionModelWithParameters((DisplayMessageRAO) action, actionModel);
 		////this.getModelService().saveAll(new Object[]{promoResult, actionModel});

@@ -29,8 +29,9 @@ public class DefaultOptimizedPromotionResultPopulator implements Populator<Optim
 //
 //
 //				});
+		
 
-//		target.setPromotionData(source.getPromotion());
+//		target.setPromotionData(getPromotionsConverter().convert(source.getPromotion()));
 		target.setConsumedEntries(Converters.convertAll(source.getConsumedEntries(), getOptimizedOrderEntryConsumedConverter()) );
 		//TODO ai
 		//populate other promotion result info
