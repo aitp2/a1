@@ -11,6 +11,9 @@
  */
 package com.accenture.performance.optimization.facades.populators;
 
+import de.hybris.platform.acceleratorfacades.cart.action.CartEntryAction;
+import de.hybris.platform.acceleratorfacades.cart.action.CartEntryActionHandler;
+import de.hybris.platform.acceleratorfacades.cart.action.CartEntryActionHandlerRegistry;
 import de.hybris.platform.commercefacades.order.data.DeliveryModeData;
 import de.hybris.platform.commercefacades.order.data.OrderEntryData;
 import de.hybris.platform.commercefacades.product.PriceDataFactory;
@@ -21,6 +24,7 @@ import de.hybris.platform.commerceservices.delivery.DeliveryService;
 import de.hybris.platform.converters.Populator;
 import de.hybris.platform.core.model.c2l.CurrencyModel;
 import de.hybris.platform.core.model.order.AbstractOrderEntryModel;
+import de.hybris.platform.core.model.order.CartEntryModel;
 import de.hybris.platform.core.model.order.delivery.DeliveryModeModel;
 import de.hybris.platform.core.model.product.ProductModel;
 import de.hybris.platform.product.ProductService;
@@ -28,6 +32,8 @@ import de.hybris.platform.servicelayer.dto.converter.Converter;
 import de.hybris.platform.servicelayer.i18n.CommonI18NService;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.springframework.util.Assert;
@@ -48,8 +54,7 @@ public class DefaultOptimizedCartEntryPopulator implements Populator<OptimizedCa
 	
 	private DeliveryService deliveryService;
 	private Converter<DeliveryModeModel, DeliveryModeData> deliveryModeConverter;
-
-
+	
 	@Override
 	public void populate(final OptimizedCartEntryData source, final OrderEntryData target)
 	{
@@ -64,8 +69,24 @@ public class DefaultOptimizedCartEntryPopulator implements Populator<OptimizedCa
 		//addConfigurations(source, target);
 		//addEntryGroups(source, target);
 		//addComments(source, target);
+		addEntryAction(source, target);
 	}
 
+	protected void addEntryAction(final OptimizedCartEntryData source, final OrderEntryData target )
+	{
+			final Set<String> supportedActions = new HashSet<>();
+			//TODO acn
+//			for (final CartEntryAction action : CartEntryAction.values())
+//			{
+//				final CartEntryActionHandler handler = getCartEntryActionHandlerRegistry().getHandler(action);
+//				if (handler != null && handler.supports((CartEntryModel) source))
+//				{
+//					supportedActions.add(action.toString());
+//				}
+//			}
+			supportedActions.add(CartEntryAction.REMOVE.toString());
+			target.setSupportedActions(supportedActions);
+	}
 
 	
 	protected void addDeliveryMode(final OptimizedCartEntryData orderEntry, final OrderEntryData entry) {

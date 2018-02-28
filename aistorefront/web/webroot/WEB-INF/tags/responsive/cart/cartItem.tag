@@ -251,7 +251,7 @@
                                     </c:otherwise>
                                 </c:choose>
                             </c:if>
-                            <form:form id="cartEntryActionForm" action="" method="post" />
+                            <form:form id="cartEntryActionForm" action="" method="delete" />
                              <%-- Build entry numbers string for execute action -- Start --%>
                             <c:choose>
 					            <c:when test="${entry.entryNumber eq -1}"> <%-- for multid entry --%>

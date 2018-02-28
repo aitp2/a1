@@ -218,7 +218,6 @@ public class OptimizePromotionActionServiceImpl extends DefaultPromotionActionSe
 		return promoResult;
 	}
 	
-	//TODO acn
 	protected OptimizedPromotionResultData findExistingPromotionResultModel(AbstractRuleEngineRuleModel rule,
 			OptimizedCartData order) {
 		if (rule != null && order != null) {

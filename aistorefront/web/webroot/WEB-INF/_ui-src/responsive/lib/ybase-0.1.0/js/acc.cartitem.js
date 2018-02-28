@@ -11,11 +11,14 @@ ACC.cartitem = {
 
 		$('.js-execute-entry-action-button').on("click", function ()
 		{
+			var result = getAuthToken();
+			
 			var entryAction = $(this).data("entryAction");
-			var entryActionUrl =  $(this).data("entryActionUrl");
+//			var entryActionUrl =  $(this).data("entryActionUrl");
 			var entryProductCode =  $(this).data("entryProductCode");
 			var entryInitialQuantity =  $(this).data("entryInitialQuantity");
 			var actionEntryNumbers =  $(this).data("actionEntryNumbers");
+			var entryActionUrl = "/cartOptimizationWebservice/v2/"+result.siteId+"/users/current/carts/"+result.cartUid+"/entries/"+actionEntryNumbers;
 
 			if(entryAction == 'REMOVE')
 			{
@@ -23,12 +26,31 @@ ACC.cartitem = {
 			}
 
 			var cartEntryActionForm = $("#cartEntryActionForm");
-			var entryNumbers = actionEntryNumbers.toString().split(';');
-			entryNumbers.forEach(function(entryNumber) {
-				var entryNumbersInput = $("<input>").attr("type", "hidden").attr("name", "entryNumbers").val(entryNumber);
-				cartEntryActionForm.append($(entryNumbersInput));
-			});
-			cartEntryActionForm.attr('action', entryActionUrl).submit();
+//			var entryNumbers = actionEntryNumbers.toString().split(';');
+//			entryNumbers.forEach(function(entryNumber) {
+//				var entryNumbersInput = $("<input>").attr("type", "hidden").attr("name", "entryNumbers").val(entryNumber);
+//				cartEntryActionForm.append($(entryNumbersInput));
+//			});
+//			cartEntryActionForm.attr('action', entryActionUrl).submit();
+			
+			var options = {
+	 			   type : 'DELETE',
+	 			   url : entryActionUrl,
+	 			   headers: {Authorization: "Bearer "+result.token },
+	 			   
+	 			   dataType:"json",
+	 			   async:false,
+	 			   error : function(request) {
+	 			   },
+	 			   success : function(data) {
+	 			    //window.location.reload(true);
+	 			   }
+	 		};
+			
+	 		$.ajax(options);
+	 		window.location.reload(true);
+		
+			
 		});
 
 		$('.js-update-entry-quantity-input').on("blur", function (e)

@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -49,6 +50,8 @@ import de.hybris.platform.commerceservices.order.hook.CommerceAddToCartMethodHoo
 import de.hybris.platform.commerceservices.order.hook.CommerceUpdateCartEntryHook;
 import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
 import de.hybris.platform.core.model.c2l.CurrencyModel;
+import de.hybris.platform.core.model.order.AbstractOrderEntryModel;
+import de.hybris.platform.core.model.order.CartEntryModel;
 import de.hybris.platform.core.model.order.CartModel;
 import de.hybris.platform.core.model.product.ProductModel;
 import de.hybris.platform.core.model.product.UnitModel;
@@ -514,6 +517,18 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 		return null;
 	}
 
+	protected void normalizeEntryNumbers(final OptimizedCartData cartData)
+	{
+		final List<OptimizedCartEntryData> entries = new ArrayList<OptimizedCartEntryData>(cartData.getEntries());
+		Collections.sort(entries, new BeanComparator("entryNumber", new ComparableComparator()));
+		for (int i = 0; i < entries.size(); i++)
+		{
+			entries.get(i).setEntryNumber(Integer.valueOf(i));
+		}
+		
+		cartData.setEntries(entries); 
+	}
+	
 	protected long normalizeEntryNumbers(final OptimizedCartData cartData, final String code)
 	{
 		long newNumber = -1;
@@ -605,40 +620,89 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 		// Now work out how many that leaves us with on this entry
 		final long entryNewQuantity = entryToUpdate.getQuantity().longValue() + actualAllowedQuantityChange;
 
-		// Adjust the entry quantity to the new value
-		entryToUpdate.setQuantity(Long.valueOf(entryNewQuantity));
-		LOG.info("========entryNewQuantity=======" + entryNewQuantity);
-		try
+		if (entryNewQuantity <= 0)
 		{
+			final OptimizedCartEntryData entry = new OptimizedCartEntryData()
+			{
+				@Override
+				public Double getBasePrice()
+				{
+					return null;
+				}
+
+				@Override
+				public Double getTotalPrice()
+				{
+					return null;
+				}
+			};
+
+			entry.setCartData(cartData);
+			//entry.setEntryGroupNumbers(new HashSet<>(entryToUpdate.getEntryGroupNumbers())); TODO acn
+			entry.setProductCode(entryToUpdate.getProductCode());
+			
+			final int entryNumber = entryToUpdate.getEntryNumber().intValue();
+			List<OptimizedCartEntryData> entries = cartData.getEntries();
+			entries.removeIf(entryItem -> entryItem.getEntryNumber().intValue() == entryNumber);
+			
+			cartData.setEntries(entries);
+			normalizeEntryNumbers(cartData);
 			defaultOptimizeCommerceCartService.calculateCart(cartData,true);
-		}
-		catch (final IllegalStateException ex)
-		{
-			LOG.info("[Calculate entries failed. The entryNumber is{0}, the error message is {1}", entryToUpdate.getEntryNumber(),
-					ex.getMessage());
-		}
 
-		// Return the modification data
-		final CommerceCartModification modification = new CommerceCartModification();
-		modification.setQuantityAdded(actualAllowedQuantityChange);
-		modification.setEntryData(entryToUpdate);
-		modification.setQuantity(entryNewQuantity);
+			// Return an empty modification
+			final CommerceCartModification modification = new CommerceCartModification();
+			modification.setEntryData(entry);
+			modification.setQuantity(0);
+			// We removed all the quantity from this row
+			modification.setQuantityAdded(-entryToUpdate.getQuantity().longValue());
 
-		if (maxOrderQuantity != null && entryNewQuantity == maxOrderQuantity.longValue())
-		{
-			modification.setStatusCode(CommerceCartModificationStatus.MAX_ORDER_QUANTITY_EXCEEDED);
-		}
-		else if (newQuantity == entryNewQuantity)
-		{
-			modification.setStatusCode(CommerceCartModificationStatus.SUCCESS);
+			if (newQuantity == 0)
+			{
+				modification.setStatusCode(CommerceCartModificationStatus.SUCCESS);
+			}
+			else
+			{
+				modification.setStatusCode(CommerceCartModificationStatus.LOW_STOCK);
+			}
+
+			return modification;
 		}
 		else
 		{
-			modification.setStatusCode(CommerceCartModificationStatus.LOW_STOCK);
+			// Adjust the entry quantity to the new value
+			entryToUpdate.setQuantity(Long.valueOf(entryNewQuantity));
+			LOG.info("========entryNewQuantity=======" + entryNewQuantity);
+			try
+			{
+				defaultOptimizeCommerceCartService.calculateCart(cartData,true);
+			}
+			catch (final IllegalStateException ex)
+			{
+				LOG.info("[Calculate entries failed. The entryNumber is{0}, the error message is {1}", entryToUpdate.getEntryNumber(),
+						ex.getMessage());
+			}
+
+			// Return the modification data
+			final CommerceCartModification modification = new CommerceCartModification();
+			modification.setQuantityAdded(actualAllowedQuantityChange);
+			modification.setEntryData(entryToUpdate);
+			modification.setQuantity(entryNewQuantity);
+
+			if (maxOrderQuantity != null && entryNewQuantity == maxOrderQuantity.longValue())
+			{
+				modification.setStatusCode(CommerceCartModificationStatus.MAX_ORDER_QUANTITY_EXCEEDED);
+			}
+			else if (newQuantity == entryNewQuantity)
+			{
+				modification.setStatusCode(CommerceCartModificationStatus.SUCCESS);
+			}
+			else
+			{
+				modification.setStatusCode(CommerceCartModificationStatus.LOW_STOCK);
+			}
+
+			return modification;
 		}
-
-		return modification;
-
 	}
 
 	protected void afterUpdateCartEntry(final CommerceCartParameter parameter, final CommerceCartModification result)
