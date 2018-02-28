@@ -9,7 +9,7 @@ public class DefaultOptimizedPromotionsPopulator extends PromotionsPopulator {
 	{
 		if (getCartService().hasSessionCart())
 		{
-			//TODO ai
+			//TODO acn
 //			final CartModel cartModel = getCartService().getSessionCart();
 //			if (cartModel != null)
 //			{

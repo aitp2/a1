@@ -19,7 +19,7 @@ public class DefaultOptimizedPromotionResultPopulator implements Populator<Optim
 	public void populate(OptimizedPromotionResultData source, PromotionResultData target) throws ConversionException {
 		target.setDescription(getOptimizePromotionResultService().getDescription(source));
 
-//		TODO ai
+//		TODO acn
 //		getPromotionResultService().getCouponCodesFromPromotion(source)
 //				.ifPresent(couponCodes ->
 //				{
@@ -33,7 +33,7 @@ public class DefaultOptimizedPromotionResultPopulator implements Populator<Optim
 
 //		target.setPromotionData(getPromotionsConverter().convert(source.getPromotion()));
 		target.setConsumedEntries(Converters.convertAll(source.getConsumedEntries(), getOptimizedOrderEntryConsumedConverter()) );
-		//TODO ai
+		//TODO acn
 		//populate other promotion result info
 		
 	}

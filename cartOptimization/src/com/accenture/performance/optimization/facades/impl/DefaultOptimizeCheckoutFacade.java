@@ -112,7 +112,6 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 		//
 	}
 	
-	//TODO acn
 	@Override
 	public List<? extends DeliveryModeData> getSupportedDeliveryModes() 
 	{

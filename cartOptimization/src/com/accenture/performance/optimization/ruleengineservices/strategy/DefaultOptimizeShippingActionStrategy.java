@@ -90,7 +90,7 @@ public class DefaultOptimizeShippingActionStrategy extends AbstractOptimizeRuleA
 	
 	@Override
 	public void undo(ItemModel var1) {
-		// TODO Auto-generated method stub
+		// TODO acn
 		LOG.error("TODO: no implement of undo!");
 		
 	}

@@ -408,7 +408,7 @@ public class DeliveryAddressCheckoutStepController extends AbstractCheckoutStepC
 				deliveryAddresses.add(selectedAddressData);
 			}
 		}else {
-			deliveryAddresses = this.getUserFacade().getAddressBook();//TODO acn
+			deliveryAddresses = this.getUserFacade().getAddressBook();
 		}
 
 		return deliveryAddresses == null ? Collections.<AddressData> emptyList() : deliveryAddresses;
