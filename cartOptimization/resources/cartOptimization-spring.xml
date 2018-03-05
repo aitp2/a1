@@ -140,6 +140,7 @@
 		<property name="baseSiteService" ref="baseSiteService" />
 		<property name="addressConverter" ref="addressConverter" />
 		<property name="cartReverseConverter" ref="cartReverseConverter" />
+		<property name="optimizeDeliveryService" ref="defaultOptimizeDeliveryService" />
 	</bean>
 	
 	<alias name="defaultOptimizeCommerceCheckoutService" alias="commerceCheckoutService" />

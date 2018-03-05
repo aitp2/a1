@@ -111,6 +111,11 @@ public class OptimizedPromotionOrderResults extends PromotionOrderResults
 	protected List<OptimizedPromotionResultData> getOptimizedPromotionResults(PromotionResultStatus statusFlag,
 			PromotionResultProducts productsFlag) {
 		LinkedList<OptimizedPromotionResultData> tmpResults = new LinkedList<OptimizedPromotionResultData>();
+		if(this.optimizedPromotionResults == null)
+		{
+			return tmpResults;
+		}
+		
 		for (OptimizedPromotionResultData promotionResult : this.optimizedPromotionResults) {
 			boolean productsOk;
 			boolean statusOk = false;

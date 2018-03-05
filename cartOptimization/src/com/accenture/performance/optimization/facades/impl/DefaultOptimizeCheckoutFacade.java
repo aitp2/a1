@@ -11,8 +11,10 @@
  */
 package com.accenture.performance.optimization.facades.impl;
 
+import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParameterNotNull;
 import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParameterNotNullStandardMessage;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +35,7 @@ import com.accenture.performance.optimization.model.OptimizedCartModel;
 import com.accenture.performance.optimization.service.OptimizeCartService;
 import com.accenture.performance.optimization.service.OptimizeCommerceCartService;
 import com.accenture.performance.optimization.service.OptimizeCommerceCheckoutService;
+import com.accenture.performance.optimization.service.OptimizeDeliveyService;
 import com.accenture.performance.optimization.service.OptimizeModelDealService;
 
 import de.hybris.platform.acceleratorfacades.order.impl.DefaultAcceleratorCheckoutFacade;
@@ -42,12 +45,12 @@ import de.hybris.platform.commercefacades.order.data.DeliveryModeData;
 import de.hybris.platform.commercefacades.order.data.OrderData;
 import de.hybris.platform.commercefacades.order.data.OrderEntryData;
 import de.hybris.platform.commercefacades.order.data.ZoneDeliveryModeData;
-import de.hybris.platform.commercefacades.user.UserFacade;
-import de.hybris.platform.commercefacades.order.impl.DefaultCheckoutFacade;
+import de.hybris.platform.commercefacades.product.data.PriceDataType;
 import de.hybris.platform.commercefacades.user.data.AddressData;
 import de.hybris.platform.commerceservices.enums.SalesApplication;
 import de.hybris.platform.commerceservices.service.data.CommerceCheckoutParameter;
 import de.hybris.platform.core.model.c2l.CountryModel;
+import de.hybris.platform.core.model.c2l.CurrencyModel;
 import de.hybris.platform.core.model.order.AbstractOrderEntryModel;
 import de.hybris.platform.core.model.order.AbstractOrderModel;
 import de.hybris.platform.core.model.order.CartModel;
@@ -56,18 +59,19 @@ import de.hybris.platform.core.model.order.delivery.DeliveryModeModel;
 import de.hybris.platform.core.model.order.payment.CreditCardPaymentInfoModel;
 import de.hybris.platform.core.model.user.AddressModel;
 import de.hybris.platform.core.model.user.CustomerModel;
+import de.hybris.platform.deliveryzone.jalo.ZoneDeliveryMode;
 import de.hybris.platform.deliveryzone.model.ZoneDeliveryModeModel;
+import de.hybris.platform.jalo.order.delivery.DeliveryMode;
 import de.hybris.platform.order.InvalidCartException;
 import de.hybris.platform.order.exceptions.CalculationException;
 import de.hybris.platform.payment.dto.BillingInfo;
 import de.hybris.platform.payment.dto.CardInfo;
 import de.hybris.platform.payment.dto.CardType;
-import de.hybris.platform.payment.dto.TransactionStatus;
-import de.hybris.platform.payment.model.PaymentTransactionEntryModel;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
 import de.hybris.platform.servicelayer.session.SessionService;
 import de.hybris.platform.site.BaseSiteService;
 import de.hybris.platform.storelocator.model.PointOfServiceModel;
+import de.hybris.platform.util.PriceValue;
 
 
 /**
@@ -99,6 +103,8 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 
 	@Autowired
 	private BaseSiteService baseSiteService;
+	
+	private OptimizeDeliveyService optimizeDeliveryService;
 
 	protected OptimizedCartData getOptimizedCart()
 	{
@@ -213,7 +219,6 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 		}
 		else
 		{
-			//
 			CartModel cartModel = new CartModel();
 			cartModel.setUser(getUserService().getUserForUID(pptimizedCartData.getUserId()));
 			return getAddressConverter().convertAll(getDeliveryService().getSupportedDeliveryAddressesForOrder(cartModel, visibleAddressesOnly));
@@ -227,30 +232,49 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 		return false;
 	}
 		
-	// TODO acn
 	@Override
 	protected DeliveryModeData convert(final DeliveryModeModel deliveryModeModel) {
 		if (deliveryModeModel instanceof ZoneDeliveryModeModel) {
 			final ZoneDeliveryModeModel zoneDeliveryModeModel = (ZoneDeliveryModeModel) deliveryModeModel;
-			final CartData cart = getCheckoutCart();
+			final OptimizedCartData cart = optimizeCartService.getSessionOptimizedCart();
 			if (cart != null) {
-				final ZoneDeliveryModeData zoneDeliveryModeData = getZoneDeliveryModeConverter()
-						.convert(zoneDeliveryModeModel);
-				// TODO calculate DeliveryCost
-				// final PriceValue deliveryCost =
-				// getDeliveryService().getDeliveryCostForDeliveryModeAndAbstractOrder(deliveryModeModel,
-				// cart);
-				// if (deliveryCost != null)
-				// {
-				// zoneDeliveryModeData.setDeliveryCost(getPriceDataFactory().create(PriceDataType.BUY,
-				// BigDecimal.valueOf(deliveryCost.getValue()), deliveryCost.getCurrencyIso()));
-				// }
+				final ZoneDeliveryModeData zoneDeliveryModeData = getZoneDeliveryModeConverter().convert(zoneDeliveryModeModel);
+				final PriceValue deliveryCost = getDeliveryCostForDeliveryModeAndAbstractOrder(deliveryModeModel,cart);
+				if (deliveryCost != null) {
+					zoneDeliveryModeData.setDeliveryCost(getPriceDataFactory().create(PriceDataType.BUY,
+							BigDecimal.valueOf(deliveryCost.getValue()), deliveryCost.getCurrencyIso()));
+				}
 
 				return zoneDeliveryModeData;
 			}
 			return null;
 		}
 		return getDeliveryModeConverter().convert(deliveryModeModel);
+	}
+	
+	public PriceValue getDeliveryCostForDeliveryModeAndAbstractOrder(final DeliveryModeModel deliveryMode, final OptimizedCartData cart)
+	{
+		validateParameterNotNull(deliveryMode, "deliveryMode model cannot be null");
+		validateParameterNotNull(cart, "abstractOrder model cannot be null");
+
+		final DeliveryMode deliveryModeSource = getModelService().getSource(deliveryMode);
+		if(! (deliveryModeSource instanceof ZoneDeliveryMode) )
+		{
+			return new PriceValue(cart.getCurrencyCode(), 0.0, cart.isNet());
+		}
+		
+		AbstractOrderModel abstractOrder = new CartModel();
+		
+		AddressModel deliverAddress = getDeliveryAddressModelForCode(cart.getDeliveryAddress().getId());
+		abstractOrder.setDeliveryAddress(deliverAddress);
+
+		CurrencyModel currency = getCommonI18NService().getCurrency(cart.getCurrencyCode());
+		abstractOrder.setCurrency(currency);
+		
+		abstractOrder.setNet(Boolean.valueOf(cart.isNet()));
+		abstractOrder.setSubtotal(cart.getSubtotal());
+		
+		return optimizeDeliveryService.getOptimizeDeliveryCostForDeliveryModeAndAbstractOrder(deliveryMode, abstractOrder);
 	}
 
 	//TODO acn
@@ -779,5 +803,20 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 	public void setBaseSiteService(final BaseSiteService baseSiteService)
 	{
 		this.baseSiteService = baseSiteService;
+	}
+
+	/**
+	 * @return the optimizeDeliveryService
+	 */
+	public OptimizeDeliveyService getOptimizeDeliveryService() {
+		return optimizeDeliveryService;
+	}
+
+	/**
+	 * @param optimizeDeliveryService the optimizeDeliveryService to set
+	 */
+	public void setOptimizeDeliveryService(OptimizeDeliveyService optimizeDeliveryService) {
+		super.setDeliveryService(optimizeDeliveryService);
+		this.optimizeDeliveryService = optimizeDeliveryService;
 	}
 }
