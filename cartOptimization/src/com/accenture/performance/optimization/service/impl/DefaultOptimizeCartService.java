@@ -763,7 +763,7 @@ public class DefaultOptimizeCartService extends DefaultCartService implements Op
 				}
 
 				// calculate the cart. Using recalculateCart() to force calculate the entries
-				//		getCommerceCartCalculationStrategy().recalculateCart(parameterList.get(0));
+				defaultOptimizeCommerceCartService.recalculateCart(parameterList.get(0));
 
 				// after add to cart
 				for (final Entry<CommerceCartParameter, CommerceCartModification> entry : paramModificationMap.entrySet())
