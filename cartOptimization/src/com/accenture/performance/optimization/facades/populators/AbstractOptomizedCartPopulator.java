@@ -235,7 +235,29 @@ public abstract class AbstractOptomizedCartPopulator<SOURCE extends OptimizedCar
 		prototype.setSubTotal(subTotalPriceData);
 		prototype.setSubTotalWithoutQuoteDiscounts(createPrice(source, Double.valueOf(subTotal)));
 		prototype.setDeliveryCost(source.getDeliveryMode() != null ? createPrice(source, source.getDeliveryCost()) : null);
-		//prototype.setTotalPriceWithTax((createPrice(source, calcTotalWithTax(source))));
+		prototype.setTotalPriceWithTax((createPrice(source, calcTotalWithTax(source))));
+	}
+	
+	protected Double calcTotalWithTax(final OptimizedCartData source)
+	{
+		if (source == null)
+		{
+			throw new IllegalArgumentException("source order must not be null");
+		}
+		if (source.getTotalPrice() == null)
+		{
+			return 0.0d;
+		}
+
+		BigDecimal totalPrice = BigDecimal.valueOf(source.getTotalPrice().doubleValue());
+
+		// Add the taxes to the total price if the cart is net; if the total was null taxes should be null as well
+		if (source.isNet() && totalPrice.compareTo(BigDecimal.ZERO) != 0 && source.getTotalTax() != null)
+		{
+			totalPrice = totalPrice.add(BigDecimal.valueOf(source.getTotalTax().doubleValue()));
+		}
+
+		return totalPrice.doubleValue();
 	}
 
 	protected PriceData createPrice(final OptimizedCartData source, final Double val)
