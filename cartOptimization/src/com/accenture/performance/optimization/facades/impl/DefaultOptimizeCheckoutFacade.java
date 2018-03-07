@@ -389,18 +389,22 @@ public class DefaultOptimizeCheckoutFacade extends DefaultAcceleratorCheckoutFac
 		validateParameterNotNullStandardMessage("deliveryModeCode", deliveryModeCode);
 
 		final OptimizedCartData cartData = optimizeCartService.getSessionOptimizedCart();
-		//will add isSupportedDeliveryMode(deliveryModeCode, cartModel) check in futhure
+		//TODO acn will add isSupportedDeliveryMode(deliveryModeCode, cartModel) check in futhure
 		if (cartData != null)
 		{
 			final DeliveryModeModel deliveryModeModel = getDeliveryService().getDeliveryModeForCode(deliveryModeCode);
 			if (deliveryModeModel != null)
 			{
-				cartData.setDeliveryMode(deliveryModeModel.getCode());
 				cartData.setCalculated(Boolean.FALSE);
-				optimizeCartService.setSessionOptimizedCart(cartData);
-				return true;
+				
+				final CommerceCheckoutParameter parameter = new CommerceCheckoutParameter();
+				parameter.setEnableHooks(true);
+				parameter.setOptimizeCart(cartData);
+				parameter.setDeliveryMode(deliveryModeModel);
+				return getCommerceCheckoutService().setDeliveryMode(parameter);
 			}
 		}
+		
 		return false;
 	}
 

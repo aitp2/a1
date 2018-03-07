@@ -96,6 +96,10 @@
 		<property name="commonI18NService" ref="commonI18NService" />
 		<property name="timeService" ref="timeService" />
 		<property name="promotionEngineService" ref="promotionEngineService" />
+		<property name="optimizeDeliveyService" ref="defaultOptimizeDeliveryService" />
+		<property name="customerAccountService" ref="customerAccountService" />
+		<property name="userService" ref="userService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
 	</bean>
 
 	<alias alias="promotionEngineService" name="defaultOptimizationPromotionService" />
@@ -159,6 +163,8 @@
 		<property name="optimizeCartService" ref="cartService" />
 		<property name="checkoutCustomerStrategy" ref="checkoutCustomerStrategy" />
 		<property name="customerAccountService" ref="customerAccountService" />
+		
+		<property name="commerceDeliveryModeStrategy" ref="defaultOptimizeCommerceDeliveryModeStrategy" />
 	</bean>
 
 	<alias name="defatulOptimizeModelDealService" alias="optimizeModelDealService" />
@@ -545,4 +551,7 @@
 	<alias name="defaultOptimizeCouponFacadeImpl" alias="voucherFacade"/>
 	<bean id="defaultOptimizeCouponFacadeImpl" parent="defaultCouponFacade" class="com.accenture.performance.optimization.facades.impl.DefaultOptimizeCouponFacadeImpl" />
 	
+	<bean id="defaultOptimizeCommerceDeliveryModeStrategy" parent="defaultCommerceDeliveryModeStrategy" class="com.accenture.performance.optimization.strategies.impl.DefaultOptimizeCommerceDeliveryModeStrategy" >
+		<property name="optimizeCommerceCartService" ref="defaultOptimizeCommerceCartService" />
+	</bean>
 </beans>

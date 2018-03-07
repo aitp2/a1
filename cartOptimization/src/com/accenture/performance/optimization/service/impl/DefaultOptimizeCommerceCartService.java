@@ -15,8 +15,13 @@ import static de.hybris.platform.servicelayer.util.ServicesUtil.validateParamete
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,19 +30,34 @@ import com.accenture.performance.optimization.facades.data.OptimizedCartData;
 import com.accenture.performance.optimization.facades.data.OptimizedCartEntryData;
 import com.accenture.performance.optimization.service.OptimizeCartService;
 import com.accenture.performance.optimization.service.OptimizeCommerceCartService;
+import com.accenture.performance.optimization.service.OptimizeDeliveyService;
 import com.accenture.performance.optimization.service.OptimizePromotionService;
 
+import de.hybris.platform.commerceservices.customer.CustomerAccountService;
 import de.hybris.platform.commerceservices.order.CommerceCartModification;
 import de.hybris.platform.commerceservices.order.CommerceCartRestoration;
 import de.hybris.platform.commerceservices.order.CommerceCartRestorationException;
 import de.hybris.platform.commerceservices.order.impl.DefaultCommerceCartService;
 import de.hybris.platform.commerceservices.service.data.CommerceCartParameter;
+import de.hybris.platform.core.PK;
+import de.hybris.platform.core.model.c2l.CurrencyModel;
+import de.hybris.platform.core.model.order.AbstractOrderModel;
+import de.hybris.platform.core.model.order.CartModel;
+import de.hybris.platform.core.model.order.delivery.DeliveryModeModel;
+import de.hybris.platform.core.model.user.AddressModel;
+import de.hybris.platform.core.model.user.CustomerModel;
 import de.hybris.platform.order.CalculationService;
 import de.hybris.platform.order.exceptions.CalculationException;
 import de.hybris.platform.promotions.model.PromotionGroupModel;
+import de.hybris.platform.servicelayer.exceptions.UnknownIdentifierException;
 import de.hybris.platform.servicelayer.i18n.CommonI18NService;
+import de.hybris.platform.servicelayer.search.FlexibleSearchQuery;
+import de.hybris.platform.servicelayer.search.FlexibleSearchService;
 import de.hybris.platform.servicelayer.time.TimeService;
-import de.hybris.platform.util.DiscountValue;
+import de.hybris.platform.servicelayer.user.UserService;
+import de.hybris.platform.util.Config;
+import de.hybris.platform.util.PriceValue;
+import de.hybris.platform.util.TaxValue;
 
 
 /**
@@ -54,7 +74,15 @@ public class DefaultOptimizeCommerceCartService extends DefaultCommerceCartServi
 	private CommonI18NService commonI18NService;
 	@Autowired
 	private OptimizeCartService optimizeCartService;
-
+	
+	private OptimizeDeliveyService optimizeDeliveyService;
+	
+	private CustomerAccountService customerAccountService;
+	
+	private UserService userService;
+	
+	private FlexibleSearchService flexibleSearchService;
+	
 	/**
 	 * @return the optimizeCartService
 	 */
@@ -62,9 +90,6 @@ public class DefaultOptimizeCommerceCartService extends DefaultCommerceCartServi
 	{
 		return optimizeCartService;
 	}
-
-
-
 
 	/**
 	 * @param optimizeCartService
@@ -74,9 +99,6 @@ public class DefaultOptimizeCommerceCartService extends DefaultCommerceCartServi
 	{
 		this.optimizeCartService = optimizeCartService;
 	}
-
-
-
 
 	@Autowired
 	private TimeService timeService;
@@ -163,6 +185,7 @@ public class DefaultOptimizeCommerceCartService extends DefaultCommerceCartServi
 		// -----------------------------
 		// reset own values
 		//final Map taxValueMap = resetAllValues(optimizedCartData);
+		resetAllValues(optimizedCartData);
 		// -----------------------------
 		// now calculate all totals
 		calculateTotals(optimizedCartData, false);
@@ -254,6 +277,145 @@ public class DefaultOptimizeCommerceCartService extends DefaultCommerceCartServi
 
 		//saveOrder(order);
 
+	}
+
+	/**
+	 * @see de.hybris.platform.order.impl.DefaultCalculationService#resetAllValues(final AbstractOrderModel order)
+	 */
+	protected Map resetAllValues(final OptimizedCartData order) throws CalculationException
+	{
+		// -----------------------------
+		// set subtotal and get tax value map
+		//final Map<TaxValue, Map<Set<TaxValue>, Double>> taxValueMap = calculateSubtotal(order, false); //TODO acn later
+		final Map<TaxValue, Map<Set<TaxValue>, Double>> taxValueMap = new HashMap<>();
+		/*
+		 * filter just relative tax values - payment and delivery prices might require conversion using taxes -> absolute
+		 * taxes do not apply here TODO: ask someone for absolute taxes and how they apply to delivery cost etc. - this
+		 * implementation might be wrong now
+		 */
+		final Collection<TaxValue> relativeTaxValues = new LinkedList<TaxValue>();
+		for (final Map.Entry<TaxValue, ?> e : taxValueMap.entrySet())
+		{
+			final TaxValue taxValue = e.getKey();
+			if (!taxValue.isAbsolute())
+			{
+				relativeTaxValues.add(taxValue);
+			}
+		}
+
+		//PLA-10914
+		final boolean setAdditionalCostsBeforeDiscounts = Config.getBoolean(
+				"ordercalculation.reset.additionalcosts.before.discounts", true);
+		if (setAdditionalCostsBeforeDiscounts)
+		{
+			resetAdditionalCosts(order, relativeTaxValues);
+		}
+		// -----------------------------
+		// set discount values ( not applied yet ) - dont needed in model domain (?)
+		//removeAllGlobalDiscountValues();
+		
+		//order.setGlobalDiscountValues(findGlobalDiscounts(order));//TODO acn
+		// -----------------------------
+		// set delivery costs - convert if net or currency is different
+
+		if (!setAdditionalCostsBeforeDiscounts)
+		{
+			resetAdditionalCosts(order, relativeTaxValues);
+		}
+
+		return taxValueMap;
+
+	}
+
+	protected void resetAdditionalCosts(final OptimizedCartData order, final Collection<TaxValue> relativeTaxValues)
+	{
+		final PriceValue deliCost = getDeliveryCost(order);//see de.hybris.platform.order.strategies.calculation.impl.DefaultFindDeliveryCostStrategy#getDeliveryCost(final AbstractOrderModel order)
+		double deliveryCostValue = 0.0;
+		if (deliCost != null)
+		{
+			deliveryCostValue = convertPriceIfNecessary(deliCost, order.isNet(), getCommonI18NService().getCurrency(order.getCurrencyCode()) , relativeTaxValues).getValue();
+		}
+		
+		order.setDeliveryCost(Double.valueOf(deliveryCostValue));
+		// -----------------------------
+		// set payment cost - convert if net or currency is different
+		//TODO acn
+//		final PriceValue payCost = findPaymentCostStrategy.getPaymentCost(order);
+//		double paymentCostValue = 0.0;
+//		if (payCost != null)
+//		{
+//			paymentCostValue = convertPriceIfNecessary(payCost, order.getNet().booleanValue(), order.getCurrency(),
+//					relativeTaxValues).getValue();
+//		}
+//		order.setPaymentCost(Double.valueOf(paymentCostValue));
+	}
+
+	protected PriceValue getDeliveryCost(final OptimizedCartData cart)
+	{
+		if(StringUtils.isBlank(cart.getDeliveryMode()))
+		{
+			return new PriceValue(cart.getCurrencyCode(), 0.0, cart.isNet());
+		}
+		
+		final DeliveryModeModel deliveryMode = optimizeDeliveyService.getDeliveryModeForCode(cart.getDeliveryMode());
+		
+		AbstractOrderModel abstractOrder = new CartModel();
+		
+		CustomerModel currentCustomer = (CustomerModel)userService.getCurrentUser();
+		AddressModel deliverAddress = getCustomerAccountService().getAddressForCode(currentCustomer, cart.getDeliveryAddress().getId());
+		abstractOrder.setDeliveryAddress(deliverAddress);
+
+		CurrencyModel currency = getCommonI18NService().getCurrency(cart.getCurrencyCode());
+		abstractOrder.setCurrency(currency);
+		
+		abstractOrder.setNet(Boolean.valueOf(cart.isNet()));
+		abstractOrder.setSubtotal(cart.getSubtotal());
+		
+		return optimizeDeliveyService.getOptimizeDeliveryCostForDeliveryModeAndAbstractOrder(deliveryMode, abstractOrder);
+	}
+
+	/**
+	 * converts a PriceValue object into a double matching the target currency and net/gross - state if necessary. this
+	 * is the case when the given price value has a different net/gross flag or different currency.
+	 *
+	 * @param pv
+	 *           the base price to convert
+	 * @param toNet
+	 *           the target net/gross state
+	 * @param toCurrency
+	 *           the target currency
+	 * @param taxValues
+	 *           the collection of tax values which apply to this price
+	 *
+	 * @return a new PriceValue containing the converted price or pv in case no conversion was necessary
+	 */
+	//YTODO: refactor to some helper class
+	public PriceValue convertPriceIfNecessary(final PriceValue pv, final boolean toNet, final CurrencyModel toCurrency,	final Collection taxValues)
+	{
+		// net - gross - conversion
+		double convertedPrice = pv.getValue();
+		if (pv.isNet() != toNet)
+		{
+			convertedPrice = pv.getOtherPrice(taxValues).getValue();
+			convertedPrice = commonI18NService.roundCurrency(convertedPrice, toCurrency.getDigits().intValue());
+		}
+		// currency conversion
+		final String iso = pv.getCurrencyIso();
+		if (iso != null && !iso.equals(toCurrency.getIsocode()))
+		{
+			try
+			{
+				final CurrencyModel basePriceCurrency = commonI18NService.getCurrency(iso);
+				convertedPrice = commonI18NService.convertAndRoundCurrency(basePriceCurrency.getConversion().doubleValue(),
+						toCurrency.getConversion().doubleValue(), toCurrency.getDigits().intValue(), convertedPrice);
+			}
+			catch (final UnknownIdentifierException e)
+			{
+				LOG.warn("Cannot convert from currency '" + iso + "' to currency '" + toCurrency.getIsocode() + "' since '" + iso
+						+ "' doesn't exist any more - ignored");
+			}
+		}
+		return new PriceValue(toCurrency.getIsocode(), convertedPrice, toNet);
 	}
 
 	protected void setCalculatedStatus(final OptimizedCartData order)
@@ -376,6 +538,75 @@ public class DefaultOptimizeCommerceCartService extends DefaultCommerceCartServi
 	public void setPromotionEngineService(final OptimizePromotionService promotionEngineService)
 	{
 		this.promotionEngineService = promotionEngineService;
+	}
+
+	/**
+	 * @return the optimizeDeliveyService
+	 */
+	public OptimizeDeliveyService getOptimizeDeliveyService() {
+		return optimizeDeliveyService;
+	}
+
+
+
+
+	/**
+	 * @param optimizeDeliveyService the optimizeDeliveyService to set
+	 */
+	public void setOptimizeDeliveyService(OptimizeDeliveyService optimizeDeliveyService) {
+		this.optimizeDeliveyService = optimizeDeliveyService;
+	}
+
+
+	/**
+	 * @return the customerAccountService
+	 */
+	public CustomerAccountService getCustomerAccountService() {
+		return customerAccountService;
+	}
+
+
+
+
+	/**
+	 * @param customerAccountService the customerAccountService to set
+	 */
+	public void setCustomerAccountService(CustomerAccountService customerAccountService) {
+		this.customerAccountService = customerAccountService;
+	}
+
+
+
+
+	/**
+	 * @return the userService
+	 */
+	public UserService getUserService() {
+		return userService;
+	}
+
+
+
+
+	/**
+	 * @param userService the userService to set
+	 */
+	public void setUserService(UserService userService) {
+		this.userService = userService;
+	}
+
+	/**
+	 * @return the flexibleSearchService
+	 */
+	public FlexibleSearchService getFlexibleSearchService() {
+		return flexibleSearchService;
+	}
+
+	/**
+	 * @param flexibleSearchService the flexibleSearchService to set
+	 */
+	public void setFlexibleSearchService(FlexibleSearchService flexibleSearchService) {
+		this.flexibleSearchService = flexibleSearchService;
 	}
 
 
