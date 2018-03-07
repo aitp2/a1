@@ -14,19 +14,16 @@ package com.accenture.performance.optimization.facades.populators;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
-import com.accenture.performance.optimization.data.OptimizedPromotionResultData;
 import com.accenture.performance.optimization.facades.data.OptimizedCartData;
+import com.accenture.performance.optimization.facades.data.OptimizedCartEntryData;
 import com.accenture.performance.optimization.ruleengineservices.result.OptimizedPromotionOrderResults;
 
 import de.hybris.platform.commercefacades.order.data.AbstractOrderData;
 import de.hybris.platform.commercefacades.order.data.CartData;
 import de.hybris.platform.commercefacades.order.data.DeliveryModeData;
 import de.hybris.platform.commerceservices.delivery.DeliveryService;
-import de.hybris.platform.core.model.order.AbstractOrderModel;
 import de.hybris.platform.core.model.order.delivery.DeliveryModeModel;
-import de.hybris.platform.promotions.result.PromotionOrderResults;
 import de.hybris.platform.servicelayer.dto.converter.ConversionException;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
 
@@ -60,6 +57,24 @@ public class DefaultOptimizedCartPopulator<T extends CartData> extends AbstractO
 		
 		Collection<String> vouchers = source.getAppliedCouponCodes();
 		target.setAppliedVouchers( vouchers == null ? Collections.emptyList():new ArrayList<>(vouchers));
+		
+		target.setDeliveryItemsQuantity(Long.valueOf(sumDeliveryItemsQuantity(source)));
+	}
+	
+	/**
+	 * @see de.hybris.platform.commercefacades.order.converters.populator.DeliveryOrderEntryGroupPopulator#sumDeliveryItemsQuantity(de.hybris.platform.core.model.order.AbstractOrderModel)
+	 */
+	protected long sumDeliveryItemsQuantity(final OptimizedCartData source)
+	{
+		long sum = 0;
+		for (final OptimizedCartEntryData entryModel : source.getEntries())
+		{
+			if (entryModel.getDeliveryPointOfService() == null)
+			{
+				sum += entryModel.getQuantity().longValue();
+			}
+		}
+		return sum;
 	}
 	
 	@Override

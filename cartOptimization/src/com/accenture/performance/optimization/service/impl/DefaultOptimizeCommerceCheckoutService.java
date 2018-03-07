@@ -361,6 +361,7 @@ public class DefaultOptimizeCommerceCheckoutService extends DefaultCommerceCheck
 		validateParameterNotNull(cartData, "Cart model cannot be null");
 		validateParameterNotNull(paymentInfoModel, "payment info model cannot be null");
 		cartData.setPaymentInfo(paymentInfoData);
+		//TODO acn calculate cart
 		getOptimizeCartService().setSessionOptimizedCart(cartData);
 		return true;
 	}

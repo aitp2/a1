@@ -53,7 +53,7 @@
 									</div>
 	
 									<div class="form-group">
-										<formElement:formInputBox idKey="card_nameOnCard" labelKey="payment.nameOnCard" path="card_nameOnCard" inputCSS="form-control" tabindex="2" mandatory="false" />
+										<formElement:formInputBox idKey="card_nameOnCard" labelKey="payment.nameOnCard" path="card_nameOnCard" inputCSS="form-control" tabindex="2" mandatory="true" />
 									</div>
 	 
 									<div class="form-group">
@@ -108,7 +108,6 @@
                                     <div class="headline">
                                         <spring:theme code="checkout.multi.paymentMethod.addPaymentDetails.billingAddress"/>
                                     </div>
-
                                     <c:if test="${cartData.deliveryItemsQuantity > 0}">
 
                                         <div id="useDeliveryAddressData"
