@@ -34,12 +34,6 @@ public class MergingCartRestorationStrategy extends DefaultCartRestorationStrate
 	@Override
 	public void restoreCart(final HttpServletRequest request)
 	{
-		// no need to merge if current cart has no entry
-		if (!getCartFacade().hasEntries())
-		{
-			super.restoreCart(request);
-		}
-		else
 		{
 			final String sessionCartGuid = getCartFacade().getSessionCartGuid();
 			final String mostRecentSavedCartGuid = getMostRecentSavedCartGuid(sessionCartGuid);
