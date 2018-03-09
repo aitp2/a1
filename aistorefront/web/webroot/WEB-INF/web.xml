@@ -25,7 +25,15 @@
 		<welcome-file/>
 	</welcome-file-list>
 
-
+	<!-- spring session -->
+	<filter>
+       <filter-name>springSessionRepositoryFilter</filter-name>
+       <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+	    <filter-name>springSessionRepositoryFilter</filter-name>
+	    <url-pattern>/*</url-pattern>
+	</filter-mapping>
 	<!-- filters -->	
 	<filter>
 		<filter-name>XSSFilter</filter-name>

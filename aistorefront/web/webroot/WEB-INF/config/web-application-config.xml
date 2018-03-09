@@ -31,6 +31,73 @@
 		</property>
 	</bean>
 	
+	
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">  
+        <property name="maxTotal" value="${redis.pool.maxTotal}"/>  
+        <property name="maxIdle" value="${redis.pool.maxIdle}"/>  
+        <property name="minIdle" value="${redis.pool.minIdle}"/>  
+        <property name="minEvictableIdleTimeMillis" value="${redis.pool.minEvictableIdleTimeMillis}"/>  
+        <property name="numTestsPerEvictionRun" value="${redis.pool.numTestsPerEvictionRun}"/>  
+        <property name="timeBetweenEvictionRunsMillis" value="${redis.pool.timeBetweenEvictionRunsMillis}"/>  
+        <property name="testWhileIdle" value="${redis.pool.testWhileIdle}"/>  
+    </bean>  
+    
+    <bean id="singleNodeJedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" destroy-method="destroy">  
+        <property name="poolConfig" ref="jedisPoolConfig"/>  
+        <property name="hostName" value="${redis.instance.host}"/>  
+        <property name="port" value="${redis.instance.port}"/>  
+        <!-- <property name="password" value="${redis.pass}"/> -->
+        <property name="timeout" value="${redis.instance.timeout}"/>  
+        <property name="usePool" value="${redis.instance.usePool}" />  
+    </bean>
+    
+    <bean id="multiNodeJedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" destroy-method="destroy" lazy-init="true" autowire-candidate="false">
+		<constructor-arg index="0">
+			<bean class="org.springframework.data.redis.connection.RedisSentinelConfiguration">
+				<constructor-arg index="0" value="${redis.instance.master}" />
+				<constructor-arg index="1">
+					<set>
+						<value>${redis.instance.sentinel.node1}</value>
+						<value>${redis.instance.sentinel.node2}</value> 
+						<value>${redis.instance.sentinel.node3}</value>
+					</set>
+				</constructor-arg>
+			</bean>
+		</constructor-arg>
+     	<constructor-arg index="1" ref="jedisPoolConfig"/>
+    	<!-- <property name="password" value="${redis.pass}"/> -->
+     	<property name="timeout" value="${redis.instance.pool.timeout}"/>
+	</bean>
+
+
+    <bean id="accentureRedisSerializer" class="com.acn.ai.storefront.serialize.AccentureJdkSerializationRedisSerializer"/>
+	
+ 	<bean id="redisTemplate1" class="org.springframework.data.redis.core.RedisTemplate">
+	    <property name="connectionFactory" ref="${redis.instance.jedisFactory}" />
+	    <property name="keySerializer">
+	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+	    </property>
+	    <property name="valueSerializer" ref="accentureRedisSerializer" />
+	    <property name="hashKeySerializer">
+	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+	    </property>
+	    <property name="hashValueSerializer" ref="accentureRedisSerializer" />
+	</bean>
+	
+	<bean id="sessionRepository"
+		class="org.springframework.session.data.redis.RedisOperationsSessionRepository">
+	    <constructor-arg ref="redisTemplate1" />
+	    <property name="defaultMaxInactiveInterval" value="${libyb2bstorefront.session.timeout}" />
+	</bean>
+	
+	
+	<bean class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration">
+		<property name="maxInactiveIntervalInSeconds" value="${libyb2bstorefront.session.timeout}" />
+	</bean>
+	
+	
+	
+	
 	<!-- Load additional configuration -->
 	<import resource="spring-filter-config.xml"/>
 	<import resource="spring-security-config.xml"/>
