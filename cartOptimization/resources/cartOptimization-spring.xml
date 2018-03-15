@@ -554,4 +554,11 @@
 	<bean id="defaultOptimizeCommerceDeliveryModeStrategy" parent="defaultCommerceDeliveryModeStrategy" class="com.accenture.performance.optimization.strategies.impl.DefaultOptimizeCommerceDeliveryModeStrategy" >
 		<property name="optimizeCommerceCartService" ref="defaultOptimizeCommerceCartService" />
 	</bean>
+	
+	<bean id="defaultOptimizeAfterCronJobFinishedEventListener" class="com.accenture.performance.optimization.listener.AfterCatalogVersionSyncCronJobFinishedEventListener" parent="abstractEventListener">
+		<property name="eventService" ref="eventService"/>
+        <property name="typeService" ref="typeService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService" />
+        <property name="configurationService" ref="configurationService" />
+	</bean>
 </beans>
