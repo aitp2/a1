@@ -105,6 +105,43 @@ public class AiSSLClient
 		return result;
 	}
 
+	public String doPurge(final String url, final String charset)
+	{
+		final CloseableHttpClient httpclient = HttpClients.createDefault();
+		String resultString = "";
+		CloseableHttpResponse response = null;
+		try
+		{
+			final HttpPurge httpPurge = new HttpPurge(url);
+			response = httpclient.execute(httpPurge);
+			if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK)
+			{
+				resultString = EntityUtils.toString(response.getEntity(), charset);
+			}
+		}
+		catch (final Exception e)
+		{
+			//TODO acn
+			e.printStackTrace();
+		}
+		finally
+		{
+			try
+			{
+				if (response != null)
+				{
+					response.close();
+				}
+				httpclient.close();
+			}
+			catch (final IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return resultString;
+	}
+	
 	public String doGet(final String url, final String charset)
 	{
 		final CloseableHttpClient httpclient = HttpClients.createDefault();
