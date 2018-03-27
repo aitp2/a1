@@ -1,12 +1,16 @@
 package com.accenture.performance.optimization.listener;
 
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.acn.ai.util.client.AiSSLClient;
 
+import de.hybris.platform.catalog.model.CatalogVersionModel;
 import de.hybris.platform.catalog.model.synchronization.CatalogVersionSyncJobModel;
-import de.hybris.platform.catalog.model.synchronization.CatalogVersionSyncScheduleMediaModel;
 import de.hybris.platform.core.model.type.ComposedTypeModel;
 import de.hybris.platform.core.model.type.TypeModel;
 import de.hybris.platform.servicelayer.config.ConfigurationService;
@@ -30,34 +34,39 @@ public class AfterCatalogVersionSyncCronJobFinishedEventListener extends Abstrac
 	protected void onEvent(AfterCronJobFinishedEvent event) {
 		if(configurationService.getConfiguration().getBoolean("ai.optimize.catalogversion.sync.finished.listener.enable", true) && isCatalogVersionSyncJob(event))
 		{
-			LOG.info("Job code:"+event.getJob());
 			LOG.info("CronJob code:"+event.getCronJob());
-			LOG.info("CronJob type:"+event.getCronJobType());
 			final String jobCode = event.getJob();
-			if(StringUtils.isNoneBlank(jobCode))
+			if(StringUtils.isNotBlank(jobCode))
 			{
 				FlexibleSearchQuery query = new FlexibleSearchQuery("SELECT {"+CatalogVersionSyncJobModel.PK+"} FROM {"+CatalogVersionSyncJobModel._TYPECODE+"} WHERE {"+CatalogVersionSyncJobModel.CODE+"} = ?code");
 				query.addQueryParameter("code", jobCode);
 				
 				CatalogVersionSyncJobModel jobModel = flexibleSearchService.searchUnique(query);
+				CatalogVersionModel sourceCatalogVersion = jobModel.getSourceVersion();
+				CatalogVersionModel targetCatalogVersion = jobModel.getTargetVersion();
+				
 				LOG.info("CatalogVersionSyncJob code:"+jobCode);
-				LOG.info("SourceVersion:"+jobModel.getSourceVersion().getVersion()+" name:"+jobModel.getSourceVersion().getCatalog().getName()+" source catalog id:"+jobModel.getSourceVersion().getCatalog().getId());
-				LOG.info("TargetVersion:"+jobModel.getTargetVersion().getVersion()+" name:"+jobModel.getTargetVersion().getCatalog().getName()+" target catalog id:"+jobModel.getTargetVersion().getCatalog().getId());
+				final String sourceCatalogID = sourceCatalogVersion.getCatalog().getId();
+				final String targetCatalogID = targetCatalogVersion.getCatalog().getId();
 				
-				//TODO check the if the catalog is product catalog or content catalog and make the cached page expired
-				///
-				
-				//TODO acn get the items sync 
-				//FlexibleSearchQuery mediaQuery = new FlexibleSearchQuery("SELECT {"+CatalogVersionSyncScheduleMediaModel.PK+"} FROM {"+CatalogVersionSyncScheduleMediaModel._TYPECODE+"} WHERE {"+CatalogVersionSyncScheduleMediaModel.CRONJOB+"} = ?cronJob");
-				//mediaQuery.addQueryParameter("cronJob", value);
-				final String contentURL = configurationService.getConfiguration().getString("ai.content.cache.url");
-				if(StringUtils.isBlank(contentURL))
+				if(sourceCatalogID.endsWith("ContentCatalog") || sourceCatalogID.endsWith("ProductCatalog"))
 				{
-					LOG.error("value for key:ai.content.cache.url can not be empty");
-					return;
+					LOG.info("SourceVersion:"+jobModel.getSourceVersion().getVersion()+" source catalog id:"+sourceCatalogID);
+					LOG.info("TargetVersion:"+jobModel.getTargetVersion().getVersion()+" target catalog id:"+targetCatalogID);
+					final String contentURL = configurationService.getConfiguration().getString("ai.purge.content.cache.url");
+					if(StringUtils.isBlank(contentURL))
+					{
+						LOG.error("value for key:ai.purge.content.cache.url can not be empty");
+						return;
+					}
+					
+					try {
+						new AiSSLClient().doPurge(contentURL, "utf-8");
+					} catch (KeyManagementException | NoSuchAlgorithmException | IOException e) {
+						LOG.error(e.getMessage(), e);
+					}
 				}
-				//String jsonParam = "";
-				//new AiSSLClient().doPost(contentURL, jsonParam, "utf-8");
+				
 			}
 		}
 		
