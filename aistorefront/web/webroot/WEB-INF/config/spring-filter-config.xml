@@ -63,6 +63,8 @@
 
 		<!-- filter to handle multipart file upload -->
 		<ref bean="fileUploadFilter"/>
+		
+		<ref bean="aiDynamicResourceFilter" />
 
 		<!-- Security -->
 		<ref bean="springSecurityFilterChain"/>
@@ -77,7 +79,7 @@
 		<ref bean="customerLocationRestorationFilter"/>
 		
 		<ref bean="occTokenFilter" />
-
+		
 	</util:list>
 	
 	<bean id="storefrontTenantDefaultFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain" >
@@ -222,7 +224,25 @@
 		<property name="maxUploadSize" value="#{configurationService.configuration.getProperty('import.csv.max.upload.size.bytes')}" />
 	</bean>
 	
+	<!-- added by wei.f.zhang -->
 	<bean id="occTokenFilter" class="com.acn.ai.storefront.filters.OccTokenFilter">
 		<property name="tokenService" ref="aiTokenService" />
 	</bean>
+	
+	<util:set id="aiIncludeUrlSet" value-type="java.lang.String">
+		<value>/**/p/**</value>
+		<value></value>
+	</util:set>
+	
+	<bean id="aiInculdeUrlRequestMatcher" class="com.acn.ai.storefront.matcher.AiInculdeUrlRequestMatcher" >
+		<property name="includeUrlSet" ref="aiIncludeUrlSet" />
+		<property name="pathMatcher" ref="defaultPathMatcher" />
+	</bean>
+	
+	<bean id="aiDynamicResourceFilter" class="com.acn.ai.storefront.filters.AiDynamicResourceFilter" >
+		<property name="requestMatcher" ref="aiInculdeUrlRequestMatcher" />
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+	<!-- //////////////////////////////// -->
+	
 </beans>

@@ -31,7 +31,6 @@ public class ExcludeUrlRequestMatcher implements RequestMatcher
 
 	private Set<String> excludeUrlSet;
 	private PathMatcher pathMatcher;
-	private boolean urlValidateEnable;
 	
 	@Override
 	public boolean matches(final HttpServletRequest request)
@@ -58,14 +57,6 @@ public class ExcludeUrlRequestMatcher implements RequestMatcher
 	@Required
 	public void setExcludeUrlSet(final Set<String> excludeUrlSet)
 	{
-		
-		if(!urlValidateEnable)
-		{
-			this.excludeUrlSet = excludeUrlSet;
-			LOG.warn("url validate disabled");
-			return;
-		}
-
 		final Set<String> validUrls = new HashSet<String>();
 		// Ensure only valid urls are added to the excludeUrlSet
 		for (final String url : excludeUrlSet)
@@ -93,20 +84,5 @@ public class ExcludeUrlRequestMatcher implements RequestMatcher
 	{
 		this.pathMatcher = pathMatcher;
 	}
-
-	/**
-	 * @return the urlValidateEnable
-	 */
-	public boolean isUrlValidateEnable() {
-		return urlValidateEnable;
-	}
-
-	/**
-	 * @param urlValidateEnable the urlValidateEnable to set
-	 */
-	public void setUrlValidateEnable(boolean urlValidateEnable) {
-		this.urlValidateEnable = urlValidateEnable;
-	}
-
 
 }

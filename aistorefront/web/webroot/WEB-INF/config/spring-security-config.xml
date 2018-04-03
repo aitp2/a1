@@ -66,16 +66,10 @@
 	<bean id="excludeUrlRequestMatcher" class="com.acn.ai.storefront.security.ExcludeUrlRequestMatcher">
 		<property name="excludeUrlSet" ref="excludeUrlSet" />
 		<property name="pathMatcher" ref="defaultPathMatcher"/>
-		<property name="urlValidateEnable" value="${ai.url.validate.excludeUrlRequestMatcher.enable}" />
 	</bean>
 
 	<!-- The set of url(s) to exclude from the 'Default security config'-->
-	<!-- <bean id="excludeUrlSet" class="java.util.HashSet" /> -->
-	<util:set id="excludeUrlSet" value-type="java.lang.String">
-		<value>/**/p/**</value><!-- added by wei.f.zhang -->
-		<value></value>
-	</util:set>
-	
+	<bean id="excludeUrlSet" class="java.util.HashSet" />
 		
 	<!-- Path matcher to use, AntPathMatcher is the default -->
 	<alias name="antPathMatcher" alias="defaultPathMatcher" />
@@ -182,7 +176,6 @@
 		</set>
 	</property>
 	<property name="pathMatcher" ref="defaultPathMatcher" />
-	<property name="urlValidateEnable" value="true" />
 	</bean>
 
 	<bean id="redirectStrategy" class="org.springframework.security.web.DefaultRedirectStrategy"  />
