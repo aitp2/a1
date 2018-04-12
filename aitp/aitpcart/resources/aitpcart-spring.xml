@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	
+	
+    <bean id="aitpcartSystemSetup" class="com.accenture.aitp.cart.setup.AitpcartSystemSetup">
+        <!-- constructor arg injection example -->
+        <constructor-arg ref="aitpcartService"/>
+    </bean>
+
+    <bean id="aitpcartService" class="com.accenture.aitp.cart.service.impl.DefaultAitpcartService">
+        <!-- setter injection example -->
+        <property name="modelService" ref="modelService"/>
+        <property name="mediaService" ref="mediaService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+    
+    <context:component-scan base-package="com.accenture.aitp.cart" />
+    
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+    
+ <bean id="extendedOrderDaoAspect" class="com.accenture.aitp.cart.aspectj.ExtendedOrderDaoAspect" />
+	
+ <bean id="modelServiceAspect" class="com.accenture.aitp.cart.aspectj.ModelServiceAspect" />
+			
+  <bean id="promotionActionServiceAspect" class="com.accenture.aitp.cart.aspectj.PromotionActionServiceAspect"/>
+<!--  
+  <alias name="aitpOrderAdjustTotalActionStrategy" alias="orderTotalAdjustActionStrategy"/>
+	<bean id="aitpOrderAdjustTotalActionStrategy" parent="abstractRuleActionStrategy" class="de.hybris.platform.promotionengineservices.action.impl.DefaultOrderAdjustTotalActionStrategy" >
+		<property name="promotionAction" value="com.accenture.aitp.cart.model.CacheRuleBasedOrderAdjustTotalActionModel"></property>
+	</bean>
+	
+  <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="orderTotalAdjustActionStrategy" />  
+         <property name="targetMethod" value="setPromotionAction" />  
+         <property name="arguments">  
+               <array>
+                <value>com.accenture.aitp.cart.model.CacheRuleBasedOrderAdjustTotalActionModel</value>
+               </array>
+         </property>  
+    </bean> 
+    -->
+</beans>

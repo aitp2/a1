@@ -1,0 +1,11 @@
+#Ant properties
+#Sat Apr 22 20:33:34 UTC 2017
+builddate=20170422 2033
+description=aitpfulfilmentprocess
+group.id=de.hybris.platform
+module.name=platform-module
+name=aitpfulfilmentprocess
+releasedate=20170420 1042
+vendor=hybris
+version=6.3.0.0-SNAPSHOT
+version.api=6.3.0
