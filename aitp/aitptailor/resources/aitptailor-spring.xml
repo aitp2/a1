@@ -140,19 +140,28 @@
 
 	<alias name="defaultCategoryModelMonitorImpl" alias="aitpCategoryModelMonitor" />
 	<bean id="defaultCategoryModelMonitorImpl" class="com.accenture.aitp.tailor.monitor.impl.DefaultCategoryModelMonitorImpl" parent="aitpAbstractModelMonitorImpl">
+		<property name="typeCode" value="Category" />
 	</bean>
 	
 	<alias name="defaultClassificationClassModelMonitorImpl" alias="aitpClassificationClassModelMonitor" />
-	<bean id="defaultClassificationClassModelMonitorImpl" class="com.accenture.aitp.tailor.monitor.impl.DefaultClassificationClassModelMonitorImpl" parent="aitpAbstractModelMonitorImpl" />
+	<bean id="defaultClassificationClassModelMonitorImpl" class="com.accenture.aitp.tailor.monitor.impl.DefaultClassificationClassModelMonitorImpl" parent="aitpAbstractModelMonitorImpl" >
+		<property name="typeCode" value="ClassificationClass" />
+	</bean>
 	
 	<alias name="defaultCMSItemModelMonitorImpl" alias="aitpCMSItemModelMonitor"/>
-	<bean id="defaultCMSItemModelMonitorImpl" class="com.accenture.aitp.tailor.monitor.impl.DefaultCMSItemModelMonitorImpl" parent="aitpAbstractModelMonitorImpl" />
+	<bean id="defaultCMSItemModelMonitorImpl" class="com.accenture.aitp.tailor.monitor.impl.DefaultCMSItemModelMonitorImpl" parent="aitpAbstractModelMonitorImpl" >
+		<property name="typeCode" value="CMSItem" />
+	</bean>
 	
 	<alias name="defaultMediaModelMonitorImpl" alias="aitpMediaModelMonitor" />
-	<bean id="defaultMediaModelMonitorImpl" class="com.accenture.aitp.tailor.monitor.impl.DefaultMediaModelMonitorImpl" parent="aitpAbstractModelMonitorImpl" />
+	<bean id="defaultMediaModelMonitorImpl" class="com.accenture.aitp.tailor.monitor.impl.DefaultMediaModelMonitorImpl" parent="aitpAbstractModelMonitorImpl" >
+		<property name="typeCode" value="Media" />
+	</bean>
 	
 	<alias name="defaultProductModelMonitorImpl" alias="aitpProductModelMonitorImpl" />
-	<bean id="defaultProductModelMonitorImpl" class="com.accenture.aitp.tailor.monitor.impl.DefaultProductModelMonitorImpl" parent="aitpAbstractModelMonitorImpl" />
+	<bean id="defaultProductModelMonitorImpl" class="com.accenture.aitp.tailor.monitor.impl.DefaultProductModelMonitorImpl" parent="aitpAbstractModelMonitorImpl" >
+		<property name="typeCode" value="Product" />
+	</bean>
 	
 	<alias name="defaultAitpModelMonitorList" alias="aitpModelMonitorList" />
     <util:list id="defaultAitpModelMonitorList">

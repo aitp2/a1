@@ -13,20 +13,20 @@ package com.accenture.aitp.tailor.monitor.impl;
 
 import de.hybris.platform.catalog.model.classification.ClassificationClassModel;
 import de.hybris.platform.category.model.CategoryModel;
-import de.hybris.platform.core.model.ItemModel;
+
+import org.apache.log4j.Logger;
 
 import com.accenture.aitp.tailor.data.ModelMonitoredInfo;
-import com.accenture.aitp.tailor.strategy.AitpModelMonitorQueueStrateg;
 
 /**
  *
  */
 public class DefaultCategoryModelMonitorImpl extends DefaultAitpAbstractModelMonitorImpl
 {
-	private AitpModelMonitorQueueStrateg aitpModelMonitorQueueStrateg;
+	private final static Logger LOG = Logger.getLogger(DefaultCategoryModelMonitorImpl.class);
 
 	@Override
-	public boolean accept(final ItemModel object)
+	public boolean accept(final Object object)
 	{
 		if (object instanceof ClassificationClassModel)
 		{
@@ -45,40 +45,21 @@ public class DefaultCategoryModelMonitorImpl extends DefaultAitpAbstractModelMon
 
 
 	@Override
-	public void put(final ItemModel object)
+	public void publish(final Object object)
 	{
 		final CategoryModel model = (CategoryModel) object;
-		final ModelMonitoredInfo info = new ModelMonitoredInfo();
+		final ModelMonitoredInfo info = createModelMonitoredInfo();
 		info.setPk(model.getPk());
-		info.setTypeCode(CategoryModel._TYPECODE);
 		info.setCode(model.getCode());
 		getAitpModelMonitorQueueStrateg().put(info);
 
 	}
 
 	@Override
-	public Object take()
+	public void consume0(final ModelMonitoredInfo info)
 	{
-		return getAitpModelMonitorQueueStrateg().take();
-	}
+		// YTODO Auto-generated method stub
 
-	/**
-	 * @return the aitpModelMonitorQueueStrateg
-	 */
-	@Override
-	public AitpModelMonitorQueueStrateg getAitpModelMonitorQueueStrateg()
-	{
-		return aitpModelMonitorQueueStrateg;
-	}
-
-	/**
-	 * @param aitpModelMonitorQueueStrateg
-	 *           the aitpModelMonitorQueueStrateg to set
-	 */
-	@Override
-	public void setAitpModelMonitorQueueStrateg(final AitpModelMonitorQueueStrateg aitpModelMonitorQueueStrateg)
-	{
-		this.aitpModelMonitorQueueStrateg = aitpModelMonitorQueueStrateg;
 	}
 
 }

@@ -11,8 +11,9 @@
  */
 package com.accenture.aitp.tailor.monitor.impl;
 
-import de.hybris.platform.core.model.ItemModel;
 import de.hybris.platform.core.model.media.MediaModel;
+
+import org.apache.log4j.Logger;
 
 import com.accenture.aitp.tailor.data.ModelMonitoredInfo;
 
@@ -22,9 +23,10 @@ import com.accenture.aitp.tailor.data.ModelMonitoredInfo;
  */
 public class DefaultMediaModelMonitorImpl extends DefaultAitpAbstractModelMonitorImpl
 {
+	private final static Logger LOG = Logger.getLogger(DefaultMediaModelMonitorImpl.class);
 
 	@Override
-	public boolean accept(final ItemModel object)
+	public boolean accept(final Object object)
 	{
 		if (object instanceof MediaModel)
 		{
@@ -38,12 +40,10 @@ public class DefaultMediaModelMonitorImpl extends DefaultAitpAbstractModelMonito
 	}
 
 	@Override
-	public void put(final ItemModel object)
+	public void publish(final Object object)
 	{
 		final MediaModel model = (MediaModel) object;
-		final ModelMonitoredInfo info = new ModelMonitoredInfo();
-		info.setTypeCode(MediaModel._TYPECODE);
-
+		final ModelMonitoredInfo info = createModelMonitoredInfo();
 		info.setPk(model.getPk());
 		info.setCode(model.getCode());
 		info.setUrl(model.getURL());
@@ -51,10 +51,10 @@ public class DefaultMediaModelMonitorImpl extends DefaultAitpAbstractModelMonito
 	}
 
 	@Override
-	public Object take()
+	public void consume0(final ModelMonitoredInfo info)
 	{
 		// YTODO Auto-generated method stub
-		return null;
+
 	}
 
 }

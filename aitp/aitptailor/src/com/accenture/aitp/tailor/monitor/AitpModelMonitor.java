@@ -11,7 +11,7 @@
  */
 package com.accenture.aitp.tailor.monitor;
 
-import de.hybris.platform.core.model.ItemModel;
+import com.accenture.aitp.tailor.data.ModelMonitoredInfo;
 
 /**
  *
@@ -23,9 +23,9 @@ public interface AitpModelMonitor
 	/**
 	 * note: care about the item under catalog version(online accept,or not)
 	 */
-	public boolean accept(final ItemModel object);
+	public boolean accept(final Object object);
 
-	public void put(final ItemModel object);
+	public void publish(final Object object);
 
-	public Object take();
+	public void consume(ModelMonitoredInfo info);
 }

@@ -31,7 +31,7 @@ public class DefaultAitpModelMonitorServiceImpl implements AitpModelMonitorServi
 	private AitpModelMonitorQueueStrateg aitpModelMonitorQueueStrateg;
 
 	@Override
-	public void put(final ItemModel object)
+	public void publish(final ItemModel object)
 	{
 		if (CollectionUtils.isEmpty(getAitpModelMonitorList()))
 		{
@@ -42,7 +42,7 @@ public class DefaultAitpModelMonitorServiceImpl implements AitpModelMonitorServi
 		{
 			if (monitor.accept(object))
 			{
-				monitor.put(object);
+				monitor.publish(object);
 				return;
 			}
 		}
@@ -50,10 +50,15 @@ public class DefaultAitpModelMonitorServiceImpl implements AitpModelMonitorServi
 	}
 
 	@Override
-	public ModelMonitoredInfo take()
+	public void consume()
 	{
-		//TODO a1 refactor
-		return getAitpModelMonitorQueueStrateg().take();
+		if (CollectionUtils.isEmpty(getAitpModelMonitorList()))
+		{
+			return;
+		}
+
+		final ModelMonitoredInfo info = getAitpModelMonitorQueueStrateg().take();
+		aitpModelMonitorList.forEach(monitor -> monitor.consume(info));
 	}
 
 	/**

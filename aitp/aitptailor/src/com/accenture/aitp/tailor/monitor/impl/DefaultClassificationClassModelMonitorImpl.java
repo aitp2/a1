@@ -12,7 +12,8 @@
 package com.accenture.aitp.tailor.monitor.impl;
 
 import de.hybris.platform.catalog.model.classification.ClassificationClassModel;
-import de.hybris.platform.core.model.ItemModel;
+
+import org.apache.log4j.Logger;
 
 import com.accenture.aitp.tailor.data.ModelMonitoredInfo;
 
@@ -21,9 +22,10 @@ import com.accenture.aitp.tailor.data.ModelMonitoredInfo;
  */
 public class DefaultClassificationClassModelMonitorImpl extends DefaultAitpAbstractModelMonitorImpl
 {
+	private final static Logger LOG = Logger.getLogger(DefaultClassificationClassModelMonitorImpl.class);
 
 	@Override
-	public boolean accept(final ItemModel object)
+	public boolean accept(final Object object)
 	{
 		if (object instanceof ClassificationClassModel)
 		{
@@ -37,22 +39,19 @@ public class DefaultClassificationClassModelMonitorImpl extends DefaultAitpAbstr
 	}
 
 	@Override
-	public void put(final ItemModel object)
+	public void publish(final Object object)
 	{
 		final ClassificationClassModel model = (ClassificationClassModel) object;
-		final ModelMonitoredInfo info = new ModelMonitoredInfo();
-		info.setTypeCode(ClassificationClassModel._TYPECODE);
-
+		final ModelMonitoredInfo info = createModelMonitoredInfo();
 		info.setPk(model.getPk());
 		info.setCode(model.getCode());
 		getAitpModelMonitorQueueStrateg().put(info);
 	}
 
 	@Override
-	public Object take()
+	public void consume0(final ModelMonitoredInfo info)
 	{
 		// YTODO Auto-generated method stub
-		return null;
-	}
 
+	}
 }

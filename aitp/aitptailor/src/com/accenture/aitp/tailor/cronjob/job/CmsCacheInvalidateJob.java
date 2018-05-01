@@ -19,7 +19,6 @@ import de.hybris.platform.servicelayer.cronjob.PerformResult;
 
 import org.apache.log4j.Logger;
 
-import com.accenture.aitp.tailor.data.ModelMonitoredInfo;
 import com.accenture.aitp.tailor.service.AitpModelMonitorService;
 
 /**
@@ -51,12 +50,7 @@ public class CmsCacheInvalidateJob extends AbstractJobPerformable<CronJobModel>
 	public PerformResult perform(final CronJobModel crobJob)
 	{
 		//TODO a1 不断地取
-		final ModelMonitoredInfo info = getAitpModelMonitorService().take();
-		if (info != null)
-		{
-			LOG.info(String.format("typeCode:%s,pk:%d,code:%s,uid:%s,url:%s", info.getTypeCode(), info.getPk().getLong(),
-					info.getCode(), info.getUid(), info.getUrl()));
-		}
+		getAitpModelMonitorService().consume();
 
 		return new PerformResult(CronJobResult.SUCCESS, CronJobStatus.FINISHED);
 	}

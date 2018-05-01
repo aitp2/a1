@@ -46,7 +46,7 @@ public class DefaultAitpPrepareInterceptor implements PrepareInterceptor<Object>
 	{
 		if (context.isModified(obj) || context.isNew(obj) || context.isRemoved(obj))
 		{
-			getAitpModelMonitorService().put((ItemModel) obj);
+			getAitpModelMonitorService().publish((ItemModel) obj);
 		}
 	}
 

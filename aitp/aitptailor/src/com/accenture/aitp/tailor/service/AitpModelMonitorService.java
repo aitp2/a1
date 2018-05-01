@@ -13,14 +13,12 @@ package com.accenture.aitp.tailor.service;
 
 import de.hybris.platform.core.model.ItemModel;
 
-import com.accenture.aitp.tailor.data.ModelMonitoredInfo;
-
 /**
  *
  */
 public interface AitpModelMonitorService
 {
-	public void put(final ItemModel object);
+	public void publish(final ItemModel object);
 
-	public ModelMonitoredInfo take();
+	public void consume();
 }
