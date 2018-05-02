@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Required;
 
 import com.accenture.aitp.tailor.data.ModelMonitoredInfo;
 import com.accenture.aitp.tailor.monitor.AitpModelMonitor;
+import com.accenture.aitp.tailor.parser.AitpCacheKeyParser;
 import com.accenture.aitp.tailor.strategy.AitpModelMonitorQueueStrateg;
 
 /**
@@ -30,6 +31,7 @@ public abstract class DefaultAitpAbstractModelMonitorImpl implements AitpModelMo
 	private final static Logger LOG = Logger.getLogger(DefaultAitpAbstractModelMonitorImpl.class);
 
 	private AitpModelMonitorQueueStrateg aitpModelMonitorQueueStrateg;
+	private AitpCacheKeyParser aitpCacheKeyParser;
 	private String typeCode;
 
 	protected boolean isOnlineVersion(final CatalogVersionModel catalogVersion)
@@ -57,6 +59,7 @@ public abstract class DefaultAitpAbstractModelMonitorImpl implements AitpModelMo
 		if (isAccept(info, getTypeCode()))
 		{
 			LOG.info(toStringOfModelMonitoredInfo(info));//TODO a1 remove later
+			LOG.info("cache key:" + getAitpCacheKeyParser().parser(info));
 			consume0(info);
 		}
 	}
@@ -107,6 +110,23 @@ public abstract class DefaultAitpAbstractModelMonitorImpl implements AitpModelMo
 		}
 
 		this.typeCode = typeCode;
+	}
+
+	/**
+	 * @return the aitpCacheKeyParser
+	 */
+	public AitpCacheKeyParser getAitpCacheKeyParser()
+	{
+		return aitpCacheKeyParser;
+	}
+
+	/**
+	 * @param aitpCacheKeyParser
+	 *           the aitpCacheKeyParser to set
+	 */
+	public void setAitpCacheKeyParser(final AitpCacheKeyParser aitpCacheKeyParser)
+	{
+		this.aitpCacheKeyParser = aitpCacheKeyParser;
 	}
 
 }
