@@ -11,11 +11,10 @@
  */
 package com.accenture.aitp.tailor.matcher;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.util.AntPathMatcher;
-
-import junit.framework.Assert;
 
 
 /**
@@ -41,7 +40,7 @@ public class AntPathMatcherTest
 	@Test
 	public void test2()
 	{
-		Assert.assertTrue(this.antPathMatcher.match("**/account/**", "/account/address"));
+		Assert.assertFalse(this.antPathMatcher.match("**/account/**", "/account/address"));
 	}
 
 }
