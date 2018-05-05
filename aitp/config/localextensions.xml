@@ -1,0 +1,58 @@
+<hybrisconfig xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='../bin/platform/resources/schemas/extensions.xsd'>
+  <extensions>
+    <path dir='${HYBRIS_BIN_DIR}' autoload='false' />
+	<path dir='${HYBRIS_BIN_DIR}/custom' autoload='false' />
+   
+    <extension name='ordermanagementaddon' />
+    <extension name='orderselfserviceaddon' />
+    <extension name='ordermanagementwebservices' />
+    <extension name='warehousing' />
+    <extension name='warehousingbackoffice' />
+    <extension name='warehousingwebservices' />
+    <extension name='instore' />
+    <extension name='mcc' />
+    <extension name='adaptivesearchsolr' />
+    <extension name='adaptivesearchbackoffice' />
+    <extension name='commerceservicesbackoffice' />
+    <extension name='solrserver' />
+     <!-- <extension name='yaddon' />
+	<extension name='ycommercewebservices' /> -->
+    <extension name='electronicsstore' />
+    <extension name='apparelstore' />
+    <extension name='acceleratorwebservicesaddon' />
+    <extension name='customersupportbackoffice' />
+    <extension name='customerticketingaddon' />
+    <extension name='ticketsystembackoffice' />
+    <extension name='consignmenttrackingbackoffice' />
+    <extension name='rulebuilderbackoffice' />
+    <extension name='couponbackoffice' />
+    <extension name='droolsruleengineservices' />
+    <extension name='couponfacades' />
+    <extension name='promotionenginesamplesaddon' />
+    <extension name='consignmenttrackingaddon' />
+	<extension name='addonsupport' />
+	<extension name="oauth2" />
+
+    <extension name='backoffice' />
+    <extension name='platformbackoffice' />
+    <extension name='deltadetection' />
+    <extension name='cms2' />
+    <extension name='cms2lib' />
+    <extension name='cmscockpit'/>
+	
+	<extension name="hmc"/>
+	<extension name="platformhmc"/>
+	<extension name="solrfacetsearchhmc"/>
+	<extension name="commercesearchhmc"/>
+	
+	<extension name="aitpfulfilmentprocess"/>
+    <extension name="aitpcore"/>
+    <extension name="aitpinitialdata"/>
+    <extension name="aitpfacades"/>
+    <extension name="aitptest"/>
+    <extension name="aitpstorefront"/>
+	<extension name="aitptailor"/>
+    <!-- <extension name="aitpcockpits"/> -->
+	
+  </extensions>
+</hybrisconfig>
