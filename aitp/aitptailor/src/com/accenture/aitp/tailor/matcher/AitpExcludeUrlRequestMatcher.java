@@ -52,14 +52,14 @@ public class AitpExcludeUrlRequestMatcher implements RequestMatcher
 		for (final String url : excludeUrlSet)
 		{
 			validUrls.add(url);
-			//			if (url.charAt(0) == '/')
-			//			{
-			//				validUrls.add(url);
-			//			}
-			//			else
-			//			{
-			//				LOG.warn("Ignoring ExcludeUrl [" + url + "] as it is not valid");
-			//			}
+			if (url.charAt(0) == '/')
+			{
+				validUrls.add(url);
+			}
+			else
+			{
+				LOG.warn("Ignoring ExcludeUrl [" + url + "] as it is not valid");
+			}
 		}
 
 		this.excludeUrlSet = validUrls;

@@ -220,11 +220,11 @@
 	
 	<util:set id="aitpexcludeUrlSet" value-type="java.lang.String">
 		<value>/cart</value>
-		<value>**/cart/**</value>
+		<value>/**/cart/**</value>
 		<value>/checkout</value>
-		<value>**/checkout/**</value>
+		<value>/**/checkout/**</value>
 		<value>/my-account</value>
-		<value>**/my-account/**</value>
+		<value>/**/my-account/**</value>
 	</util:set>
 	
 	<alias name="aitpExcludeUrlRequestMatcher" alias="aiInculdeUrlRequestMatcher" />
