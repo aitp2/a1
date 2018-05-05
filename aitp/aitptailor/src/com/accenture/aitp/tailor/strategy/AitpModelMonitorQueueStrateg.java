@@ -21,4 +21,7 @@ public interface AitpModelMonitorQueueStrateg
 	public void put(final ModelMonitoredInfo info);
 
 	public ModelMonitoredInfo take();
+
+	//TODO a1
+	//public long remain();
 }

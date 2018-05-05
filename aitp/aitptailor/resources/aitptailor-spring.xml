@@ -213,4 +213,29 @@
 	<bean id="aitpCmsCacheInvalidateJob" class="com.accenture.aitp.tailor.cronjob.job.CmsCacheInvalidateJob" parent="abstractJobPerformable">
 		<property name="aitpModelMonitorService" ref="aitpModelMonitorService" />
 	</bean>
+	
+	<!-- Path matcher to use, AntPathMatcher is the default -->
+	<alias name="antPathMatcher" alias="defaultAitpPathMatcher" />
+	<bean id="antPathMatcher" class="org.springframework.util.AntPathMatcher" />
+	
+	<util:set id="aitpexcludeUrlSet" value-type="java.lang.String">
+		<value>/cart</value>
+		<value>**/cart/**</value>
+		<value>/checkout</value>
+		<value>**/checkout/**</value>
+		<value>/my-account</value>
+		<value>**/my-account/**</value>
+	</util:set>
+	
+	<alias name="aitpExcludeUrlRequestMatcher" alias="aiInculdeUrlRequestMatcher" />
+	<bean id="aitpExcludeUrlRequestMatcher" class="com.accenture.aitp.tailor.matcher.AitpExcludeUrlRequestMatcher" >
+		<property name="excludeUrlSet" ref="aitpexcludeUrlSet" />
+		<property name="pathMatcher" ref="defaultAitpPathMatcher" />
+	</bean>
+	
+	<alias name="aitpDynamicResourceFilter" alias="aiDynamicResourceFilter"/>
+	<bean id="aitpDynamicResourceFilter" class="com.accenture.aitp.tailor.filter.AitpDynamicResourceFilter" >
+		<property name="requestMatcher" ref="aiInculdeUrlRequestMatcher" />
+		<property name="configurationService" ref="configurationService" />
+	</bean>
 </beans>
