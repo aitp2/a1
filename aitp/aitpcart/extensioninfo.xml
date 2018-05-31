@@ -16,6 +16,7 @@
       <!-- you should add all required extensions to this list, except platform extensions which are automatically required -->         
       <!-- <requires-extension name="cms"/> -->         
       <requires-extension name="promotionengineservices"/>
+      <requires-extension name="commerceservices"/>
 
       <coremodule generated="true" manager="com.accenture.aitp.cart.jalo.AitpcartManager" packageroot="com.accenture.aitp.cart"/>
 

@@ -11,23 +11,10 @@
 --><extensioninfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="extensioninfo.xsd">
 
 	<extension abstractclassprefix="Generated" classprefix="AitpStorefront" name="aitpstorefront" usemaven="false">		
-        <requires-extension name="adaptivesearchsamplesaddon"/>
-
-<!-- <requires-extension name="assistedservicepromotionaddon"/>
-<requires-extension name="assistedservicestorefront"/>
- 
-<requires-extension name="orderselfserviceaddon"/>
-<requires-extension name="customerticketingaddon"/>
-
-<requires-extension name="textfieldconfiguratortemplateaddon"/>
-<requires-extension name="smarteditaddon"/>
-
-<requires-extension name="liveeditaddon"/>-->
-<requires-extension name="promotionenginesamplesaddon"/>
-<requires-extension name="commerceorgsamplesaddon"/>
-<requires-extension name="acceleratorstorefrontcommons"/>
+        <requires-extension name="acceleratorstorefrontcommons"/>
 		<requires-extension name="aitpfacades"/>
-		 <!-- <requires-extension name="aitpcart"/> -->
+		<requires-extension name="aitpcart"/>
+
 		<webmodule jspcompile="false" webroot="/aitpstorefront"/>
 
 		

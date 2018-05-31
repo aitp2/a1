@@ -35,15 +35,21 @@
     </bean>
     
     <context:component-scan base-package="com.accenture.aitp.cart" />
-    
     <aop:aspectj-autoproxy proxy-target-class="true" />
     
- <bean id="extendedOrderDaoAspect" class="com.accenture.aitp.cart.aspectj.ExtendedOrderDaoAspect" />
-	
- <bean id="modelServiceAspect" class="com.accenture.aitp.cart.aspectj.ModelServiceAspect" />
-			
-  <bean id="promotionActionServiceAspect" class="com.accenture.aitp.cart.aspectj.PromotionActionServiceAspect"/>
-<!--  
+    <import resource="aitpcart-spring-sessioncart.xml"/>
+  
+    
+    <bean id="modelServiceAspect" class="com.accenture.aitp.cart.aspectj.ModelServiceAspect" />
+  
+   <bean id="extendedOrderDaoAspect" class="com.accenture.aitp.cart.aspectj.ExtendedOrderDaoAspect" />
+
+    <alias name="aitpPromotionActionService" alias="promotionActionService"/>
+	<bean id="aitpPromotionActionService" parent="defaultPromotionActionService" class="com.accenture.aitp.cart.service.impl.AitpPromotionActionService" />
+
+   <!--  
+     <bean id="promotionActionServiceAspect" class="com.accenture.aitp.cart.aspectj.PromotionActionServiceAspect"/>
+   
   <alias name="aitpOrderAdjustTotalActionStrategy" alias="orderTotalAdjustActionStrategy"/>
 	<bean id="aitpOrderAdjustTotalActionStrategy" parent="abstractRuleActionStrategy" class="de.hybris.platform.promotionengineservices.action.impl.DefaultOrderAdjustTotalActionStrategy" >
 		<property name="promotionAction" value="com.accenture.aitp.cart.model.CacheRuleBasedOrderAdjustTotalActionModel"></property>
@@ -59,4 +65,6 @@
          </property>  
     </bean> 
     -->
+    
+    
 </beans>

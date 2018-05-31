@@ -14,14 +14,14 @@
          name="pmd-eclipse"
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
          
-	<description>Java PMD ruleset for hybris</description>
-
 	<exclude-pattern>.*/generated-sources/.*</exclude-pattern>
 	<exclude-pattern>.*/Generated/.*</exclude-pattern>
 	<exclude-pattern>.*/gensrc/.*</exclude-pattern>
 	<exclude-pattern>.*/jsp/.*</exclude-pattern>
 	<exclude-pattern>.*_jsp.java</exclude-pattern>
 	<exclude-pattern>.*/jax-doclets/.*</exclude-pattern>
+
+	<description>Java PMD ruleset for hybris</description>
 
    <rule ref="rulesets/java/basic.xml/JumbledIncrementer">
         <priority>2</priority>
