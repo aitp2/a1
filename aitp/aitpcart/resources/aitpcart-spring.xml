@@ -59,4 +59,21 @@
          </property>  
     </bean> 
     -->
+    
+   	<alias name="aitpCalculationService" alias="calculationService"/>
+	<bean id="aitpCalculationService" class="com.accenture.aitp.cart.service.order.impl.AitpCalculationService"
+			parent="defaultCalculationService">
+		<property name="findTaxesStrategies" ref="taxesStrategiesFinderList"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="findDeliveryCostStrategy" ref="findDeliveryCostStrategy"/>
+		<property name="findPaymentCostStrategy" ref="findPaymentCostStrategy"/>
+	</bean>
+	
+	<alias name="aitpFindPaymentCostStrategy" alias="findPaymentCostStrategy"/>
+	<bean id="aitpFindPaymentCostStrategy"
+			class="com.accenture.aitp.cart.service.order.strategies.calculation.impl.AitpFindPaymentCostStrategy"
+			parent="defaultFindPaymentCostStrategy">
+		<property name="configurationService" ref="configurationService"/>
+	</bean>	
+    
 </beans>

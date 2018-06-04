@@ -25,4 +25,12 @@ public final class AitpcartConstants extends GeneratedAitpcartConstants
 	// implement here constants used by this extension
 
     public static final String PLATFORM_LOGO_CODE = "aitpcartPlatformLogo";
+    
+    public static final String AITP_CART_SWTICH_ON = "true";
+    
+    public static final String AITP_CART_SWTICH_OFF = "false";
+    
+    public static final String AITP_CART_TAX_SWTICH = "aitp.cart.tax.swtich";
+    
+    public static final String AITP_CART_PAYMENTCOST_SWTICH = "aitp.cart.paymentcost.swtich";
 }
