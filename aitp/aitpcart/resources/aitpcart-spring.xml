@@ -47,6 +47,14 @@
     <alias name="aitpPromotionActionService" alias="promotionActionService"/>
 	<bean id="aitpPromotionActionService" parent="defaultPromotionActionService" class="com.accenture.aitp.cart.service.impl.AitpPromotionActionService" />
 
+    <alias name="aitpPromotionEngineService" alias="promotionEngineService"/>
+    <bean id="aitpPromotionEngineService" class="com.accenture.aitp.cart.service.impl.AitpPromotionEngineService" parent="defaultPromotionEngineService" >
+     <property name="redisTemplate" ref="redisTemplate"/>
+     <property name="promotionResultDatabase" value="2"/>
+    </bean>
+
+    <bean id="de.hybris.platform.servicelayer.internal.jalo.order.InMemoryCart" class="com.accenture.aitp.cart.jalo.AitpPromotionCart" scope="prototype" />
+
    <!--  
      <bean id="promotionActionServiceAspect" class="com.accenture.aitp.cart.aspectj.PromotionActionServiceAspect"/>
    

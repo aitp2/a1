@@ -64,7 +64,7 @@
 		<!-- filter to handle multipart file upload -->
 		<ref bean="fileUploadFilter"/>
 		
-		<ref bean="aiDynamicResourceFilter" />
+		<!--  <ref bean="aiDynamicResourceFilter" /> -->
 
 		<!-- Security -->
 		<ref bean="springSecurityFilterChain"/>

@@ -12,6 +12,7 @@
 package com.accenture.aitp.cart.factory.impl;
 
 import de.hybris.platform.servicelayer.web.session.HybrisSpringSessionRepositoryFactory;
+import de.hybris.platform.util.Config;
 
 import org.springframework.core.serializer.Deserializer;
 import org.springframework.session.SessionRepository;
@@ -24,11 +25,19 @@ public class DefaultAitpSpringSessionRepositoryFactory implements HybrisSpringSe
 {
 	private SessionRepository sessionRepository;
 
+	private HybrisSpringSessionRepositoryFactory hybrisSessionRepositoryFactory;
+
+	private static final String SAVED_SESSION_REDIS = "redisSession";
+
 	@Override
 	public SessionRepository createRepository(final Deserializer deSerializer, final String extension, final String contextRoot)
 	{
-
-		return getSessionRepository();
+		final String redisSession = Config.getParameter("spring.session." + extension + ".save");
+		if (SAVED_SESSION_REDIS.equals(redisSession))
+		{
+			return getSessionRepository();
+		}
+		return hybrisSessionRepositoryFactory.createRepository(deSerializer, extension, contextRoot);
 	}
 
 	/**
@@ -47,5 +56,15 @@ public class DefaultAitpSpringSessionRepositoryFactory implements HybrisSpringSe
 	{
 		this.sessionRepository = sessionRepository;
 	}
+
+	/**
+	 * @param hybrisSessionRepositoryFactory
+	 *           the hybrisSessionRepositoryFactory to set
+	 */
+	public void setHybrisSessionRepositoryFactory(final HybrisSpringSessionRepositoryFactory hybrisSessionRepositoryFactory)
+	{
+		this.hybrisSessionRepositoryFactory = hybrisSessionRepositoryFactory;
+	}
+
 
 }
