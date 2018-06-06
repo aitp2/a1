@@ -17,6 +17,14 @@
 			xsi:noNamespaceSchemaLocation="items.xsd">
 
 	<itemtypes>
+	 <itemtype code="AitpInMemoryCart" extends="InMemoryCart"
+          jaloclass="com.accenture.aitp.cart.jalo.AitpInMemoryCart"
+        
+        jaloonly="true"
+                  autocreate="true"
+                  generate="true">>
+       
+       </itemtype>
        <itemtype code="CacheRuleBasedOrderAdjustTotalAction" extends="RuleBasedOrderAdjustTotalAction"
           jaloclass="com.accenture.aitp.cart.jalo.CacheRuleBasedOrderAdjustTotalAction"
         

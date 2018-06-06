@@ -13,12 +13,15 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/aop
            http://www.springframework.org/schema/aop/spring-aop.xsd
            http://www.springframework.org/schema/context 
-           http://www.springframework.org/schema/context/spring-context.xsd">
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
 
 	
 	
@@ -48,15 +51,22 @@
 	<bean id="aitpPromotionActionService" parent="defaultPromotionActionService" class="com.accenture.aitp.cart.service.impl.AitpPromotionActionService" />
 
     <alias name="aitpPromotionEngineService" alias="promotionEngineService"/>
-    <bean id="aitpPromotionEngineService" class="com.accenture.aitp.cart.service.impl.AitpPromotionEngineService" parent="defaultPromotionEngineService" >
-     <property name="redisTemplate" ref="redisTemplate"/>
-     <property name="promotionResultDatabase" value="2"/>
-    </bean>
+    <bean id="aitpPromotionEngineService" class="com.accenture.aitp.cart.service.impl.AitpPromotionEngineService" parent="defaultPromotionEngineService" />
 
-    <bean id="de.hybris.platform.servicelayer.internal.jalo.order.InMemoryCart" class="com.accenture.aitp.cart.jalo.AitpPromotionCart" scope="prototype" />
+
+    <util:list id="aitpRuleActionHandlerList">
+        <bean id="aitpRuleActionMetadataHandler" class="com.accenture.aitp.cart.aspectj.AitpRuleActionMetadataHandler"/>
+    </util:list>
+    
+    <bean id="AitpRuleActionMetadataHandlersMergeDirective" depends-on="ruleActionMetadataHandlers" parent="mapMergeDirective" >
+		<property name="key" value="ruleCode"/>
+		<property name="value" ref="aitpRuleActionHandlerList"/>
+	</bean>
 
    <!--  
-     <bean id="promotionActionServiceAspect" class="com.accenture.aitp.cart.aspectj.PromotionActionServiceAspect"/>
+     <bean id="ruleActionStrategyAspect" class="de.hybris.platform.promotionengineservices.action.impl.RuleActionStrategyAspect"/>
+       <bean id="de.hybris.platform.servicelayer.internal.jalo.order.InMemoryCart" class="com.accenture.aitp.cart.jalo.AitpPromotionCart" scope="prototype" />
+       <bean id="inMemoryCartAspect" class="com.accenture.aitp.cart.aspectj.InMemoryCartAspect" />
    
   <alias name="aitpOrderAdjustTotalActionStrategy" alias="orderTotalAdjustActionStrategy"/>
 	<bean id="aitpOrderAdjustTotalActionStrategy" parent="abstractRuleActionStrategy" class="de.hybris.platform.promotionengineservices.action.impl.DefaultOrderAdjustTotalActionStrategy" >
