@@ -26,12 +26,28 @@
        
        </itemtype>
        <itemtype code="CacheRuleBasedOrderAdjustTotalAction" extends="RuleBasedOrderAdjustTotalAction"
-          jaloclass="com.accenture.aitp.cart.jalo.CacheRuleBasedOrderAdjustTotalAction"
-        
-        jaloonly="true"
-                  autocreate="true"
-                  generate="true">>
+          jaloclass="com.accenture.aitp.cart.jalo.CacheRuleBasedOrderAdjustTotalAction"    
+         jaloonly="true" autocreate="true" generate="true" />
        
-       </itemtype>
+       <itemtype code="CacheRuleBasedOrderEntryAdjustAction" extends="RuleBasedOrderEntryAdjustAction"
+          jaloclass="com.accenture.aitp.cart.jalo.CacheRuleBasedOrderEntryAdjustAction"
+          jaloonly="true" autocreate="true" generate="true" />
+          
+        <itemtype code="CacheRuleRuleBasedAddCouponAction" extends="RuleBasedAddCouponAction"
+          jaloclass="com.accenture.aitp.cart.jalo.CacheRuleBasedAddCouponAction"
+          jaloonly="true" autocreate="true" generate="true" />
+       
+       <itemtype code="CacheRuleBasedOrderChangeDeliveryModeAction" extends="RuleBasedOrderChangeDeliveryModeAction"
+          jaloclass="com.accenture.aitp.cart.jalo.CacheRuleBasedOrderChangeDeliveryModeAction"
+          jaloonly="true" autocreate="true" generate="true" />
+       
+        <itemtype code="CacheRuleBasedOrderAddProductAction" extends="RuleBasedOrderAddProductAction"
+          jaloclass="com.accenture.aitp.cart.jalo.CacheRuleBasedOrderAddProductAction"
+          jaloonly="true" autocreate="true" generate="true" />
+       
+       <itemtype code="CacheRuleBasedPotentialPromotionMessageAction" extends="RuleBasedPotentialPromotionMessageAction"
+          jaloclass="com.accenture.aitp.cart.jalo.CacheRuleBasedPotentialPromotionMessageAction"
+          jaloonly="true" autocreate="true" generate="true" />
+
 	</itemtypes>
 </items>

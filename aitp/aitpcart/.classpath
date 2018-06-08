@@ -12,5 +12,6 @@
 	<classpathentry kind="src" output="eclipsebin/classes" path="gensrc"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/promotionengineservices"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/commerceservices"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/couponservices"/>
 	<classpathentry kind="output" path="eclipsebin/notused"/>
 </classpath>

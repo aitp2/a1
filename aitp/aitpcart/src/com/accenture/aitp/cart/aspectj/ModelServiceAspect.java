@@ -11,9 +11,17 @@
  */
 package com.accenture.aitp.cart.aspectj;
 
+import de.hybris.platform.couponservices.model.RuleBasedAddCouponActionModel;
+import de.hybris.platform.promotionengineservices.model.RuleBasedOrderAddProductActionModel;
 import de.hybris.platform.promotionengineservices.model.RuleBasedOrderAdjustTotalActionModel;
+import de.hybris.platform.promotionengineservices.model.RuleBasedOrderChangeDeliveryModeActionModel;
+import de.hybris.platform.promotionengineservices.model.RuleBasedOrderEntryAdjustActionModel;
+import de.hybris.platform.promotionengineservices.model.RuleBasedPotentialPromotionMessageActionModel;
+import de.hybris.platform.promotions.model.CachedPromotionOrderEntryConsumedModel;
 import de.hybris.platform.promotions.model.CachedPromotionResultModel;
+import de.hybris.platform.promotions.model.PromotionOrderEntryConsumedModel;
 import de.hybris.platform.promotions.model.PromotionResultModel;
+import de.hybris.platform.servicelayer.model.ModelService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +31,12 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
+import com.accenture.aitp.cart.model.CacheRuleBasedOrderAddProductActionModel;
 import com.accenture.aitp.cart.model.CacheRuleBasedOrderAdjustTotalActionModel;
+import com.accenture.aitp.cart.model.CacheRuleBasedOrderChangeDeliveryModeActionModel;
+import com.accenture.aitp.cart.model.CacheRuleBasedOrderEntryAdjustActionModel;
+import com.accenture.aitp.cart.model.CacheRuleBasedPotentialPromotionMessageActionModel;
+import com.accenture.aitp.cart.model.CacheRuleRuleBasedAddCouponActionModel;
 
 
 /**
@@ -34,6 +47,8 @@ public class ModelServiceAspect
 {
 	private static final Logger logger = Logger.getLogger(ModelServiceAspect.class);
 
+	private static Map<Class, Class> replaceClassMap;
+	private static Map<Class, Class> recoverClassMap;
 	/*
 	 * @Around("execution(* de.hybris.platform.servicelayer.internal.model.impl.*.save*(..))") public void
 	 * saveAspect(final ProceedingJoinPoint joinPoint) throws Throwable { if (joinPoint.getArgs().length > 0) { final
@@ -52,9 +67,9 @@ public class ModelServiceAspect
 	{
 		if (joinPoint.getArgs().length == 1)
 		{
-			final Map<Object, Object> getReplaceClassMap = getReplaceClassMap();
+			final Map<Class, Class> getReplaceClassMap = getReplaceClassMap();
 			final Object obj = joinPoint.getArgs()[0];
-			final Object replaceClass = getReplaceClassMap.get(obj);
+			final Class replaceClass = getReplaceClassMap.get(obj);
 			if (replaceClass != null)
 			{
 				logger.info("super cart replace classs from [" + obj + "] to [" + replaceClass + "]");
@@ -66,24 +81,71 @@ public class ModelServiceAspect
 	}
 
 
-
-
-
-	private Map<Object, Object> getReplaceClassMap()
+	@Around("execution(* de.hybris.platform.servicelayer.internal.model.impl.*.clone(..))")
+	public Object cloneAspect(final ProceedingJoinPoint joinPoint) throws Throwable
 	{
-		final Map<Object, Object> replaceMap = new HashMap<>();
-		replaceMap.put(PromotionResultModel.class, CachedPromotionResultModel.class);
-		replaceMap.put(PromotionResultModel.class.getSimpleName(), CachedPromotionResultModel.class.getSimpleName());
-		replaceMap.put(RuleBasedOrderAdjustTotalActionModel.class, CacheRuleBasedOrderAdjustTotalActionModel.class);
-
-		return replaceMap;
+		if (joinPoint.getArgs().length == 1)
+		{
+			final Map<Class, Class> getReplaceClassMap = getRecoverMap();
+			final Object obj = joinPoint.getArgs()[0];
+			final Class replaceClass = getReplaceClassMap.get(obj.getClass());
+			final ModelService modelService = (ModelService) joinPoint.getTarget();
+			if (replaceClass != null)
+			{
+				logger.info("super clone replace classs from [" + obj + "] to [" + replaceClass + "]");
+				return modelService.clone(obj, replaceClass);
+			}
+		}
+		return joinPoint.proceed();
 	}
 
 
+
+	public Map<Class, Class> getRecoverMap()
+	{
+		if (null == ModelServiceAspect.recoverClassMap)
+		{
+			final Map<Class, Class> recoverMap = new HashMap<>();
+			for (final Map.Entry<Class, Class> entry : getReplaceClassMap().entrySet())
+			{
+				recoverMap.put(entry.getValue(), entry.getKey());
+			}
+			ModelServiceAspect.recoverClassMap = recoverMap;
+		}
+		return ModelServiceAspect.recoverClassMap;
+	}
+
+
+	public Map<Class, Class> getReplaceClassMap()
+	{
+		if (null == ModelServiceAspect.replaceClassMap)
+		{
+			final Map<Class, Class> replaceMap = new HashMap<>();
+			replaceMap.put(PromotionResultModel.class, CachedPromotionResultModel.class);
+			replaceMap.put(RuleBasedOrderAdjustTotalActionModel.class, CacheRuleBasedOrderAdjustTotalActionModel.class);
+			replaceMap.put(RuleBasedOrderEntryAdjustActionModel.class, CacheRuleBasedOrderEntryAdjustActionModel.class);
+			replaceMap.put(RuleBasedAddCouponActionModel.class, CacheRuleRuleBasedAddCouponActionModel.class);
+			replaceMap.put(RuleBasedOrderChangeDeliveryModeActionModel.class,
+					CacheRuleBasedOrderChangeDeliveryModeActionModel.class);
+			replaceMap.put(RuleBasedOrderAddProductActionModel.class, CacheRuleBasedOrderAddProductActionModel.class);
+			replaceMap.put(RuleBasedPotentialPromotionMessageActionModel.class,
+					CacheRuleBasedPotentialPromotionMessageActionModel.class);
+			replaceMap.put(PromotionOrderEntryConsumedModel.class, CachedPromotionOrderEntryConsumedModel.class);
+			ModelServiceAspect.replaceClassMap = replaceMap;
+		}
+
+		return ModelServiceAspect.replaceClassMap;
+	}
+
 	/**
-	 * private Map<Object, Object> getReplaceClassMap() { final Map<Object, Object> replaceMap = new HashMap<>();
-	 * replaceMap.put(CartModel.class, CartModel.class); replaceMap.put(CartEntryModel.class, CartEntryModel.class);
-	 *
-	 * return replaceMap; }
+	 * @param replaceClassMap
+	 *           the replaceClassMap to set
 	 */
+	public static void setReplaceClassMap(final Map<Class, Class> replaceClassMap)
+	{
+		ModelServiceAspect.replaceClassMap = replaceClassMap;
+	}
+
+
+
 }
