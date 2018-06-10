@@ -18,7 +18,6 @@ import de.hybris.platform.promotionengineservices.model.RuleBasedOrderChangeDeli
 import de.hybris.platform.promotionengineservices.model.RuleBasedOrderEntryAdjustActionModel;
 import de.hybris.platform.promotionengineservices.model.RuleBasedPotentialPromotionMessageActionModel;
 import de.hybris.platform.promotions.model.CachedPromotionOrderEntryConsumedModel;
-import de.hybris.platform.promotions.model.CachedPromotionResultModel;
 import de.hybris.platform.promotions.model.PromotionOrderEntryConsumedModel;
 import de.hybris.platform.promotions.model.PromotionResultModel;
 import de.hybris.platform.servicelayer.model.ModelService;
@@ -31,6 +30,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
+import com.accenture.aitp.cart.model.AitpCachedPromotionResultModel;
 import com.accenture.aitp.cart.model.CacheRuleBasedOrderAddProductActionModel;
 import com.accenture.aitp.cart.model.CacheRuleBasedOrderAdjustTotalActionModel;
 import com.accenture.aitp.cart.model.CacheRuleBasedOrderChangeDeliveryModeActionModel;
@@ -121,7 +121,7 @@ public class ModelServiceAspect
 		if (null == ModelServiceAspect.replaceClassMap)
 		{
 			final Map<Class, Class> replaceMap = new HashMap<>();
-			replaceMap.put(PromotionResultModel.class, CachedPromotionResultModel.class);
+			replaceMap.put(PromotionResultModel.class, AitpCachedPromotionResultModel.class);
 			replaceMap.put(RuleBasedOrderAdjustTotalActionModel.class, CacheRuleBasedOrderAdjustTotalActionModel.class);
 			replaceMap.put(RuleBasedOrderEntryAdjustActionModel.class, CacheRuleBasedOrderEntryAdjustActionModel.class);
 			replaceMap.put(RuleBasedAddCouponActionModel.class, CacheRuleRuleBasedAddCouponActionModel.class);

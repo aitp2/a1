@@ -1,5 +1,6 @@
 package com.accenture.aitp.cart.jalo;
 
+import de.hybris.platform.core.model.order.AbstractOrderModel;
 import de.hybris.platform.jalo.Item;
 import de.hybris.platform.jalo.JaloBusinessException;
 import de.hybris.platform.jalo.JaloInvalidParameterException;
@@ -36,7 +37,7 @@ public class AitpInMemoryCart extends GeneratedAitpInMemoryCart
 	public void setAttribute(final SessionContext ctx, final String qualifier, final Object value)
 			throws JaloInvalidParameterException, JaloSecurityException, JaloBusinessException
 	{
-		if ("allPromotionResults".equals(qualifier))
+		if (AbstractOrderModel.ALLPROMOTIONRESULTS.equals(qualifier))
 		{
 			promotionResults.clear();
 			promotionResults.addAll((Set) value);
@@ -52,21 +53,8 @@ public class AitpInMemoryCart extends GeneratedAitpInMemoryCart
 			throws JaloInvalidParameterException, JaloSecurityException
 	{
 		Object retval = null;
-		if ("allPromotionResults".equals(qualifier))
+		if (AbstractOrderModel.ALLPROMOTIONRESULTS.equals(qualifier))
 		{
-			/*
-			 * final RedisTemplate redisTemplate = (RedisTemplate)
-			 * Registry.getApplicationContext().getBean("redisTemplate");
-			 *
-			 * retval = redisTemplate.execute(new RedisCallback<Set<PromotionResult>>() {
-			 *
-			 * @Override public Set<PromotionResult> doInRedis(final RedisConnection redisConnection) throws
-			 * DataAccessException { redisConnection.select(2); final byte[] result =
-			 * redisConnection.get(redisTemplate.getKeySerializer().serialize(getCode())); return (Set<PromotionResult>)
-			 * redisTemplate.getValueSerializer().deserialize(result); }
-			 *
-			 * });
-			 */
 			final Set<CachedPromotionResult> prSet = new HashSet<>(this.promotionResults.size());
 			promotionResults.stream().forEach(pr -> prSet.add(pr));
 			retval = prSet;

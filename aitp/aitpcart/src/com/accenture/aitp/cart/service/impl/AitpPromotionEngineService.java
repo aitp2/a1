@@ -51,4 +51,11 @@ public class AitpPromotionEngineService extends DefaultPromotionEngineService
 		return promotionOrderResult;
 	}
 
+	@Override
+	protected void cleanupAbstractOrder(final AbstractOrderModel cart)
+	{
+		super.cleanupAbstractOrder(cart);
+		cart.setAllPromotionResults(new HashSet());
+		getModelService().save(cart);
+	}
 }

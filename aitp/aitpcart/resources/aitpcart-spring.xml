@@ -42,7 +42,6 @@
     
     <import resource="aitpcart-spring-sessioncart.xml"/>
   
-    
     <bean id="modelServiceAspect" class="com.accenture.aitp.cart.aspectj.ModelServiceAspect" />
   
    <bean id="extendedOrderDaoAspect" class="com.accenture.aitp.cart.aspectj.ExtendedOrderDaoAspect" />
@@ -50,39 +49,18 @@
     <alias name="aitpPromotionActionService" alias="promotionActionService"/>
 	<bean id="aitpPromotionActionService" parent="defaultPromotionActionService" class="com.accenture.aitp.cart.service.impl.AitpPromotionActionService" />
 
+   <!-- use the jalo replace the override impe service -->
+   <!-- 
     <alias name="aitpPromotionEngineService" alias="promotionEngineService"/>
     <bean id="aitpPromotionEngineService" class="com.accenture.aitp.cart.service.impl.AitpPromotionEngineService" parent="defaultPromotionEngineService" />
-
-
+ -->
     <util:list id="aitpRuleActionHandlerList">
         <bean id="aitpRuleActionMetadataHandler" class="com.accenture.aitp.cart.aspectj.AitpRuleActionMetadataHandler"/>
     </util:list>
     
-    <bean id="AitpRuleActionMetadataHandlersMergeDirective" depends-on="ruleActionMetadataHandlers" parent="mapMergeDirective" >
+    <bean id="aitpRuleActionMetadataHandlersMergeDirective" depends-on="ruleActionMetadataHandlers" parent="mapMergeDirective" >
 		<property name="key" value="ruleCode"/>
 		<property name="value" ref="aitpRuleActionHandlerList"/>
 	</bean>
 
-   <!--  
-     <bean id="ruleActionStrategyAspect" class="de.hybris.platform.promotionengineservices.action.impl.RuleActionStrategyAspect"/>
-       <bean id="de.hybris.platform.servicelayer.internal.jalo.order.InMemoryCart" class="com.accenture.aitp.cart.jalo.AitpPromotionCart" scope="prototype" />
-       <bean id="inMemoryCartAspect" class="com.accenture.aitp.cart.aspectj.InMemoryCartAspect" />
-   
-  <alias name="aitpOrderAdjustTotalActionStrategy" alias="orderTotalAdjustActionStrategy"/>
-	<bean id="aitpOrderAdjustTotalActionStrategy" parent="abstractRuleActionStrategy" class="de.hybris.platform.promotionengineservices.action.impl.DefaultOrderAdjustTotalActionStrategy" >
-		<property name="promotionAction" value="com.accenture.aitp.cart.model.CacheRuleBasedOrderAdjustTotalActionModel"></property>
-	</bean>
-	
-  <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="targetObject" ref="orderTotalAdjustActionStrategy" />  
-         <property name="targetMethod" value="setPromotionAction" />  
-         <property name="arguments">  
-               <array>
-                <value>com.accenture.aitp.cart.model.CacheRuleBasedOrderAdjustTotalActionModel</value>
-               </array>
-         </property>  
-    </bean> 
-    -->
-    
-    
 </beans>
