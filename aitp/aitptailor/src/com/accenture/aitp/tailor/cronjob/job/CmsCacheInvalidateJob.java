@@ -19,6 +19,7 @@ import de.hybris.platform.servicelayer.cronjob.PerformResult;
 
 import org.apache.log4j.Logger;
 
+import com.accenture.aitp.tailor.data.ModelMonitoredInfo;
 import com.accenture.aitp.tailor.service.AitpModelMonitorService;
 
 /**
@@ -49,9 +50,15 @@ public class CmsCacheInvalidateJob extends AbstractJobPerformable<CronJobModel>
 	@Override
 	public PerformResult perform(final CronJobModel crobJob)
 	{
-		//TODO a1 不断地取
-		getAitpModelMonitorService().consume();
-
+		LOG.info("start invalidate url checking");
+		
+		ModelMonitoredInfo info = getAitpModelMonitorService().consume();
+		while(info != null) {
+			LOG.info("=====> invalidate url checking for : " + info);
+			getAitpModelMonitorService().invalidateUrls(info);
+			info = getAitpModelMonitorService().consume();
+		}
+		LOG.info("end invalidate url checking");
 		return new PerformResult(CronJobResult.SUCCESS, CronJobStatus.FINISHED);
 	}
 

@@ -11,6 +11,8 @@
  */
 package com.accenture.aitp.tailor.service;
 
+import com.accenture.aitp.tailor.data.ModelMonitoredInfo;
+
 import de.hybris.platform.core.model.ItemModel;
 
 /**
@@ -18,7 +20,9 @@ import de.hybris.platform.core.model.ItemModel;
  */
 public interface AitpModelMonitorService
 {
-	public void publish(final ItemModel object);
+	 void publish(final ItemModel object);
 
-	public void consume();
+	 ModelMonitoredInfo consume();
+	 
+	 void invalidateUrls(ModelMonitoredInfo context);
 }

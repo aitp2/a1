@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <alias name="defaultAitpModelMonitorServiceImpl" alias="aitpModelMonitorService" />
+    <bean id="defaultAitpModelMonitorServiceImpl" class="com.accenture.aitp.tailor.service.impl.DefaultAitpModelMonitorServiceImpl" >
+    	<property name="configurationService" ref="configurationService" />
+    	<property name="modelMap" ref="monitoredModelMap" />
+    	<property name="aitpModelMonitorQueueStrategy" ref="aitpModelMonitorQueueStrategy" />
+    </bean>
+
+	<alias name="defaultAitpModelMonitorQueueStrategyImpl" alias="aitpModelMonitorQueueStrategy" />
+	<bean id="defaultAitpModelMonitorQueueStrategyImpl" class="com.accenture.aitp.tailor.strategy.impl.DefaultAitpModelMonitorQueueStrategyImpl" />
+
+    <!-- map for model and parser -->
+	<alias name="defaultMonitorModelMap" alias="monitoredModelMap"/>
+	<util:map id="defaultMonitorModelMap" key-type="java.lang.String">
+		<!-- productModel -->
+		<entry key="Product" value-ref="aitpProductInvalidateStrategy"/>
+		<entry key="VariantProduct" value-ref="aitpProductInvalidateStrategy"/>
+		<entry key="ElectronicsColorVariantProduct" value-ref="aitpProductInvalidateStrategy"/>
+	</util:map>
+	
+    <alias name="aitpProductInvalidateStrategyImpl" alias="aitpProductInvalidateStrategy" />
+    <bean id="aitpProductInvalidateStrategyImpl" class="com.accenture.aitp.tailor.service.strategy.AitpProductInvalidateStrategyImpl" >
+    	<property name="initPropMap">
+   	   	   <map>
+   	   	     <entry key="code" value="#root?.code"/>
+   	   	     <entry key="catalogversionpk" value="#root?.catalogVersion.pk"/>
+   	   	   </map>
+    	</property>
+    	<property name="parsers" ref="aitpProductCacheKeyParser" />
+    </bean>
+    
+    <!-- List for map -->
+	<alias name="defaultAiptProductParserList" alias="aiptProductParserList" />
+    <util:list id="defaultAiptProductParserList">
+		<ref bean="aitpProductCacheKeyParser" />
+	</util:list>
+
+	<alias name="defalutAitpAbstractCacheKeyParserImpl" alias="aitpAbstractCacheKeyParser" />
+	<bean id="defalutAitpAbstractCacheKeyParserImpl" class="com.accenture.aitp.tailor.parser.impl.DefalutAitpAbstractCacheKeyParserImpl" abstract="true">
+	</bean>
+	
+	<alias name="defalutAitpCategoryCacheKeyParserImpl" alias="aitpCategoryCacheKeyParser" />
+	<bean id="defalutAitpCategoryCacheKeyParserImpl" class="com.accenture.aitp.tailor.parser.impl.DefalutAitpCategoryCacheKeyParserImpl" parent="aitpAbstractCacheKeyParser">
+	</bean>
+	
+	<alias name="defalutAitpClassificationclassCacheKeyParserImpl" alias="aitpClassificationclassCacheKeyParser" />
+	<bean id="defalutAitpClassificationclassCacheKeyParserImpl" class="com.accenture.aitp.tailor.parser.impl.DefalutAitpClassificationclassCacheKeyParserImpl" parent="aitpAbstractCacheKeyParser">
+	</bean>
+	
+	<alias name="defalutAitpCmsCacheKeyParserImpl" alias="aitpCmsCacheKeyParser" />
+	<bean id="defalutAitpCmsCacheKeyParserImpl" class="com.accenture.aitp.tailor.parser.impl.DefalutAitpCmsCacheKeyParserImpl" parent="aitpAbstractCacheKeyParser">
+	</bean>
+	
+	<alias name="defalutAitpMediaCacheKeyParserImpl" alias="aitpMediaCacheKeyParser" />
+	<bean id="defalutAitpMediaCacheKeyParserImpl" class="com.accenture.aitp.tailor.parser.impl.DefalutAitpMediaCacheKeyParserImpl" parent="aitpAbstractCacheKeyParser">
+	</bean>
+	
+	<bean id="defalutAitpProductCacheKeyParserImpl" class="com.accenture.aitp.tailor.parser.impl.DefalutAitpProductCacheKeyParserImpl" parent="aitpAbstractCacheKeyParser">
+		<property name="templates">
+   	   	   <list>
+   	   	     <value>/p/$code</value>
+   	   	   </list>
+    	</property>
+	</bean>
+	
+	<alias name="defalutAitpProductCacheKeyParserImpl2" alias="aitpProductCacheKeyParser" />
+	<bean id="defalutAitpProductCacheKeyParserImpl2" class="com.accenture.aitp.tailor.parser.impl.DefalutAitpProductCacheKeyParserImpl2" parent="aitpAbstractCacheKeyParser">
+		<property name="productDataUrlResolver" ref="productDataUrlResolver" />
+		<property name="basePathList">
+   	   	   <list>
+   	   	     <value>/yacceleratorstorefront/electronics/en</value>
+   	   	   </list>
+    	</property>
+    	<property name="configurationService" ref="configurationService" />
+    	<property name="catalogVersionService" ref="catalogVersionService" />
+    	<property name="modelService" ref="modelService"/>
+	</bean>
+	
+</beans>

@@ -1,0 +1,11 @@
+#Ant properties
+#Wed Mar 14 17:08:13 UTC 2018
+builddate=20180314 1708
+description=aitpcsi
+group.id=de.hybris.platform
+module.name=platform-module
+name=aitpcsi
+releasedate=20180313 1011
+vendor=hybris
+version=6.7.0.0
+version.api=6.7.0
