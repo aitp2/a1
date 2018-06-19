@@ -57,8 +57,16 @@
     	<!-- <property name="password" value="${redis.pass}"/> -->
      	<property name="timeout" value="${redis.instance.pool.timeout}"/>
 	</bean>
-	  <bean id="accentureRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureJdkSerializationRedisSerializer"/>
+	  <bean id="accentureRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureJdkSerializationRedisSerializer">
+	    <property name="cartSerializerStrategy" ref="cartSerializerStrategy"/>
+	  </bean>
 	
+	 <bean id="cartSerializerStrategy" class="com.accenture.aitp.cart.strategy.impl.CartSerializerStrategyImpl">
+       <property name="redisTemplate" ref="redisTemplate"/>
+       <property name="cartKeyGenerateStrategy" ref="cartKeyGenerateStrategy"/>
+       <property name="cartService" ref="cartService"/>
+       <property name="modelService" ref="modelService"/>  
+    </bean>
 	
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
 	    <property name="connectionFactory" ref="${redis.instance.jedisFactory}" />

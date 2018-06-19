@@ -45,9 +45,14 @@
     <bean id="modelServiceAspect" class="com.accenture.aitp.cart.aspectj.ModelServiceAspect" />
   
    <bean id="extendedOrderDaoAspect" class="com.accenture.aitp.cart.aspectj.ExtendedOrderDaoAspect" />
+   <bean id="commerceCartDaoAspect" class="com.accenture.aitp.cart.aspectj.CommerceCartDaoAspect">
+     <property name="cartSerializerStrategy" ref="cartSerializerStrategy"/>
+   </bean>
+   <bean id="cartServiceAspect" class="com.accenture.aitp.cart.aspectj.CartServiceAspect"/>
 
     <alias name="aitpPromotionActionService" alias="promotionActionService"/>
 	<bean id="aitpPromotionActionService" parent="defaultPromotionActionService" class="com.accenture.aitp.cart.service.impl.AitpPromotionActionService" />
+
 
    <!-- use the jalo replace the override impe service -->
    <!-- 
@@ -62,5 +67,20 @@
 		<property name="key" value="ruleCode"/>
 		<property name="value" ref="aitpRuleActionHandlerList"/>
 	</bean>
-
+    <alias name="cartKeyGenerateStrategyImpl" alias="cartKeyGenerateStrategy"/>
+    <bean id="cartKeyGenerateStrategyImpl" class="com.accenture.aitp.cart.strategy.impl.CartKeyGenerateStrategyImpl">
+     <property name="modelService" ref="modelService"/>
+     <property name="userService" ref="userService"/>
+    </bean>
+    
+    <!-- 
+    <bean id="addSessionCartAfterNameListMergeDirective" depends-on="storefrontTenantDefaultFilterChainList" parent="listMergeDirective">
+		<property name="add" ref="lastBean" />
+		<property name="afterBeanNames">
+			<list value-type="java.lang.String">
+				<value>hybrisSpringSessionFilter</value>
+			</list>
+		</property>
+	</bean>
+	-->
 </beans>
