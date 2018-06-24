@@ -73,6 +73,20 @@
      <property name="userService" ref="userService"/>
     </bean>
     
+     <bean id="logAroundAdvice" class="com.accenture.aitp.cart.aspectj.LogAroundAdvice" />
+	
+	  <aop:config>
+	    <aop:pointcut id="calculateCartLog"  expression="execution(public * *.*calculateCart*(..))"/>
+	    <aop:pointcut id="updatePromotionsLog"  expression="execution(public * *.*.updatePromotions*(..))"/>
+	    <aop:pointcut id="controllerLog"  expression="execution(public * com.accenture.aitp.storefront.controllers.*.*Controller.*(..))"/>
+	    
+	    <aop:aspect id="logAspect" ref="logAroundAdvice">  
+            <aop:around pointcut-ref="calculateCartLog" method="doAround"/>
+            <aop:around pointcut-ref="updatePromotionsLog" method="doAround"/>
+           <aop:around pointcut-ref="controllerLog" method="doAround"/>
+        </aop:aspect>  
+	  </aop:config>
+    
     <!-- 
     <bean id="addSessionCartAfterNameListMergeDirective" depends-on="storefrontTenantDefaultFilterChainList" parent="listMergeDirective">
 		<property name="add" ref="lastBean" />

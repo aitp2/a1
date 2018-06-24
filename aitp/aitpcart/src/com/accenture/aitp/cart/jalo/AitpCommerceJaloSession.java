@@ -58,7 +58,10 @@ public class AitpCommerceJaloSession extends CommerceJaloSession
 			{
 
 				final RedisTemplate redisTemplate = (RedisTemplate) Registry.getApplicationContext().getBean("redisTemplate");
+				final long beforeInvokeTime = System.currentTimeMillis();
 				this._cart = (Cart) redisTemplate.opsForValue().get(this.cartKey);
+				LOG.info(Thread.currentThread().getName() + "--get session cart use time "
+						+ (System.currentTimeMillis() - beforeInvokeTime) + " ms");
 				return this._cart;
 			}
 			catch (final JaloItemNotFoundException arg0)
