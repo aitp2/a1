@@ -27,6 +27,28 @@
 
 
 	<!-- filters -->	
+    <filter>
+       <filter-name>DruidWebStatFilter</filter-name>
+       <filter-class>com.alibaba.druid.support.http.WebStatFilter</filter-class>
+       <init-param>
+           <param-name>exclusions</param-name>
+           <param-value>*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*</param-value>
+       </init-param>
+       <init-param>
+            <param-name>sessionStatEnable</param-name>
+            <param-value>false</param-value>
+       </init-param>
+       <init-param>
+            <param-name>profileEnable</param-name>
+            <param-value>true</param-value>
+       </init-param>
+   	</filter>
+   	
+    <filter-mapping>
+        <filter-name>DruidWebStatFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+	
 	<filter>
 		<filter-name>XSSFilter</filter-name>
 		<filter-class>de.hybris.platform.servicelayer.web.XSSFilter</filter-class>
@@ -158,6 +180,26 @@
 	</context-param>	
 
 	<!-- Servlets -->
+    <servlet>
+            <servlet-name>DruidStatView</servlet-name>
+            <servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+            <init-param>
+                    <param-name>resetEnable</param-name>
+                    <param-value>true</param-value>
+            </init-param>
+            <init-param>
+                    <param-name>loginUsername</param-name>
+                    <param-value>admin</param-value>
+            </init-param>
+            <init-param>
+                    <param-name>loginPassword</param-name>
+                    <param-value>nimda</param-value>
+            </init-param>
+    </servlet>
+    <servlet-mapping>
+            <servlet-name>DruidStatView</servlet-name>
+            <url-pattern>/druid/*</url-pattern>
+    </servlet-mapping>
 
 	<servlet>
 		<description>
