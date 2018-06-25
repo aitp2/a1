@@ -21,5 +21,5 @@ import com.accenture.aitp.tailor.data.ModelMonitoredInfo;
  */
 public interface AitpCacheKeyParser
 {
-	public List<String> parser(final ModelMonitoredInfo info);
+	public List<String> invalidateUrl(final ModelMonitoredInfo info);
 }

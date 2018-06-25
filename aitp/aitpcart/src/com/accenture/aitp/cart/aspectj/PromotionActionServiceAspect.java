@@ -16,7 +16,6 @@ import java.util.Collections;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
 
 
 /**
@@ -26,13 +25,7 @@ import org.aspectj.lang.annotation.Pointcut;
 public class PromotionActionServiceAspect
 {
 
-	@Pointcut("execution(protected * *.createConsumedEntries(..))")
-	public void createConsumedEntries()
-	{
-		//
-	}
-
-	@Around("createConsumedEntries()")
+	@Around("execution(protected * de.hybris.platform.promotionengineservices.promotionengine.impl.*.createConsumedEntries(..))")
 	public Object createConsumedEntries(final ProceedingJoinPoint joinPoint) throws Throwable
 	{
 		if (joinPoint.getArgs().length == 1)

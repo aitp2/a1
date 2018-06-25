@@ -16,7 +16,6 @@
 			extensions which are automatically required -->
 		<requires-extension name="acceleratorfacades"/>
 		<requires-extension name="aitpcore"/>
-       
 
 		<coremodule generated="true" manager="de.hybris.platform.jalo.extension.GenericManager" packageroot="com.accenture.aitp.facades"/>
 

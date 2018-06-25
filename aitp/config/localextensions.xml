@@ -1,8 +1,8 @@
 <hybrisconfig xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:noNamespaceSchemaLocation='../bin/platform/resources/schemas/extensions.xsd'>
   <extensions>
     <path dir='${HYBRIS_BIN_DIR}' autoload='false' />
-	<path dir='${HYBRIS_BIN_DIR}/custom' autoload='false' />
-   
+    <path dir="/Users/mingming/work/a1/aitp" autoload='false'/>
+    
     <extension name='ordermanagementaddon' />
     <extension name='orderselfserviceaddon' />
     <extension name='ordermanagementwebservices' />
@@ -11,12 +11,15 @@
     <extension name='warehousingwebservices' />
     <extension name='instore' />
     <extension name='mcc' />
+    <extension name='hmc' />
+    <extension name='platformhmc' />
+    <extension name='backoffice' />
     <extension name='adaptivesearchsolr' />
     <extension name='adaptivesearchbackoffice' />
     <extension name='commerceservicesbackoffice' />
     <extension name='solrserver' />
-     <!-- <extension name='yaddon' />
-	<extension name='ycommercewebservices' /> -->
+   <extension name='yaddon' />
+
     <extension name='electronicsstore' />
     <extension name='apparelstore' />
     <extension name='acceleratorwebservicesaddon' />
@@ -29,30 +32,33 @@
     <extension name='droolsruleengineservices' />
     <extension name='couponfacades' />
     <extension name='promotionenginesamplesaddon' />
+    <extension name='promotionengineservices'/>
     <extension name='consignmenttrackingaddon' />
-	<extension name='addonsupport' />
-	<extension name="oauth2" />
-
-    <extension name='backoffice' />
-    <extension name='platformbackoffice' />
-    <extension name='deltadetection' />
-    <extension name='cms2' />
-    <extension name='cms2lib' />
-    <extension name='cmscockpit'/>
-	
-	<extension name="hmc"/>
-	<extension name="platformhmc"/>
-	<extension name="solrfacetsearchhmc"/>
-	<extension name="commercesearchhmc"/>
-	
-	<extension name="aitpfulfilmentprocess"/>
-    <extension name="aitpcore"/>
-    <extension name="aitpinitialdata"/>
-    <extension name="aitpfacades"/>
-    <extension name="aitptest"/>
-    <extension name="aitpstorefront"/>
-	<extension name="aitptailor"/>
-    <!-- <extension name="aitpcockpits"/> -->
-	
+    <extension name='addonsupport' />
+    <extension name="oauth2" />
+    
+    
+     <extension name='aitpcockpits' />
+     <extension name='aitpstorefront' />
+     <extension name='aitpcore' />
+     <extension name='aitpfacades' />
+     <extension name='aitpfulfilmentprocess' />
+     <extension name='aitpinitialdata' />
+     <extension name='aitpcart' />
+     <extension name='aitpcsi' />
+     <extension name='aitptailor' />
+   <!--  
+    <extension name="cartOptimization"/>
+    <extension name="cartOptimizationWebservice"/>
+     <extension name='aistorefront' />
+     <extension name='aicore' />
+     <extension name='aifacades' />
+     <extension name='aifulfilmentprocess' />
+     <extension name='aiinitialdata' />
+     <extension name='aicockpits' />
+   
+    <extension name="demooccaddon"/>
+    <extension name="demohotfolder"/>
+      -->
   </extensions>
 </hybrisconfig>

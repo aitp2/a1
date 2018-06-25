@@ -21,7 +21,7 @@ import com.accenture.aitp.tailor.service.AitpModelMonitorService;
 /**
  *
  */
-public class DefaultAitpPrepareInterceptor implements PrepareInterceptor<Object>
+public class DefaultAitpPrepareInterceptor implements PrepareInterceptor<ItemModel>
 {
 	private AitpModelMonitorService aitpModelMonitorService;
 
@@ -42,12 +42,9 @@ public class DefaultAitpPrepareInterceptor implements PrepareInterceptor<Object>
 	}
 
 	@Override
-	public void onPrepare(final Object obj, final InterceptorContext context) throws InterceptorException
+	public void onPrepare(final ItemModel model, final InterceptorContext context) throws InterceptorException
 	{
-		if (context.isModified(obj) || context.isNew(obj) || context.isRemoved(obj))
-		{
-			getAitpModelMonitorService().publish((ItemModel) obj);
-		}
+		getAitpModelMonitorService().publish(model);
 	}
 
 }

@@ -65,12 +65,5 @@
     </bean>
 
 	-->
-	<bean class="com.accenture.aitp.tailor.data.ModelMonitoredInfo">
-		<property name="typeCode" type="java.lang.String"/>
-		<property name="pk" type="de.hybris.platform.core.PK" />
-		<property name="code" type="java.lang.String" />
-		<property name="uid" type="java.lang.String" />
-		<property name="url" type="java.lang.String" />
-	</bean>
 
 </beans>

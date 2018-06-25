@@ -13,12 +13,15 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/aop
            http://www.springframework.org/schema/aop/spring-aop.xsd
            http://www.springframework.org/schema/context 
-           http://www.springframework.org/schema/context/spring-context.xsd">
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
 
 	
 	
@@ -35,29 +38,64 @@
     </bean>
     
     <context:component-scan base-package="com.accenture.aitp.cart" />
-    
     <aop:aspectj-autoproxy proxy-target-class="true" />
     
- <bean id="extendedOrderDaoAspect" class="com.accenture.aitp.cart.aspectj.ExtendedOrderDaoAspect" />
+    <import resource="aitpcart-spring-sessioncart.xml"/>
 	
  <bean id="modelServiceAspect" class="com.accenture.aitp.cart.aspectj.ModelServiceAspect" />
 			
-  <bean id="promotionActionServiceAspect" class="com.accenture.aitp.cart.aspectj.PromotionActionServiceAspect"/>
-<!--  
-  <alias name="aitpOrderAdjustTotalActionStrategy" alias="orderTotalAdjustActionStrategy"/>
-	<bean id="aitpOrderAdjustTotalActionStrategy" parent="abstractRuleActionStrategy" class="de.hybris.platform.promotionengineservices.action.impl.DefaultOrderAdjustTotalActionStrategy" >
-		<property name="promotionAction" value="com.accenture.aitp.cart.model.CacheRuleBasedOrderAdjustTotalActionModel"></property>
+   <bean id="extendedOrderDaoAspect" class="com.accenture.aitp.cart.aspectj.ExtendedOrderDaoAspect" />
+   <bean id="commerceCartDaoAspect" class="com.accenture.aitp.cart.aspectj.CommerceCartDaoAspect">
+     <property name="cartSerializerStrategy" ref="cartSerializerStrategy"/>
 	</bean>
+   <bean id="cartServiceAspect" class="com.accenture.aitp.cart.aspectj.CartServiceAspect"/>
+
+    <alias name="aitpPromotionActionService" alias="promotionActionService"/>
+	<bean id="aitpPromotionActionService" parent="defaultPromotionActionService" class="com.accenture.aitp.cart.service.impl.AitpPromotionActionService" />
+
+
+   <!-- use the jalo replace the override impe service -->
+   <!-- 
+    <alias name="aitpPromotionEngineService" alias="promotionEngineService"/>
+    <bean id="aitpPromotionEngineService" class="com.accenture.aitp.cart.service.impl.AitpPromotionEngineService" parent="defaultPromotionEngineService" />
+ -->
+    <util:list id="aitpRuleActionHandlerList">
+        <bean id="aitpRuleActionMetadataHandler" class="com.accenture.aitp.cart.aspectj.AitpRuleActionMetadataHandler"/>
+    </util:list>
 	
-  <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="targetObject" ref="orderTotalAdjustActionStrategy" />  
-         <property name="targetMethod" value="setPromotionAction" />  
-         <property name="arguments">  
-               <array>
-                <value>com.accenture.aitp.cart.model.CacheRuleBasedOrderAdjustTotalActionModel</value>
-               </array>
-         </property>  
-    </bean> 
+    <bean id="aitpRuleActionMetadataHandlersMergeDirective" depends-on="ruleActionMetadataHandlers" parent="mapMergeDirective" >
+		<property name="key" value="ruleCode"/>
+		<property name="value" ref="aitpRuleActionHandlerList"/>
+	</bean>
+    <alias name="cartKeyGenerateStrategyImpl" alias="cartKeyGenerateStrategy"/>
+    <bean id="cartKeyGenerateStrategyImpl" class="com.accenture.aitp.cart.strategy.impl.CartKeyGenerateStrategyImpl">
+     <property name="modelService" ref="modelService"/>
+     <property name="userService" ref="userService"/>
+    </bean>
+    
+     <bean id="logAroundAdvice" class="com.accenture.aitp.cart.aspectj.LogAroundAdvice" />
+	
+	  <aop:config>
+	    <aop:pointcut id="calculateCartLog"  expression="execution(public * *.*calculateCart*(..))"/>
+	    <aop:pointcut id="updatePromotionsLog"  expression="execution(public * *.*.updatePromotions*(..))"/>
+	    <aop:pointcut id="controllerLog"  expression="execution(public * com.accenture.aitp.storefront.controllers.*.*Controller.*(..))"/>
+	    
+	    <aop:aspect id="logAspect" ref="logAroundAdvice">  
+            <aop:around pointcut-ref="calculateCartLog" method="doAround"/>
+            <aop:around pointcut-ref="updatePromotionsLog" method="doAround"/>
+           <aop:around pointcut-ref="controllerLog" method="doAround"/>
+        </aop:aspect>  
+	  </aop:config>
+    
+    <!-- 
+    <bean id="addSessionCartAfterNameListMergeDirective" depends-on="storefrontTenantDefaultFilterChainList" parent="listMergeDirective">
+		<property name="add" ref="lastBean" />
+		<property name="afterBeanNames">
+			<list value-type="java.lang.String">
+				<value>hybrisSpringSessionFilter</value>
+			</list>
+		</property>
+	</bean>
     -->
     
    	<alias name="aitpCalculationService" alias="calculationService"/>

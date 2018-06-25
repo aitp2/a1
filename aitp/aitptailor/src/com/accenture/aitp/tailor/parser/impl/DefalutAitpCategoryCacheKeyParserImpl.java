@@ -22,7 +22,7 @@ public class DefalutAitpCategoryCacheKeyParserImpl extends DefalutAitpAbstractCa
 {
 
 	@Override
-	public List<String> parser(final ModelMonitoredInfo info)
+	public List<String> invalidateUrl(final ModelMonitoredInfo info)
 	{
 		// YTODO Auto-generated method stub
 		return null;
