@@ -57,18 +57,28 @@
     	<!-- <property name="password" value="${redis.pass}"/> -->
      	<property name="timeout" value="${redis.instance.pool.timeout}"/>
 	</bean>
-	  <bean id="accentureRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureJdkSerializationRedisSerializer">
-	    <property name="cartSerializerStrategy" ref="cartSerializerStrategy"/>
-	  </bean>
-	
+	 <!-- JdkSerialization -->
+	  <bean id="accenturejdkRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureJdkSerializationRedisSerializer"/>
+	 
+	  <!-- KryoSerialization  -->
+	  <bean id="accentureRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureKryoSerializationRedisSerializer"/>
+	 
+	    <!-- KryoSerialization  
+	  <bean id="accentureRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureFastJsonSerializationRedisSerializer"/>
+       -->
 	 <bean id="cartSerializerStrategy" class="com.accenture.aitp.cart.strategy.impl.CartSerializerStrategyImpl">
-       <property name="redisTemplate" ref="redisTemplate"/>
+       <property name="redisTemplate" ref="redisCartTemplate"/>
        <property name="cartKeyGenerateStrategy" ref="cartKeyGenerateStrategy"/>
        <property name="cartService" ref="cartService"/>
        <property name="modelService" ref="modelService"/>  
     </bean>
-	
-	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+    
+    <bean id="aitpRedisSerializer" class="com.accenture.aitp.cart.serialize.AitpRedisSerializer">
+     <property name="redisSerializer" ref="accenturejdkRedisSerializer"/>
+     <property name="cartSerializerStrategy" ref="cartSerializerStrategy"/>
+    </bean>
+    
+    <bean id="redisCartTemplate" class="org.springframework.data.redis.core.RedisTemplate">
 	    <property name="connectionFactory" ref="${redis.instance.jedisFactory}" />
 	     <property name="keySerializer">
 	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
@@ -78,6 +88,18 @@
 	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
 	    </property>
 	    <property name="hashValueSerializer" ref="accentureRedisSerializer" />
+	</bean>
+	
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+	    <property name="connectionFactory" ref="${redis.instance.jedisFactory}" />
+	     <property name="keySerializer">
+	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+	    </property>
+	    <property name="valueSerializer" ref="aitpRedisSerializer" />
+	    <property name="hashKeySerializer">
+	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+	    </property>
+	    <property name="hashValueSerializer" ref="aitpRedisSerializer" />
 	</bean>
 	
     <bean id="sessionRepository" class="org.springframework.session.data.redis.RedisOperationsSessionRepository">

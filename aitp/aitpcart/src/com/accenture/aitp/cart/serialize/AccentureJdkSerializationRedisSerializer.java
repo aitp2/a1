@@ -3,15 +3,11 @@ package com.accenture.aitp.cart.serialize;
 
 
 
-import de.hybris.platform.jalo.JaloSession;
-
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.serializer.support.DeserializingConverter;
 import org.springframework.core.serializer.support.SerializingConverter;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
-
-import com.accenture.aitp.cart.strategy.CartSerializerStrategy;
 
 
 /**
@@ -20,7 +16,6 @@ import com.accenture.aitp.cart.strategy.CartSerializerStrategy;
  */
 public class AccentureJdkSerializationRedisSerializer implements RedisSerializer<Object>
 {
-	private CartSerializerStrategy cartSerializerStrategy;
 	private final Converter<Object, byte[]> serializer = new SerializingConverter(new DefaultAccentureSerializer());
 	private final Converter<byte[], Object> deserializer = new DeserializingConverter(new DefaultAccentureDeserializer());
 
@@ -51,10 +46,7 @@ public class AccentureJdkSerializationRedisSerializer implements RedisSerializer
 		}
 		try
 		{
-			if (object instanceof JaloSession)
-			{
-				cartSerializerStrategy.serializerSessionCart((JaloSession) object);
-			}
+
 			return this.serializer.convert(object);
 		}
 		catch (final Exception ex)
@@ -63,14 +55,7 @@ public class AccentureJdkSerializationRedisSerializer implements RedisSerializer
 		}
 	}
 
-	/**
-	 * @param cartSerializerStrategy
-	 *           the cartSerializerStrategy to set
-	 */
-	public void setCartSerializerStrategy(final CartSerializerStrategy cartSerializerStrategy)
-	{
-		this.cartSerializerStrategy = cartSerializerStrategy;
-	}
+
 
 
 }

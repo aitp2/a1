@@ -6,12 +6,16 @@
 	<classpathentry kind="lib" path="lib/jedis-2.9.0.jar"/>
 	<classpathentry kind="lib" path="lib/spring-data-commons-1.13.9.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/spring-data-keyvalue-1.2.9.RELEASE.jar"/>
-	<classpathentry kind="lib" path="lib/spring-data-redis-1.8.9.RELEASE.jar" sourcepath="/var/folders/pj/fgd6c0ns40xcnht8sdhcvz740000gn/T/decompiler/source/spring-data-redis-1.8.9.RELEASE-sources.jar"/>
+	<classpathentry kind="lib" path="lib/spring-data-redis-1.8.9.RELEASE.jar" sourcepath="/var/folders/pj/fgd6c0ns40xcnht8sdhcvz740000gn/T/decompiler/source/spring-data-redis-1.8.9.RELEASE-sources-1530086087082.jar"/>
+	<classpathentry kind="lib" path="lib/kryo-5.0.0-RC1.jar" sourcepath="/var/folders/pj/fgd6c0ns40xcnht8sdhcvz740000gn/T/decompiler/source/kryo-5.0.0-RC1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/fastjson-1.2.47.jar" sourcepath="/var/folders/pj/fgd6c0ns40xcnht8sdhcvz740000gn/T/decompiler/source/fastjson-1.2.47-sources.jar"/>
+	<classpathentry kind="lib" path="lib/kryo-5.0.0-RC1-sources.jar"/>
 	<classpathentry kind="src" output="eclipsebin/classes" path="src"/>
 	<classpathentry kind="src" output="eclipsebin/classes" path="testsrc"/>
 	<classpathentry kind="src" output="eclipsebin/classes" path="gensrc"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/promotionengineservices"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/commerceservices"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/couponservices"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/aitpcore"/>
 	<classpathentry kind="output" path="eclipsebin/notused"/>
 </classpath>
