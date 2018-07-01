@@ -49,8 +49,6 @@
      <property name="cartSerializerStrategy" ref="cartSerializerStrategy"/>
 	</bean>
    <bean id="cartServiceAspect" class="com.accenture.aitp.cart.aspectj.CartServiceAspect"/>
-   <bean id="cookieHttpSessionStrategyAspect" class="com.accenture.aitp.cart.aspectj.CookieHttpSessionStrategyAspect" />
-
     <alias name="aitpPromotionActionService" alias="promotionActionService"/>
 	<bean id="aitpPromotionActionService" parent="defaultPromotionActionService" class="com.accenture.aitp.cart.service.impl.AitpPromotionActionService" />
 

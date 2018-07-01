@@ -95,11 +95,11 @@
 	     <property name="keySerializer">
 	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
 	    </property>
-	    <property name="valueSerializer" ref="aitpRedisSerializer" />
+	    <property name="valueSerializer" ref="accentureRedisSerializer" />
 	    <property name="hashKeySerializer">
 	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
 	    </property>
-	    <property name="hashValueSerializer" ref="aitpRedisSerializer" />
+	    <property name="hashValueSerializer" ref="accentureRedisSerializer" />
 	</bean>
 	
     <bean id="sessionRepository" class="org.springframework.session.data.redis.RedisOperationsSessionRepository">

@@ -79,10 +79,7 @@ public class StoreSessionCartFilter extends GenericFilterBean
 				final String cartKey = cartKeyGenerateStrategy.generateCartKey(cart);
 				final long before = System.currentTimeMillis();
 				redisTemplate.opsForValue().set(cartKey, modelService.getSource(cart));
-				if (LOGGER.isDebugEnabled())
-				{
-					LOGGER.info("set session cart:" + cartKey + " use time:" + (System.currentTimeMillis() - before) + "ms");
-				}
+				LOGGER.info("set session cart:" + cartKey + " use time:" + (System.currentTimeMillis() - before) + "ms");
 				sessionService.setAttribute(SESSION_CACHE_CART_KEY, cartKey);
 			}
 		}
