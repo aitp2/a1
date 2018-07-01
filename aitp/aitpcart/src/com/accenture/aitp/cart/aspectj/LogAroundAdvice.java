@@ -37,7 +37,7 @@ public class LogAroundAdvice
 		final String threadName = Thread.currentThread().getName();
 		final String className = joinPoint.getTarget().getClass().getName();
 		final String methodName = joinPoint.getSignature().getName();
-		//LOGGER.info(uid+"--"+threadName+"--"+className+"--"+methodName+" start process");
+		LOGGER.info(uid + "--" + threadName + "--" + className + "--" + methodName + " start process");
 		try
 		{
 			return joinPoint.proceed();

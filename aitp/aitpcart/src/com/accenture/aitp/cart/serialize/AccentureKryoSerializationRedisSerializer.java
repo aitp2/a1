@@ -11,10 +11,14 @@
  */
 package com.accenture.aitp.cart.serialize;
 
+import de.hybris.platform.cms2.jalo.site.CMSSite;
+import de.hybris.platform.jalo.c2l.Currency;
 import de.hybris.platform.jalo.product.Product;
 import de.hybris.platform.jalo.product.Unit;
+import de.hybris.platform.jalo.user.Customer;
 import de.hybris.platform.servicelayer.internal.jalo.order.InMemoryCartEntry;
 import de.hybris.platform.servicelayer.internal.jalo.order.JaloOnlyItemHelper;
+import de.hybris.platform.store.BaseStore;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,13 +30,13 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 
 import com.accenture.aitp.cart.jalo.AitpInMemoryCart;
-import com.accenture.aitp.cart.serialize.kryo.ItemSerializer;
 import com.accenture.aitp.core.jalo.ApparelProduct;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.BeanSerializer;
+import com.esotericsoftware.kryo.serializers.JavaSerializer;
 
 
 /**
@@ -131,18 +135,19 @@ public class AccentureKryoSerializationRedisSerializer implements RedisSerialize
 			final Kryo kryo = new Kryo();
 			kryo.setRegistrationRequired(false);
 			kryo.setClassLoader(Thread.currentThread().getContextClassLoader());
-
+			// cart session
 			kryo.register(JaloOnlyItemHelper.class, new BeanSerializer(kryo, JaloOnlyItemHelper.class));
-			kryo.register(AitpInMemoryCart.class, new BeanSerializer(kryo, AitpInMemoryCart.class));
-			kryo.register(InMemoryCartEntry.class, new BeanSerializer(kryo, InMemoryCartEntry.class));
+			kryo.register(AitpInMemoryCart.class, new JavaSerializer());
+			kryo.register(InMemoryCartEntry.class, new JavaSerializer());
 
-			kryo.register(ApparelProduct.class, new ItemSerializer());
-			kryo.register(Unit.class, new ItemSerializer());
-			kryo.register(de.hybris.platform.jalo.user.Customer.class, new ItemSerializer());
-			kryo.register(de.hybris.platform.jalo.c2l.Currency.class, new ItemSerializer());
-			kryo.register(de.hybris.platform.store.BaseStore.class, new ItemSerializer());
-			kryo.register(de.hybris.platform.cms2.jalo.site.CMSSite.class, new ItemSerializer());
-			kryo.register(Product.class, new ItemSerializer());
+			kryo.register(ApparelProduct.class, new JavaSerializer());
+			kryo.register(Unit.class, new JavaSerializer());
+			kryo.register(Customer.class, new JavaSerializer());
+			kryo.register(Currency.class, new JavaSerializer());
+			kryo.register(BaseStore.class, new JavaSerializer());
+			kryo.register(CMSSite.class, new JavaSerializer());
+			kryo.register(Product.class, new JavaSerializer());
+
 			return kryo;
 		}
 	};

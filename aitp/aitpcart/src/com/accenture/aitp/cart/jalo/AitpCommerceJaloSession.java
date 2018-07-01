@@ -38,9 +38,9 @@ import com.accenture.aitp.cart.strategy.CartKeyGenerateStrategy;
  */
 public class AitpCommerceJaloSession extends CommerceJaloSession
 {
-	private static final Logger LOG = Logger.getLogger(AitpCommerceJaloSession.class);
-	private transient volatile Cart _cart;
-	private volatile String cartKey;
+	//private static final Logger LOG = Logger.getLogger(AitpCommerceJaloSession.class);
+	//private transient volatile Cart _cart;
+	//private volatile String cartKey;
 	/*
 	 * @Override public Object setAttribute(final String name, final Object value) { return
 	 * this.getSessionContext().setAttribute(name, value); }
@@ -51,7 +51,7 @@ public class AitpCommerceJaloSession extends CommerceJaloSession
 	 * this.getSessionContext().removeAttribute(name); }
 	 *
 	 */
-
+/**
 	@Override
 	protected Cart getAttachedCart()
 	{
@@ -122,7 +122,7 @@ public class AitpCommerceJaloSession extends CommerceJaloSession
 		this._cart = cart;
 		this.cartKey = cartKeyGenerateStrategy.generateCartKey(cart);
 
-	}
+	}*/
 
 	@Override
 	public SearchResult search(final GenericQuery query)

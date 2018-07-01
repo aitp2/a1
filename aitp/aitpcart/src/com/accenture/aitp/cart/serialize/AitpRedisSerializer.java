@@ -24,6 +24,14 @@ import com.accenture.aitp.cart.strategy.CartSerializerStrategy;
  */
 public class AitpRedisSerializer implements RedisSerializer<Object>
 {
+	private final ThreadLocal<Boolean> serializer = new ThreadLocal<Boolean>()
+	{
+		@Override
+		protected Boolean initialValue()
+		{
+			return Boolean.TRUE;
+		}
+	};
 	private CartSerializerStrategy cartSerializerStrategy;
 	private RedisSerializer redisSerializer;
 
@@ -36,8 +44,9 @@ public class AitpRedisSerializer implements RedisSerializer<Object>
 	@Override
 	public byte[] serialize(final Object object) throws SerializationException
 	{
-		if (object instanceof JaloSession)
+		if (object instanceof JaloSession && null == serializer.get())
 		{
+			serializer.set(Boolean.TRUE);
 			cartSerializerStrategy.serializerSessionCart((JaloSession) object);
 		}
 		return getRedisSerializer().serialize(object);

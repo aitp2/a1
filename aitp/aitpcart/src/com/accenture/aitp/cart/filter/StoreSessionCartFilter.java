@@ -12,8 +12,10 @@
 package com.accenture.aitp.cart.filter;
 
 import de.hybris.platform.core.model.order.CartModel;
+import de.hybris.platform.jalo.order.Cart;
 import de.hybris.platform.order.CartService;
 import de.hybris.platform.servicelayer.model.ModelService;
+import de.hybris.platform.servicelayer.session.SessionService;
 import de.hybris.platform.util.Config;
 
 import java.io.IOException;
@@ -23,6 +25,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import org.apache.log4j.Logger;
+import org.drools.core.util.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -34,29 +38,68 @@ import com.accenture.aitp.cart.strategy.CartKeyGenerateStrategy;
  */
 public class StoreSessionCartFilter extends GenericFilterBean
 {
+	private static final Logger LOGGER = Logger.getLogger(StoreSessionCartFilter.class);
+	private static final String SESSION_CACHE_CART_KEY = "sessionCartCacheKey";
 	private boolean touchSessionCart;
 	private RedisTemplate redisTemplate;
 	private CartKeyGenerateStrategy cartKeyGenerateStrategy;
+
 	private CartService cartService;
 	private ModelService modelService;
+	private SessionService sessionService;
 
 	@Override
 	public void doFilter(final ServletRequest httpRequest, final ServletResponse httpResponse, final FilterChain filterChain)
 			throws IOException, ServletException
 	{
+		if (touchSessionCart && !cartService.hasSessionCart())
+		{
+			initSessionCartFromCache();
+		}
 		try
 		{
 			filterChain.doFilter(httpRequest, httpResponse);
 		}
 		finally
 		{
-			if (touchSessionCart && cartService.hasSessionCart())
+			if (touchSessionCart)
 			{
-				final CartModel cart = cartService.getSessionCart();
-				if (null != cart)
+				setSessionCartToCache();
+			}
+		}
+	}
+
+	protected void setSessionCartToCache()
+	{
+		if (cartService.hasSessionCart())
+		{
+			final CartModel cart = cartService.getSessionCart();
+			if (null != cart)
+			{
+				final String cartKey = cartKeyGenerateStrategy.generateCartKey(cart);
+				final long before = System.currentTimeMillis();
+				redisTemplate.opsForValue().set(cartKey, modelService.getSource(cart));
+				if (LOGGER.isDebugEnabled())
 				{
-					redisTemplate.opsForValue().set(cartKeyGenerateStrategy.generateCartKey(cart), modelService.getSource(cart));
+					LOGGER.info("set session cart:" + cartKey + " use time:" + (System.currentTimeMillis() - before) + "ms");
 				}
+				sessionService.setAttribute(SESSION_CACHE_CART_KEY, cartKey);
+			}
+		}
+	}
+
+
+	protected void initSessionCartFromCache()
+	{
+		final String cartKey = sessionService.getAttribute(SESSION_CACHE_CART_KEY);
+		if (!StringUtils.isEmpty(cartKey))
+		{
+			final long before = System.currentTimeMillis();
+			final Cart cart = (Cart) redisTemplate.opsForValue().get(cartKey);
+			LOGGER.info("get session cart:" + cartKey + " use time:" + (System.currentTimeMillis() - before) + "ms");
+			if (null != cart)
+			{
+				cartService.setSessionCart(modelService.get(cart));
 			}
 		}
 	}
@@ -111,6 +154,14 @@ public class StoreSessionCartFilter extends GenericFilterBean
 	}
 
 
+	/**
+	 * @param sessionService
+	 *           the sessionService to set
+	 */
+	public void setSessionService(final SessionService sessionService)
+	{
+		this.sessionService = sessionService;
+	}
 
 
 }

@@ -37,6 +37,7 @@ public class CartSerializerStrategyImpl implements CartSerializerStrategy
 	private CartService cartService;
 	private ModelService modelService;
 
+
 	@Override
 	public void serializerSessionCart(final JaloSession jaloSession)
 	{

@@ -49,6 +49,7 @@
      <property name="cartSerializerStrategy" ref="cartSerializerStrategy"/>
 	</bean>
    <bean id="cartServiceAspect" class="com.accenture.aitp.cart.aspectj.CartServiceAspect"/>
+   <bean id="cookieHttpSessionStrategyAspect" class="com.accenture.aitp.cart.aspectj.CookieHttpSessionStrategyAspect" />
 
     <alias name="aitpPromotionActionService" alias="promotionActionService"/>
 	<bean id="aitpPromotionActionService" parent="defaultPromotionActionService" class="com.accenture.aitp.cart.service.impl.AitpPromotionActionService" />
@@ -79,25 +80,33 @@
 	    <aop:pointcut id="calculateCartLog"  expression="execution(public * *.*calculateCart*(..))"/>
 	    <aop:pointcut id="updatePromotionsLog"  expression="execution(public * *.*.updatePromotions*(..))"/>
 	    <aop:pointcut id="controllerLog"  expression="execution(public * com.accenture.aitp.storefront.controllers.*.*Controller.*(..))"/>
+	    <aop:pointcut id="cartSerializerLog" expression="execution(public * com.accenture.aitp.cart.strategy.impl.*.serializer*(..))" />
 	    
 	    <aop:aspect id="logAspect" ref="logAroundAdvice">  
             <aop:around pointcut-ref="calculateCartLog" method="doAround"/>
             <aop:around pointcut-ref="updatePromotionsLog" method="doAround"/>
            <aop:around pointcut-ref="controllerLog" method="doAround"/>
+           <aop:around pointcut-ref="cartSerializerLog" method="doAround"/>   
         </aop:aspect>  
 	  </aop:config>
     
-    <!-- 
-    <bean id="addSessionCartAfterNameListMergeDirective" depends-on="storefrontTenantDefaultFilterChainList" parent="listMergeDirective">
-		<property name="add" ref="lastBean" />
+    <bean id="storeSessionCartFilter" class="com.accenture.aitp.cart.filter.StoreSessionCartFilter">
+      <property name="redisTemplate" ref="redisCartTemplate" />
+      <property name="cartKeyGenerateStrategy" ref="cartKeyGenerateStrategy" />
+      <property name="cartService" ref="cartService" />
+      <property name="modelService" ref="modelService" />
+      <property name="sessionService" ref="sessionService" />
+    </bean>
+   <!-- 
+    <bean id="addSessionCartFilterAfterNameListMergeDirective" depends-on="defaultStorefrontTenantDefaultFilterChainList" parent="listMergeDirective">
+		<property name="add" ref="storeSessionCartFilter" />
 		<property name="afterBeanNames">
 			<list value-type="java.lang.String">
-				<value>hybrisSpringSessionFilter</value>
+				<value>storefrontSessionFilter</value>
 			</list>
 		</property>
 	</bean>
     -->
-    
    	<alias name="aitpCalculationService" alias="calculationService"/>
 	<bean id="aitpCalculationService" class="com.accenture.aitp.cart.service.order.impl.AitpCalculationService"
 			parent="defaultCalculationService">

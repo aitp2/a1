@@ -58,36 +58,36 @@
      	<property name="timeout" value="${redis.instance.pool.timeout}"/>
 	</bean>
 	 <!-- JdkSerialization -->
-	  <bean id="accenturejdkRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureJdkSerializationRedisSerializer"/>
+	  <bean id="accentureRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureJdkSerializationRedisSerializer"/>
 	 
 	  <!-- KryoSerialization  -->
-	  <bean id="accentureRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureKryoSerializationRedisSerializer"/>
+	  <bean id="accentureCartRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureKryoSerializationRedisSerializer"/>
 	 
 	    <!-- KryoSerialization  
 	  <bean id="accentureRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureFastJsonSerializationRedisSerializer"/>
        -->
 	 <bean id="cartSerializerStrategy" class="com.accenture.aitp.cart.strategy.impl.CartSerializerStrategyImpl">
-       <property name="redisTemplate" ref="redisCartTemplate"/>
+       <property name="redisTemplate" ref="redisTemplate"/>
        <property name="cartKeyGenerateStrategy" ref="cartKeyGenerateStrategy"/>
        <property name="cartService" ref="cartService"/>
        <property name="modelService" ref="modelService"/>  
     </bean>
-    
+    <!-- 
     <bean id="aitpRedisSerializer" class="com.accenture.aitp.cart.serialize.AitpRedisSerializer">
-     <property name="redisSerializer" ref="accenturejdkRedisSerializer"/>
+     <property name="redisSerializer" ref="accentureRedisSerializer"/>
      <property name="cartSerializerStrategy" ref="cartSerializerStrategy"/>
     </bean>
-    
+      -->
     <bean id="redisCartTemplate" class="org.springframework.data.redis.core.RedisTemplate">
 	    <property name="connectionFactory" ref="${redis.instance.jedisFactory}" />
 	     <property name="keySerializer">
 	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
 	    </property>
-	    <property name="valueSerializer" ref="accentureRedisSerializer" />
+	    <property name="valueSerializer" ref="accentureCartRedisSerializer" />
 	    <property name="hashKeySerializer">
 	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
 	    </property>
-	    <property name="hashValueSerializer" ref="accentureRedisSerializer" />
+	    <property name="hashValueSerializer" ref="accentureCartRedisSerializer" />
 	</bean>
 	
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
@@ -111,7 +111,7 @@
     <property name="sessionRepository" ref="sessionRepository"/>
     <property name="hybrisSessionRepositoryFactory" ref="defaultSessionRepositoryFactory" />
    </bean>
-    
+     
     <bean id="jalosession" class="de.hybris.platform.jalo.JaloSessionFactory">
 		<property name="targetClassName" value="com.accenture.aitp.cart.jalo.AitpCommerceJaloSession"/>
 	</bean>
