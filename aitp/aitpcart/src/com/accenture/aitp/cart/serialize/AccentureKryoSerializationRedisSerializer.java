@@ -30,7 +30,6 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 
 import com.accenture.aitp.cart.jalo.AitpInMemoryCart;
-import com.accenture.aitp.core.jalo.ApparelProduct;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.Serializer;
 import com.esotericsoftware.kryo.io.Input;
@@ -140,7 +139,6 @@ public class AccentureKryoSerializationRedisSerializer implements RedisSerialize
 			kryo.register(AitpInMemoryCart.class, new JavaSerializer());
 			kryo.register(InMemoryCartEntry.class, new JavaSerializer());
 
-			kryo.register(ApparelProduct.class, new JavaSerializer());
 			kryo.register(Unit.class, new JavaSerializer());
 			kryo.register(Customer.class, new JavaSerializer());
 			kryo.register(Currency.class, new JavaSerializer());

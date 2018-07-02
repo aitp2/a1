@@ -18,8 +18,7 @@
       <requires-extension name="promotionengineservices"/>
       <requires-extension name="commerceservices"/>
       <requires-extension name="couponservices"/>
-      <requires-extension name="aitpcore"/>
-     
+      <requires-extension name="libyphase2acb2bpromotion"/>
       <coremodule generated="true" manager="com.accenture.aitp.cart.jalo.AitpcartManager" packageroot="com.accenture.aitp.cart"/>
 
 			

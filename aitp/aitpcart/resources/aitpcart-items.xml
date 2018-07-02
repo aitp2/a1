@@ -49,5 +49,22 @@
           jaloclass="com.accenture.aitp.cart.jalo.CacheRuleBasedPotentialPromotionMessageAction"
           jaloonly="true" autocreate="true" generate="true" />
 
+       <itemtype code="CacheRuleBasedOrderEntryRebateAction" extends="RuleBasedOrderEntryRebateAction"
+          jaloclass="com.accenture.aitp.cart.jalo.CacheRuleBasedOrderEntryRebateAction"
+          jaloonly="true" autocreate="true" generate="true" />
+          
+       <itemtype code="CacheRuleBasedAdjustOrderEntryQuantityAction" extends="RuleBasedAdjustOrderEntryQuantityAction"
+          jaloclass="com.accenture.aitp.cart.jalo.CacheRuleBasedAdjustOrderEntryQuantityAction"
+          jaloonly="true" autocreate="true" generate="true" />
+          
+       <itemtype code="CacheRuleBasedSplitNormalEntryAction" extends="RuleBasedSplitNormalEntryAction"
+          jaloclass="com.accenture.aitp.cart.jalo.CacheRuleBasedSplitNormalEntryAction"
+          jaloonly="true" autocreate="true" generate="true" />
+          
+        <itemtype code="CacheLackFreeProductAction" extends="LackFreeProductAction"
+          jaloclass="com.accenture.aitp.cart.jalo.CacheLackFreeProductAction"
+          jaloonly="true" autocreate="true" generate="true" />
+
+
 	</itemtypes>
 </items>

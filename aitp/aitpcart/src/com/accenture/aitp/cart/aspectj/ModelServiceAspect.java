@@ -11,6 +11,7 @@
  */
 package com.accenture.aitp.cart.aspectj;
 
+import de.hybris.platform.core.Registry;
 import de.hybris.platform.couponservices.model.RuleBasedAddCouponActionModel;
 import de.hybris.platform.promotionengineservices.model.RuleBasedOrderAddProductActionModel;
 import de.hybris.platform.promotionengineservices.model.RuleBasedOrderAdjustTotalActionModel;
@@ -63,7 +64,7 @@ public class ModelServiceAspect
 
 
 	@Around("execution(* de.hybris.platform.servicelayer.internal.model.impl.*.create(..))")
-	public Object createAspect(final ProceedingJoinPoint joinPoint) throws Throwable
+	public Object create(final ProceedingJoinPoint joinPoint) throws Throwable
 	{
 		if (joinPoint.getArgs().length == 1)
 		{
@@ -80,9 +81,8 @@ public class ModelServiceAspect
 		return joinPoint.proceed();
 	}
 
-
 	@Around("execution(* de.hybris.platform.servicelayer.internal.model.impl.*.clone(..))")
-	public Object cloneAspect(final ProceedingJoinPoint joinPoint) throws Throwable
+	public Object clone(final ProceedingJoinPoint joinPoint) throws Throwable
 	{
 		if (joinPoint.getArgs().length == 1)
 		{
@@ -120,6 +120,26 @@ public class ModelServiceAspect
 	{
 		if (null == ModelServiceAspect.replaceClassMap)
 		{
+			ModelServiceAspect.replaceClassMap = initReplaceMap();
+		}
+
+		return ModelServiceAspect.replaceClassMap;
+	}
+
+	/**
+	 *
+	 * init the replace map class , if not bean config , create a new map
+	 */
+	public Map<Class, Class> initReplaceMap()
+	{
+		try
+		{
+
+			return (Map<Class, Class>) Registry.getApplicationContext().getBean("replaceClassMap");
+
+		}
+		catch (final Exception e)
+		{
 			final Map<Class, Class> replaceMap = new HashMap<>();
 			replaceMap.put(PromotionResultModel.class, AitpCachedPromotionResultModel.class);
 			replaceMap.put(RuleBasedOrderAdjustTotalActionModel.class, CacheRuleBasedOrderAdjustTotalActionModel.class);
@@ -131,19 +151,8 @@ public class ModelServiceAspect
 			replaceMap.put(RuleBasedPotentialPromotionMessageActionModel.class,
 					CacheRuleBasedPotentialPromotionMessageActionModel.class);
 			replaceMap.put(PromotionOrderEntryConsumedModel.class, CachedPromotionOrderEntryConsumedModel.class);
-			ModelServiceAspect.replaceClassMap = replaceMap;
+			return replaceMap;
 		}
-
-		return ModelServiceAspect.replaceClassMap;
-	}
-
-	/**
-	 * @param replaceClassMap
-	 *           the replaceClassMap to set
-	 */
-	public static void setReplaceClassMap(final Map<Class, Class> replaceClassMap)
-	{
-		ModelServiceAspect.replaceClassMap = replaceClassMap;
 	}
 
 

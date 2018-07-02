@@ -16,6 +16,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/promotionengineservices"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/commerceservices"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/couponservices"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/aitpcore"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/libyphase2acb2bpromotion"/>
 	<classpathentry kind="output" path="eclipsebin/notused"/>
 </classpath>

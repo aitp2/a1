@@ -11,60 +11,22 @@
  */
 package com.accenture.aitp.cart.factory.impl;
 
-import de.hybris.platform.servicelayer.web.session.HybrisSpringSessionRepositoryFactory;
-import de.hybris.platform.util.Config;
-
-import org.springframework.core.serializer.Deserializer;
-import org.springframework.session.SessionRepository;
-
-
 /**
  *
  */
-public class DefaultAitpSpringSessionRepositoryFactory implements HybrisSpringSessionRepositoryFactory
-{
-	private SessionRepository sessionRepository;
-
-	private HybrisSpringSessionRepositoryFactory hybrisSessionRepositoryFactory;
-
-	private static final String SAVED_SESSION_REDIS = "redisSession";
-
-	@Override
-	public SessionRepository createRepository(final Deserializer deSerializer, final String extension, final String contextRoot)
-	{
-		final String redisSession = Config.getParameter("spring.session." + extension + ".save");
-		if (SAVED_SESSION_REDIS.equals(redisSession))
-		{
-			return getSessionRepository();
-		}
-		return hybrisSessionRepositoryFactory.createRepository(deSerializer, extension, contextRoot);
-	}
-
-	/**
-	 * @return the sessionRepository
-	 */
-	public SessionRepository getSessionRepository()
-	{
-		return sessionRepository;
-	}
-
-	/**
-	 * @param sessionRepository
-	 *           the sessionRepository to set
-	 */
-	public void setSessionRepository(final SessionRepository sessionRepository)
-	{
-		this.sessionRepository = sessionRepository;
-	}
-
-	/**
-	 * @param hybrisSessionRepositoryFactory
-	 *           the hybrisSessionRepositoryFactory to set
-	 */
-	public void setHybrisSessionRepositoryFactory(final HybrisSpringSessionRepositoryFactory hybrisSessionRepositoryFactory)
-	{
-		this.hybrisSessionRepositoryFactory = hybrisSessionRepositoryFactory;
-	}
+public class DefaultAitpSpringSessionRepositoryFactory
+{ /*
+   * implements HybrisSpringSessionRepositoryFactory { private SessionRepository sessionRepository;
+   * 
+   * private HybrisSpringSessionRepositoryFactory hybrisSessionRepositoryFactory;
+   * 
+   * private static final String SAVED_SESSION_REDIS = "redisSession";
+   * 
+   * @Override public SessionRepository createRepository(final Deserializer deSerializer, final String extension, final
+   * String contextRoot) { final String redisSession = Config.getParameter("spring.session." + extension + ".save"); if
+   * (SAVED_SESSION_REDIS.equals(redisSession)) { return getSessionRepository(); } return
+   * hybrisSessionRepositoryFactory.createRepository(deSerializer, extension, contextRoot); }
+   */
 
 
 }

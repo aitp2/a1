@@ -17,8 +17,7 @@ import de.hybris.platform.ruleengineservices.rao.AbstractRuleActionRAO;
 
 import java.util.Collection;
 import java.util.Collections;
-
-import reactor.util.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 
 /**
