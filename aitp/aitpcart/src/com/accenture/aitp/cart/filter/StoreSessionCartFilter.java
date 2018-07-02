@@ -19,18 +19,24 @@ import de.hybris.platform.servicelayer.session.SessionService;
 import de.hybris.platform.util.Config;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.drools.core.util.StringUtils;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.GenericFilterBean;
 
 import com.accenture.aitp.cart.strategy.CartKeyGenerateStrategy;
+
+import reactor.util.CollectionUtils;
 
 
 /**
@@ -48,6 +54,9 @@ public class StoreSessionCartFilter extends GenericFilterBean
 	private ModelService modelService;
 	private SessionService sessionService;
 
+	private List<String> cartOperationUrls;
+	private PathMatcher pathMatcher;
+
 	@Override
 	public void doFilter(final ServletRequest httpRequest, final ServletResponse httpResponse, final FilterChain filterChain)
 			throws IOException, ServletException
@@ -62,7 +71,7 @@ public class StoreSessionCartFilter extends GenericFilterBean
 		}
 		finally
 		{
-			if (touchSessionCart)
+			if (touchSessionCart && isCartOperationUrl((HttpServletRequest) httpRequest))
 			{
 				setSessionCartToCache();
 			}
@@ -101,6 +110,33 @@ public class StoreSessionCartFilter extends GenericFilterBean
 		}
 	}
 
+	protected boolean isCartOperationUrl(final HttpServletRequest request)
+	{
+		if (CollectionUtils.isEmpty(cartOperationUrls))
+		{
+			return true;
+		}
+		final String servletPath = request.getServletPath();
+
+		for (final String input : cartOperationUrls)
+		{
+			if (pathMatcher.match(input, servletPath))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	/**
+	 * @param cartOperationUrls
+	 *           the cartOperationUrls to set
+	 */
+	public void setCartOperationUrls(final List<String> cartOperationUrls)
+	{
+		this.cartOperationUrls = cartOperationUrls;
+	}
 
 	@Override
 	public void afterPropertiesSet() throws ServletException
@@ -160,5 +196,9 @@ public class StoreSessionCartFilter extends GenericFilterBean
 		this.sessionService = sessionService;
 	}
 
-
+	@Required
+	public void setPathMatcher(final PathMatcher pathMatcher)
+	{
+		this.pathMatcher = pathMatcher;
+	}
 }
