@@ -75,13 +75,10 @@
 	  </aop:config>
     
     <bean id="storeSessionCartFilter" class="com.accenture.aitp.cart.filter.StoreSessionCartFilter">
-      <property name="redisTemplate" ref="redisCartTemplate" />
-      <property name="cartKeyGenerateStrategy" ref="cartKeyGenerateStrategy" />
       <property name="cartService" ref="cartService" />
-      <property name="modelService" ref="modelService" />
-      <property name="sessionService" ref="sessionService" />
       <property name="pathMatcher" ref="cartPathMatcher"/>
       <property name="cartOperationUrls" ref="cartOperationUrls" />
+      <property name="cartSerializerStrategy" ref="cartSerializerStrategy"/>
     </bean>
     
    <bean id="cartPathMatcher" class="org.springframework.util.AntPathMatcher" />
@@ -124,8 +121,9 @@
 	</util:map>
 	
 	<util:list id="cartOperationUrls" value-type="java.lang.String" >
-	  <value>/**/cart/*</value>
-	  <value>/**/checkout/*</value>
+	  <value>/**/cart/**</value>
+	  <value>/**/checkout/**</value>
+	  <value>/**/j_spring_security_check</value>
 	</util:list>
     
 </beans>

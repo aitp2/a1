@@ -47,7 +47,7 @@ public class AitpRedisSerializer implements RedisSerializer<Object>
 		if (object instanceof JaloSession && null == serializer.get())
 		{
 			serializer.set(Boolean.TRUE);
-			cartSerializerStrategy.serializerSessionCart((JaloSession) object);
+			cartSerializerStrategy.serializerCart((JaloSession) object);
 		}
 		return getRedisSerializer().serialize(object);
 	}

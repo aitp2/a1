@@ -15,7 +15,6 @@ import de.hybris.platform.core.model.user.UserModel;
 
 import java.util.Collections;
 
-import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -31,16 +30,14 @@ public class CommerceCartDaoAspect
 {
 	private CartSerializerStrategy cartSerializerStrategy;
 
-	private static final Logger logger = Logger.getLogger(CommerceCartDaoAspect.class);
-
-	@Around("execution(* de.hybris.platform.commerceservices.order.dao.*.getCartsForSiteAndUser(..))")
+	@Around("execution(* de.hybris.platform.commerceservices.order.dao.impl.*.getCartsForSiteAndUser(..))")
 	public Object getCartsForSiteAndUser(final ProceedingJoinPoint joinPoint) throws Throwable
 	{
 		return Collections.singletonList(processHandler(joinPoint, 1));
 
 	}
 
-	@Around("execution(* de.hybris.platform.commerceservices.order.dao.*.getCartForGuidAndSiteAndUser(..))")
+	@Around("execution(* de.hybris.platform.commerceservices.order.dao.impl.*.getCartForGuidAndSiteAndUser(..))")
 	public Object getCartForGuidAndSiteAndUser(final ProceedingJoinPoint joinPoint) throws Throwable
 	{
 		final Object[] args = joinPoint.getArgs();
@@ -57,7 +54,7 @@ public class CommerceCartDaoAspect
 		return joinPoint.proceed();
 	}
 
-	@Around("execution(* de.hybris.platform.commerceservices.order.dao.*.getCartForGuidAndSite(..))")
+	@Around("execution(* de.hybris.platform.commerceservices.order.dao.impl.*.getCartForGuidAndSite(..))")
 	public Object getCartForGuidAndSite(final ProceedingJoinPoint joinPoint) throws Throwable
 	{
 		final Object[] args = joinPoint.getArgs();
@@ -72,14 +69,14 @@ public class CommerceCartDaoAspect
 		return joinPoint.proceed();
 	}
 
-	@Around("execution(* de.hybris.platform.commerceservices.order.dao.*.getCartForCodeAndUser(..))")
+	@Around("execution(* de.hybris.platform.commerceservices.order.dao.impl.*.getCartForCodeAndUser(..))")
 	public Object getCartForCodeAndUser(final ProceedingJoinPoint joinPoint) throws Throwable
 	{
 		return processHandler(joinPoint, 1);
 
 	}
 
-	@Around("execution(* de.hybris.platform.commerceservices.order.dao.*.getCartForSiteAndUser(..))")
+	@Around("execution(* de.hybris.platform.commerceservices.order.dao.impl.*.getCartForSiteAndUser(..))")
 	public Object getCartForSiteAndUser(final ProceedingJoinPoint joinPoint) throws Throwable
 	{
 		return processHandler(joinPoint, 1);

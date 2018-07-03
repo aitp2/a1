@@ -19,6 +19,10 @@ import de.hybris.platform.order.CartService;
 import de.hybris.platform.order.impl.DefaultCartService;
 import de.hybris.platform.servicelayer.model.ModelService;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
+import org.drools.core.util.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.accenture.aitp.cart.strategy.CartKeyGenerateStrategy;
@@ -30,6 +34,9 @@ import com.accenture.aitp.cart.strategy.CartSerializerStrategy;
  */
 public class CartSerializerStrategyImpl implements CartSerializerStrategy
 {
+	private static final Logger LOGGER = Logger.getLogger(CartSerializerStrategyImpl.class);
+	private static final String SESSION_CACHE_CART_KEY = "sessionCartCacheKey";
+
 	//private static final int DEFAULT_CART_MAX_AGE = 2419200;
 	//private static final int DEFAULT_ANONYMOUS_CART_MAX_AGE = 1209600;
 	private RedisTemplate redisTemplate;
@@ -39,7 +46,7 @@ public class CartSerializerStrategyImpl implements CartSerializerStrategy
 
 
 	@Override
-	public void serializerSessionCart(final JaloSession jaloSession)
+	public void serializerCart(final JaloSession jaloSession)
 	{
 		final Object object = jaloSession.getAttribute(DefaultCartService.SESSION_CART_PARAMETER_NAME);
 		if (null != object)
@@ -49,6 +56,56 @@ public class CartSerializerStrategyImpl implements CartSerializerStrategy
 		}
 	}
 
+	@Override
+	public void initSessionCart(final HttpServletRequest httpRequest)
+	{
+		final String cartKey = (String) httpRequest.getSession().getAttribute(SESSION_CACHE_CART_KEY);
+		if (!StringUtils.isEmpty(cartKey))
+		{
+			final long before = System.currentTimeMillis();
+			final Cart cart = (Cart) getRedisTemplate().opsForValue().get(cartKey);
+			if (LOGGER.isDebugEnabled())
+			{
+				LOGGER.info("get session cart:" + cartKey + " use time:" + (System.currentTimeMillis() - before) + "ms");
+			}
+			if (null != cart)
+			{
+				cartService.setSessionCart(modelService.get(cart));
+			}
+			else
+			{
+				httpRequest.getSession().removeAttribute(SESSION_CACHE_CART_KEY);
+			}
+		}
+	}
+
+
+	@Override
+	public void serializerCart(final HttpServletRequest httpRequest, final CartModel cartModel)
+	{
+		if (null != cartModel)
+		{
+			final String cartKey = cartKeyGenerateStrategy.generateCartKey(cartModel);
+			final long before = System.currentTimeMillis();
+			getRedisTemplate().opsForValue().set(cartKey, modelService.getSource(cartModel));
+			httpRequest.getSession().setAttribute(SESSION_CACHE_CART_KEY, cartKey);
+			if (LOGGER.isDebugEnabled())
+			{
+				LOGGER.info("set session cart:" + cartKey + " use time:" + (System.currentTimeMillis() - before) + "ms");
+			}
+		}
+	}
+
+	@Override
+	public void removeSerializerCart(final CartModel cart)
+	{
+		if (null != cart)
+		{
+			final String cartKey = cartKeyGenerateStrategy.generateCartKey(cart);
+			getRedisTemplate().delete(cartKey);
+		}
+
+	}
 
 	@Override
 	public CartModel queryCartByUser(final UserModel user)
@@ -139,6 +196,4 @@ public class CartSerializerStrategyImpl implements CartSerializerStrategy
 	{
 		this.modelService = modelService;
 	}
-
-
 }
