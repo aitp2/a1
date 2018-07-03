@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	
+	 <!-- JdkSerialization -->
+	<bean id="accentureRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureJdkSerializationRedisSerializer"/>
+	 
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+	    <property name="connectionFactory" ref="${redis.instance.jedisFactory}" />
+	     <property name="keySerializer">
+	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+	    </property>
+	    <property name="valueSerializer" ref="accentureRedisSerializer" />
+	    <property name="hashKeySerializer">
+	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+	    </property>
+	    <property name="hashValueSerializer" ref="accentureRedisSerializer" />
+	</bean>
+	
+    <bean id="sessionRepository" class="org.springframework.session.data.redis.RedisOperationsSessionRepository">
+    <constructor-arg ref="redisTemplate" />
+   </bean>
+   
+   <alias name="defaultAitpSpringSessionRepositoryFactory" alias="sessionRepositoryFactory"/>
+   <bean id="defaultAitpSpringSessionRepositoryFactory" class="com.accenture.aitp.cart.factory.impl.DefaultAitpSpringSessionRepositoryFactory">
+    <property name="sessionRepository" ref="sessionRepository"/>
+    <property name="hybrisSessionRepositoryFactory" ref="defaultSessionRepositoryFactory" />
+   </bean>
+     
+</beans>
