@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+    
+   <util:map id="replaceClassMap" key-type="java.lang.Class" value-type="java.lang.Class">
+	   <entry key="de.hybris.platform.promotions.model.PromotionResultModel" value="com.accenture.aitp.cart.model.AitpCachedPromotionResultModel"/>
+	  <entry key="de.hybris.platform.promotions.model.PromotionOrderEntryConsumedModel" value="de.hybris.platform.promotions.model.CachedPromotionOrderEntryConsumedModel"/>
+	  <entry key="de.hybris.platform.promotionengineservices.model.RuleBasedOrderAddProductActionModel" value="com.accenture.aitp.cart.model.CacheRuleBasedOrderAddProductActionModel"/>
+	  <entry key="de.hybris.platform.promotionengineservices.model.RuleBasedOrderAdjustTotalActionModel" value="com.accenture.aitp.cart.model.CacheRuleBasedOrderAdjustTotalActionModel"/>
+	  <entry key="de.hybris.platform.promotionengineservices.model.RuleBasedOrderChangeDeliveryModeActionModel" value="com.accenture.aitp.cart.model.CacheRuleBasedOrderChangeDeliveryModeActionModel"/>
+	  <entry key="de.hybris.platform.couponservices.model.RuleBasedAddCouponActionModel" value="com.accenture.aitp.cart.model.CacheRuleRuleBasedAddCouponActionModel"/>
+	  <entry key="de.hybris.platform.promotionengineservices.model.RuleBasedOrderEntryAdjustActionModel" value="com.accenture.aitp.cart.model.CacheRuleBasedOrderEntryAdjustActionModel"/>
+	  <entry key="de.hybris.platform.promotionengineservices.model.RuleBasedPotentialPromotionMessageActionModel" value="com.accenture.aitp.cart.model.CacheRuleBasedPotentialPromotionMessageActionModel"/>
+	</util:map>
+	
+	<util:list id="cartOperationUrls" value-type="java.lang.String" >
+	  <value>/**/cart/**</value>
+	  <value>/**/checkout/**</value>
+	  <value>/**/j_spring_security_check</value>
+	</util:list>
+    
+</beans>

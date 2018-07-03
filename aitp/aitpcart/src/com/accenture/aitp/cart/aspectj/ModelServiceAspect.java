@@ -92,7 +92,10 @@ public class ModelServiceAspect
 			final ModelService modelService = (ModelService) joinPoint.getTarget();
 			if (replaceClass != null)
 			{
-				logger.info("super clone replace classs from [" + obj + "] to [" + replaceClass + "]");
+				if (logger.isDebugEnabled())
+				{
+					logger.info("super clone replace classs from [" + obj + "] to [" + replaceClass + "]");
+				}
 				return modelService.clone(obj, replaceClass);
 			}
 		}

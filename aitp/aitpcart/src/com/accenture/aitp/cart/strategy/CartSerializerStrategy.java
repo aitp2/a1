@@ -15,14 +15,23 @@ import de.hybris.platform.core.model.order.CartModel;
 import de.hybris.platform.core.model.user.UserModel;
 import de.hybris.platform.jalo.JaloSession;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 /**
- *
+ * @desc cart serializer and derializer stratrgy
+ * @author mingming.wang
  */
 public interface CartSerializerStrategy
 {
 
-	void serializerSessionCart(JaloSession jaloSession);
+	void serializerCart(JaloSession jaloSession);
+
+	void serializerCart(HttpServletRequest httpRequest, CartModel cart);
+
+	void removeSerializerCart(CartModel cart);
+
+	void initSessionCart(HttpServletRequest httpRequest);
 
 	CartModel queryCartByUser(UserModel user);
 

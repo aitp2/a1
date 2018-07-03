@@ -11,50 +11,49 @@
  */
 package com.accenture.aitp.cart.filter;
 
-import de.hybris.platform.core.model.order.CartModel;
-import de.hybris.platform.jalo.order.Cart;
 import de.hybris.platform.order.CartService;
-import de.hybris.platform.servicelayer.model.ModelService;
-import de.hybris.platform.servicelayer.session.SessionService;
 import de.hybris.platform.util.Config;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
-import org.drools.core.util.StringUtils;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.beans.factory.annotation.Required;
+import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.GenericFilterBean;
 
-import com.accenture.aitp.cart.strategy.CartKeyGenerateStrategy;
+import com.accenture.aitp.cart.strategy.CartSerializerStrategy;
+
+import reactor.util.CollectionUtils;
 
 
 /**
+ * filter serializer session cart by the cartSerializerStrategy 1. before the next fiter, init session cart from
+ * serializer cart via cartSerializerStrategy 2. do filer chain 3. serializer session cart via cartSerializerStrategy
  *
+ * @author mingming.wang
  */
 public class StoreSessionCartFilter extends GenericFilterBean
 {
-	private static final Logger LOGGER = Logger.getLogger(StoreSessionCartFilter.class);
-	private static final String SESSION_CACHE_CART_KEY = "sessionCartCacheKey";
-	private boolean touchSessionCart;
-	private RedisTemplate redisTemplate;
-	private CartKeyGenerateStrategy cartKeyGenerateStrategy;
-
+	private static boolean touchSessionCart;
 	private CartService cartService;
-	private ModelService modelService;
-	private SessionService sessionService;
+	private CartSerializerStrategy cartSerializerStrategy;
+
+	private List<String> cartOperationUrls;
+	private PathMatcher pathMatcher;
 
 	@Override
 	public void doFilter(final ServletRequest httpRequest, final ServletResponse httpResponse, final FilterChain filterChain)
 			throws IOException, ServletException
 	{
-		if (touchSessionCart && !cartService.hasSessionCart())
+		if (touchSessionCart && !getCartService().hasSessionCart())
 		{
-			initSessionCartFromCache();
+			getCartSerializerStrategy().initSessionCart((HttpServletRequest) httpRequest);
 		}
 		try
 		{
@@ -62,73 +61,66 @@ public class StoreSessionCartFilter extends GenericFilterBean
 		}
 		finally
 		{
-			if (touchSessionCart)
+			if (touchSessionCart && getCartService().hasSessionCart() && isCartOperationUrl((HttpServletRequest) httpRequest))
 			{
-				setSessionCartToCache();
+				getCartSerializerStrategy().serializerCart((HttpServletRequest) httpRequest, getCartService().getSessionCart());
 			}
 		}
 	}
 
-	protected void setSessionCartToCache()
+	protected boolean isCartOperationUrl(final HttpServletRequest request)
 	{
-		if (cartService.hasSessionCart())
+		if (CollectionUtils.isEmpty(cartOperationUrls))
 		{
-			final CartModel cart = cartService.getSessionCart();
-			if (null != cart)
+			return true;
+		}
+		final String servletPath = request.getServletPath();
+
+		for (final String input : cartOperationUrls)
+		{
+			if (pathMatcher.match(input, servletPath))
 			{
-				final String cartKey = cartKeyGenerateStrategy.generateCartKey(cart);
-				final long before = System.currentTimeMillis();
-				redisTemplate.opsForValue().set(cartKey, modelService.getSource(cart));
-				LOGGER.info("set session cart:" + cartKey + " use time:" + (System.currentTimeMillis() - before) + "ms");
-				sessionService.setAttribute(SESSION_CACHE_CART_KEY, cartKey);
+				return true;
 			}
 		}
+		return false;
 	}
 
 
-	protected void initSessionCartFromCache()
+	/**
+	 * @return the cartSerializerStrategy
+	 */
+	public CartSerializerStrategy getCartSerializerStrategy()
 	{
-		final String cartKey = sessionService.getAttribute(SESSION_CACHE_CART_KEY);
-		if (!StringUtils.isEmpty(cartKey))
-		{
-			final long before = System.currentTimeMillis();
-			final Cart cart = (Cart) redisTemplate.opsForValue().get(cartKey);
-			LOGGER.info("get session cart:" + cartKey + " use time:" + (System.currentTimeMillis() - before) + "ms");
-			if (null != cart)
-			{
-				cartService.setSessionCart(modelService.get(cart));
-			}
-		}
+		return cartSerializerStrategy;
 	}
 
+	/**
+	 * @param cartSerializerStrategy
+	 *           the cartSerializerStrategy to set
+	 */
+	public void setCartSerializerStrategy(final CartSerializerStrategy cartSerializerStrategy)
+	{
+		this.cartSerializerStrategy = cartSerializerStrategy;
+	}
+
+	/**
+	 * @param cartOperationUrls
+	 *           the cartOperationUrls to set
+	 */
+	public void setCartOperationUrls(final List<String> cartOperationUrls)
+	{
+		this.cartOperationUrls = cartOperationUrls;
+	}
 
 	@Override
 	public void afterPropertiesSet() throws ServletException
 	{
 		super.afterPropertiesSet();
-		this.touchSessionCart = Config.getBoolean("redis.session.cart.support", false);
+		StoreSessionCartFilter.touchSessionCart = Config.getBoolean("redis.session.cart.support", false);
 
 	}
 
-
-	/**
-	 * @param redisTemplate
-	 *           the redisTemplate to set
-	 */
-	public void setRedisTemplate(final RedisTemplate redisTemplate)
-	{
-		this.redisTemplate = redisTemplate;
-	}
-
-
-	/**
-	 * @param cartKeyGenerateStrategy
-	 *           the cartKeyGenerateStrategy to set
-	 */
-	public void setCartKeyGenerateStrategy(final CartKeyGenerateStrategy cartKeyGenerateStrategy)
-	{
-		this.cartKeyGenerateStrategy = cartKeyGenerateStrategy;
-	}
 
 
 	/**
@@ -141,23 +133,19 @@ public class StoreSessionCartFilter extends GenericFilterBean
 	}
 
 
-	/**
-	 * @param modelService
-	 *           the modelService to set
-	 */
-	public void setModelService(final ModelService modelService)
+
+	@Required
+	public void setPathMatcher(final PathMatcher pathMatcher)
 	{
-		this.modelService = modelService;
+		this.pathMatcher = pathMatcher;
 	}
 
-
 	/**
-	 * @param sessionService
-	 *           the sessionService to set
+	 * @return the cartService
 	 */
-	public void setSessionService(final SessionService sessionService)
+	public CartService getCartService()
 	{
-		this.sessionService = sessionService;
+		return cartService;
 	}
 
 

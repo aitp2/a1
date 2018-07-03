@@ -11,12 +11,15 @@
  */
 package com.accenture.aitp.cart.aspectj;
 
+import de.hybris.platform.core.Registry;
 import de.hybris.platform.core.model.order.CartModel;
 import de.hybris.platform.order.CartService;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+
+import com.accenture.aitp.cart.strategy.CartSerializerStrategy;
 
 
 /**
@@ -37,6 +40,21 @@ public class CartServiceAspect
 			final CartModel sessionCart = cartService.getSessionCart();
 			cartService.removeSessionCart();
 			cartService.setSessionCart(sessionCart);
+		}
+
+	}
+
+	@Around("execution(* de.hybris.platform.order.impl.*.removeSessionCart(..))")
+	public void removeSessionCart(final ProceedingJoinPoint joinPoint) throws Throwable
+	{
+		final CartService cartService = (CartService) joinPoint.getTarget();
+		if (cartService.hasSessionCart())
+		{
+			final CartModel cart = cartService.getSessionCart();
+			final CartSerializerStrategy cartSerializerStrategy = (CartSerializerStrategy) Registry.getApplicationContext()
+					.getBean("cartSerializerStrategy");
+			cartSerializerStrategy.removeSerializerCart(cart);
+			joinPoint.proceed();
 		}
 
 	}

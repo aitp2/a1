@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	  <!-- KryoSerialization  -->
+	  <bean id="accentureCartRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureKryoSerializationRedisSerializer"/>
+	 
+	    <!-- KryoSerialization  
+	  <bean id="accentureRedisSerializer" class="com.accenture.aitp.cart.serialize.AccentureFastJsonSerializationRedisSerializer"/>
+       -->
+	 <bean id="cartSerializerStrategy" class="com.accenture.aitp.cart.strategy.impl.CartSerializerStrategyImpl">
+       <property name="redisTemplate" ref="redisCartTemplate"/>
+       <property name="cartKeyGenerateStrategy" ref="cartKeyGenerateStrategy"/>
+       <property name="cartService" ref="cartService"/>
+       <property name="modelService" ref="modelService"/>  
+    </bean>
+    <!-- 
+    <bean id="aitpRedisSerializer" class="com.accenture.aitp.cart.serialize.AitpRedisSerializer">
+     <property name="redisSerializer" ref="accentureRedisSerializer"/>
+     <property name="cartSerializerStrategy" ref="cartSerializerStrategy"/>
+    </bean>
+      -->
+    <bean id="redisCartTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+	    <property name="connectionFactory" ref="${redis.instance.jedisFactory}" />
+	     <property name="keySerializer">
+	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+	    </property>
+	    <property name="valueSerializer" ref="accentureCartRedisSerializer" />
+	    <property name="hashKeySerializer">
+	    <bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+	    </property>
+	    <property name="hashValueSerializer" ref="accentureCartRedisSerializer" />
+	</bean>
+	
+    <bean id="jalosession" class="de.hybris.platform.jalo.JaloSessionFactory">
+		<property name="targetClassName" value="com.accenture.aitp.cart.jalo.AitpCommerceJaloSession"/>
+	</bean>
+	
+</beans>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:component-scan base-package="com.accenture.aitp.cart" />
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+    	
+   <bean id="modelServiceAspect" class="com.accenture.aitp.cart.aspectj.ModelServiceAspect" />
+			
+   <bean id="extendedOrderDaoAspect" class="com.accenture.aitp.cart.aspectj.ExtendedOrderDaoAspect" />
+   <bean id="commerceCartDaoAspect" class="com.accenture.aitp.cart.aspectj.CommerceCartDaoAspect">
+     <property name="cartSerializerStrategy" ref="cartSerializerStrategy"/>
+	</bean>
+   <bean id="cartServiceAspect" class="com.accenture.aitp.cart.aspectj.CartServiceAspect"/>
+    <alias name="aitpPromotionActionService" alias="promotionActionService"/>
+	<bean id="aitpPromotionActionService" parent="defaultPromotionActionService" class="com.accenture.aitp.cart.service.impl.AitpPromotionActionService" />
+
+
+   <!-- use the jalo replace the override impe service -->
+   <!-- 
+    <alias name="aitpPromotionEngineService" alias="promotionEngineService"/>
+    <bean id="aitpPromotionEngineService" class="com.accenture.aitp.cart.service.impl.AitpPromotionEngineService" parent="defaultPromotionEngineService" />
+ -->
+    <util:list id="aitpRuleActionHandlerList">
+        <bean id="aitpRuleActionMetadataHandler" class="com.accenture.aitp.cart.aspectj.AitpRuleActionMetadataHandler"/>
+    </util:list>
+	
+    <bean id="aitpRuleActionMetadataHandlersMergeDirective" depends-on="ruleActionMetadataHandlers" parent="mapMergeDirective" >
+		<property name="key" value="ruleCode"/>
+		<property name="value" ref="aitpRuleActionHandlerList"/>
+	</bean>
+    <alias name="cartKeyGenerateStrategyImpl" alias="cartKeyGenerateStrategy"/>
+    <bean id="cartKeyGenerateStrategyImpl" class="com.accenture.aitp.cart.strategy.impl.CartKeyGenerateStrategyImpl">
+     <property name="modelService" ref="modelService"/>
+     <property name="userService" ref="userService"/>
+    </bean>
+    
+     <bean id="logAroundAdvice" class="com.accenture.aitp.cart.aspectj.LogAroundAdvice" />
+	
+	  <aop:config>
+	    <aop:pointcut id="calculateCartLog"  expression="execution(public * *.*calculateCart*(..))"/>
+	    <aop:pointcut id="updatePromotionsLog"  expression="execution(public * *.*.updatePromotions*(..))"/>
+	    <aop:pointcut id="controllerLog"  expression="execution(public * com.accenture.aitp.storefront.controllers.*.*Controller.*(..))"/>
+	    <aop:pointcut id="cartSerializerLog" expression="execution(public * com.accenture.aitp.cart.strategy.impl.*.serializer*(..))" />
+	    
+	    <aop:aspect id="logAspect" ref="logAroundAdvice">  
+            <aop:around pointcut-ref="calculateCartLog" method="doAround"/>
+            <aop:around pointcut-ref="updatePromotionsLog" method="doAround"/>
+           <aop:around pointcut-ref="controllerLog" method="doAround"/>
+           <aop:around pointcut-ref="cartSerializerLog" method="doAround"/>   
+        </aop:aspect>  
+	  </aop:config>
+    
+    <bean id="storeSessionCartFilter" class="com.accenture.aitp.cart.filter.StoreSessionCartFilter">
+      <property name="cartService" ref="cartService" />
+      <property name="pathMatcher" ref="cartPathMatcher"/>
+      <property name="cartOperationUrls" ref="cartOperationUrls" />
+      <property name="cartSerializerStrategy" ref="cartSerializerStrategy"/>
+    </bean>
+    
+   <bean id="cartPathMatcher" class="org.springframework.util.AntPathMatcher" />
+    
+   <!-- 
+    <bean id="addSessionCartFilterAfterNameListMergeDirective" depends-on="defaultStorefrontTenantDefaultFilterChainList" parent="listMergeDirective">
+		<property name="add" ref="storeSessionCartFilter" />
+		<property name="afterBeanNames">
+			<list value-type="java.lang.String">
+				<value>storefrontSessionFilter</value>
+			</list>
+		</property>
+	</bean>
+    -->
+   	<alias name="aitpCalculationService" alias="calculationService"/>
+	<bean id="aitpCalculationService" class="com.accenture.aitp.cart.service.order.impl.AitpCalculationService"
+			parent="defaultCalculationService">
+		<property name="findTaxesStrategies" ref="taxesStrategiesFinderList"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="findDeliveryCostStrategy" ref="findDeliveryCostStrategy"/>
+		<property name="findPaymentCostStrategy" ref="findPaymentCostStrategy"/>
+	</bean>
+	
+	<alias name="aitpFindPaymentCostStrategy" alias="findPaymentCostStrategy"/>
+	<bean id="aitpFindPaymentCostStrategy"
+			class="com.accenture.aitp.cart.service.order.strategies.calculation.impl.AitpFindPaymentCostStrategy"
+			parent="defaultFindPaymentCostStrategy">
+		<property name="configurationService" ref="configurationService"/>
+	</bean>	
+    
+</beans>

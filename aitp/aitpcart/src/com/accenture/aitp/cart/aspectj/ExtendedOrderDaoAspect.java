@@ -44,7 +44,6 @@ public class ExtendedOrderDaoAspect
 		{
 			final CartService cartService = (CartService) Registry.getApplicationContext().getBean("cartService");
 			final boolean hasSessionCart = cartService.hasSessionCart();
-			logger.info("ExtendedOrderDaoAspect interceptory hasSession cart:" + hasSessionCart);
 			if (hasSessionCart)
 			{
 				final CartModel cartModel = cartService.getSessionCart();
