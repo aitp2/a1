@@ -1,13 +1,12 @@
 <!DOCTYPE aspectj PUBLIC "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
 <aspectj>
 	<weaver options="-XnoInline -Xset:weaveJavaPackages=true">
-	    <include within="de.hybris.platform.servicelayer.internal.model.impl.*"/>
-	    <include within="de.hybris.platform.promotionengineservices.order.dao.impl.DefaultExtendedOrderDao" />
-	    <include within="de.hybris.platform.commerceservices.order.dao.*" />
-	    <include within="de.hybris.platform.order.impl.*" />
-	    <include within="de.hybris.platform.promotionengineservices.promotionengine.impl.*"/>
-	    <include within="com.accenture.aitp.cart.aspectj.*"/>
-	    
+	 <include within="de.hybris.platform.order.impl.*" />
+	 <include within="de.hybris.platform.servicelayer.internal.model.impl.*"/>
+	 <include within="de.hybris.platform.commerceservices.order.dao.impl.*"/>
+	  <include within="de.hybris.platform.promotionengineservices.promotionengine.impl.*"/>
+	  <include within="de.hybris.platform.promotionengineservices.order.dao.impl.DefaultExtendedOrderDao" />
+	  <include within="com.accenture.aitp.cart.aspectj.*"/>
 	</weaver>
 	<aspects>
 	   <aspect name="com.accenture.aitp.cart.aspectj.ModelServiceAspect" />
