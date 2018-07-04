@@ -6,6 +6,7 @@
 	 <include within="de.hybris.platform.commerceservices.order.dao.impl.*"/>
 	  <include within="de.hybris.platform.promotionengineservices.promotionengine.impl.*"/>
 	  <include within="de.hybris.platform.promotionengineservices.order.dao.impl.DefaultExtendedOrderDao" />
+	  <include within="com.liby.phase2.ac.b2b.promotion.service.impl.*"/>
 	  <include within="com.accenture.aitp.cart.aspectj.*"/>
 	</weaver>
 	<aspects>
