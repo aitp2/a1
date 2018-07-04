@@ -29,9 +29,7 @@
    <bean id="modelServiceAspect" class="com.accenture.aitp.cart.aspectj.ModelServiceAspect" />
 			
    <bean id="extendedOrderDaoAspect" class="com.accenture.aitp.cart.aspectj.ExtendedOrderDaoAspect" />
-   <bean id="commerceCartDaoAspect" class="com.accenture.aitp.cart.aspectj.CommerceCartDaoAspect">
-     <property name="cartSerializerStrategy" ref="cartSerializerStrategy"/>
-	</bean>
+   <bean id="commerceCartDaoAspect" class="com.accenture.aitp.cart.aspectj.CommerceCartDaoAspect"/>
    <bean id="cartServiceAspect" class="com.accenture.aitp.cart.aspectj.CartServiceAspect"/>
     <alias name="aitpPromotionActionService" alias="promotionActionService"/>
 	<bean id="aitpPromotionActionService" parent="defaultPromotionActionService" class="com.accenture.aitp.cart.service.impl.AitpPromotionActionService" />
