@@ -19,8 +19,11 @@ import de.hybris.platform.order.CartService;
 import de.hybris.platform.order.impl.DefaultCartService;
 import de.hybris.platform.servicelayer.model.ModelService;
 
+import java.util.Collections;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.drools.core.util.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -87,6 +90,12 @@ public class CartSerializerStrategyImpl implements CartSerializerStrategy
 		{
 			final String cartKey = cartKeyGenerateStrategy.generateCartKey(cartModel);
 			final long before = System.currentTimeMillis();
+			// if the entries is empty and promotion result is not empty, clear the promotion result
+			if (CollectionUtils.isEmpty(cartModel.getEntries()) && CollectionUtils.isNotEmpty(cartModel.getAllPromotionResults()))
+			{
+				cartModel.setAllPromotionResults(Collections.EMPTY_SET);
+				modelService.save(cartModel);
+			}
 			getRedisTemplate().opsForValue().set(cartKey, modelService.getSource(cartModel));
 			httpRequest.getSession().setAttribute(SESSION_CACHE_CART_KEY, cartKey);
 			if (LOGGER.isDebugEnabled())
