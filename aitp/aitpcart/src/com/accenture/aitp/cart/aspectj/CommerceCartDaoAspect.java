@@ -11,6 +11,7 @@
  */
 package com.accenture.aitp.cart.aspectj;
 
+import de.hybris.platform.core.Registry;
 import de.hybris.platform.core.model.user.UserModel;
 
 import java.util.Collections;
@@ -28,7 +29,6 @@ import com.accenture.aitp.cart.strategy.CartSerializerStrategy;
 @Aspect
 public class CommerceCartDaoAspect
 {
-	private CartSerializerStrategy cartSerializerStrategy;
 
 	@Around("execution(* de.hybris.platform.commerceservices.order.dao.impl.*.getCartsForSiteAndUser(..))")
 	public Object getCartsForSiteAndUser(final ProceedingJoinPoint joinPoint) throws Throwable
@@ -101,17 +101,7 @@ public class CommerceCartDaoAspect
 	 */
 	public CartSerializerStrategy getCartSerializerStrategy()
 	{
-		return cartSerializerStrategy;
+		return (CartSerializerStrategy) Registry.getApplicationContext().getBean("cartSerializerStrategy");
 	}
-
-	/**
-	 * @param cartSerializerStrategy
-	 *           the cartSerializerStrategy to set
-	 */
-	public void setCartSerializerStrategy(final CartSerializerStrategy cartSerializerStrategy)
-	{
-		this.cartSerializerStrategy = cartSerializerStrategy;
-	}
-
 
 }
