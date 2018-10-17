@@ -46,7 +46,6 @@
 		<!-- generic platform filters -->
 		<ref bean="log4jFilter"/>
 		<ref bean="storefrontSessionFilter"/>
-		<ref bean="storeSessionCartFilter"/>
 		<ref bean="accMediaFilter"/>
 		<ref bean="addOnDevelopmentFilter"/>
 

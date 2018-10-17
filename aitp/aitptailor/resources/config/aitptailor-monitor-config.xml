@@ -36,6 +36,7 @@
 		<!-- productModel -->
 		<entry key="Product" value-ref="aitpProductInvalidateStrategy"/>
 		<entry key="VariantProduct" value-ref="aitpProductInvalidateStrategy"/>
+		<entry key="ApparelProduct" value-ref="aitpProductInvalidateStrategy"/>
 		<entry key="ElectronicsColorVariantProduct" value-ref="aitpProductInvalidateStrategy"/>
 	</util:map>
 	

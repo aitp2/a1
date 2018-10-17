@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config">
+
+	<!-- aitpbackoffice UI configuration should be provided here -->
+
+	<!--<context component="component-code" module="aitpbackoffice">-->
+		<!--Please check documentation for code snippets for specific components-->
+	<!--</context>-->
+	<context component="explorer-tree" merge-by="module">
+		<n:explorer-tree xmlns:n="http://www.hybris.com/cockpitng/config/explorertree">
+			<n:navigation-node id="nodetree.cache.center">
+				<n:type-node id="nodetree.cache.center.setting" code="CacheSetting" />
+				<n:type-node id="nodetree.cache.center.monitortarget" code="MonitorTarget" />
+				<n:type-node id="nodetree.cache.center.invaliaterule" code="InvalidateRule" />
+				<n:type-node id="nodetree.cache.center.cacheserver" code="CacheServer" />
+				<n:type-node id="nodetree.cache.center.monitorqueque" code="MonitorQueque" />
+				<n:type-node id="nodetree.cache.center.csicomponent" code="CSIComponent" />
+				<n:type-node id="nodetree.cache.center.monitorlog" code="MonitorLog" />
+			</n:navigation-node>
+		</n:explorer-tree>
+	</context>
+	
+	<!-- CacheSetting start -->
+	<context type="CacheSetting" merge-mode="replace" component="listview"> 
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+			<list:column qualifier="code" label="backoffice.cachesetting.list.code" width="30%"/>
+			<list:column qualifier="description" label="backoffice.cachesetting.list.description" width="500"  />
+ 		</list:list-view>
+	</context>
+	
+	<context type="CacheSetting" merge-mode="replace" component="editor-area"> 
+    	<editorArea:editorArea
+			xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			 <editorArea:tab>
+			<editorArea:section name="backoffice.cachesetting.section.title" columns="1">
+			 			<editorArea:attribute qualifier="code" label="backoffice.cachesetting.edit.code" />
+			 			<editorArea:attribute qualifier="description" label="backoffice.cachesetting.edit.description" />
+			 			<editorArea:attribute qualifier="defaultCacheTime" label="backoffice.cachesetting.edit.cachetime" />
+			 			<editorArea:attribute qualifier="inValidateDelayTime" label="backoffice.cachesetting.edit.delaytime" />
+			 			
+						<editorArea:attribute
+							editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor" qualifier="monitorTargets" >
+							<editorArea:editor-parameter>
+								<editorArea:name>listConfigContext</editorArea:name>
+								<editorArea:value>referenceListViewBasesites</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>disableDisplayingDetails</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>disableRemoveReference</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute
+							editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor" qualifier="baseSites" >
+							<editorArea:editor-parameter>
+								<editorArea:name>listConfigContext</editorArea:name>
+								<editorArea:value>referenceListViewBasesites</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>disableDisplayingDetails</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>disableRemoveReference</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+				<editorArea:attribute qualifier="invalidateMode" label="backoffice.cachesetting.edit.mode" />
+			</editorArea:section>
+			</editorArea:tab> 
+		</editorArea:editorArea>
+	</context>
+	
+	<context merge-mode="replace" parent="GenericItem" type="BaseSite" component="referenceListViewBasesites">
+		<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+			<list-view:column qualifier="uid" label="basesite.uid" />	
+			<list-view:column qualifier="name" label="basesite.name" />	
+		</list-view:list-view>
+	</context>
+
+	<context merge-mode="replace" parent="GenericItem" type="MonitorTarget" component="referenceListViewMonitorTarget">
+		<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+			<list-view:column qualifier="code" label="monitortarget.code" />	
+			<list-view:column qualifier="description" label="monitortarget.description" />	
+		</list-view:list-view>
+	</context>
+	<!-- CacheSetting end -->
+	
+	<!-- MonitorTarget start -->
+	<context type="MonitorTarget" merge-mode="replace" component="listview"> 
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+			<list:column qualifier="code" label="backoffice.cachesetting.list.code" width="30%"/>
+			<list:column qualifier="description" label="backoffice.cachesetting.list.description" width="500"  />
+ 		</list:list-view>
+	</context>
+	
+	<context type="MonitorTarget" merge-mode="replace" component="editor-area"> 
+    	<editorArea:editorArea
+			xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			 <editorArea:tab>
+			<editorArea:section name="backoffice.monitortarget.section.title" columns="1">
+			 			<editorArea:attribute qualifier="code" label="backoffice.cachesetting.edit.code" />
+			 			<editorArea:attribute qualifier="description" label="backoffice.cachesetting.edit.description" />
+			 			<editorArea:attribute qualifier="targetKey" label="backoffice.cachesetting.edit.cachetime" />
+			</editorArea:section>
+			<editorArea:section columns="1"> 			
+						<editorArea:attribute
+							editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor" qualifier="invalidateRules" >
+							<editorArea:editor-parameter>
+								<editorArea:name>listConfigContext</editorArea:name>
+								<editorArea:value>referenceListViewInvalidateRules</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>disableDisplayingDetails</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>disableRemoveReference</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute
+							editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor" qualifier="cacheServers" >
+							<editorArea:editor-parameter>
+								<editorArea:name>listConfigContext</editorArea:name>
+								<editorArea:value>referenceListViewCacheServers</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>disableDisplayingDetails</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>disableRemoveReference</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute
+							editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor" qualifier="catalogues" >
+							<editorArea:editor-parameter>
+								<editorArea:name>listConfigContext</editorArea:name>
+								<editorArea:value>referenceListViewCatalogues</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>disableDisplayingDetails</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>disableRemoveReference</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute
+							editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor" qualifier="cacheServers" >
+							<editorArea:editor-parameter>
+								<editorArea:name>listConfigContext</editorArea:name>
+								<editorArea:value>referenceListViewCacheServers</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>disableDisplayingDetails</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>disableRemoveReference</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+			</editorArea:section>
+			</editorArea:tab> 
+		</editorArea:editorArea>
+	</context>
+	
+	<context merge-mode="replace" parent="GenericItem" type="InvalidateRule" component="referenceListViewInvalidateRules">
+		<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+			<list-view:column qualifier="code" label="invalidaterule.code" />	
+			<list-view:column qualifier="ruleKey" label="invalidaterule.rulekey" />	
+		</list-view:list-view>
+	</context>
+
+	<context merge-mode="replace" parent="GenericItem" type="CacheServer" component="referenceListViewCacheServers">
+		<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+			<list-view:column qualifier="name" label="cacheserver.name" />	
+			<list-view:column qualifier="description" label="cacheserver.description" />	
+		</list-view:list-view>
+	</context>
+	
+	<context merge-mode="replace" parent="GenericItem" type="Catalog" component="referenceListViewCatalogues">
+		<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+			<list-view:column qualifier="name" label="cacheserver.name" />	
+			<list-view:column qualifier="description" label="cacheserver.description" />	
+		</list-view:list-view>
+	</context>
+	
+	<context merge-mode="replace" parent="GenericItem" type="CacheServer" component="referenceListViewCacheServers">
+		<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+			<list-view:column qualifier="name" label="cacheserver.name" />	
+			<list-view:column qualifier="description" label="cacheserver.description" />	
+		</list-view:list-view>
+	</context>
+	<!-- MonitorTarget end -->
+
+	<!-- CacheServer start -->
+	<context type="CacheServer" merge-mode="replace" component="listview"> 
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+			<list:column qualifier="name" label="backoffice.cachesetting.list.code" width="30%"/>
+			<list:column qualifier="description" label="backoffice.cachesetting.list.description" width="500"  />
+ 		</list:list-view>
+	</context>
+	
+	<context type="CacheServer" merge-mode="replace" component="editor-area"> 
+    	<editorArea:editorArea
+			xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			 <editorArea:tab>
+			<editorArea:section name="backoffice.monitortarget.section.title" columns="1">
+			 			<editorArea:attribute qualifier="name" label="backoffice.cacheserver.edit.name" />
+			 			<editorArea:attribute qualifier="description" label="backoffice.cacheserver.edit.description" />
+			 			<editorArea:attribute qualifier="serverIpAddress" label="backoffice.cacheserver.edit.serveripaddress" />
+			 			<editorArea:attribute qualifier="purgeCallUrl" label="backoffice.cacheserver.edit.purgecallurl" />
+			 			<editorArea:attribute qualifier="maxCacheTime" label="backoffice.cacheserver.edit.maxcachetime" />
+			 			<editorArea:attribute qualifier="maxCacheSize" label="backoffice.cacheserver.edit.maxcachesize" />
+			 			<editorArea:attribute qualifier="cacheCleanStrategy" label="backoffice.cacheserver.edit.strategy" />
+						<editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="cachePages"/>
+						<editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="noCachePages"/>
+			</editorArea:section>
+			</editorArea:tab> 
+		</editorArea:editorArea>
+	</context>
+	<!-- MonitorTarget end -->
+
+</config>

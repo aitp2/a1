@@ -16,32 +16,174 @@
 <items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 			xsi:noNamespaceSchemaLocation="items.xsd">
 
+	<collectiontypes>
+		<collectiontype code="InvalidateUrlCollection" elementtype="java.lang.String" autocreate="true" generate="true" type="set" />
+		<collectiontype code="CachePagesCollection" elementtype="java.lang.String" autocreate="true" generate="true" type="set" />
+		<collectiontype code="NoCachePagesCollection" elementtype="java.lang.String" autocreate="true" generate="true" type="set" />
+	</collectiontypes>
+	<relations>
+		<relation code="CacheSettingMonitorTargetRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="set2targetrel" typecode="32001" />
+			<sourceElement qualifier="cacheSettings" type="CacheSetting" cardinality="many" collectiontype="set" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="monitorTargets" type="MonitorTarget" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		<relation code="CacheSettingSiteRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="set2siterel" typecode="32002" />
+			<sourceElement qualifier="cacheSettings" type="CacheSetting" cardinality="many" collectiontype="set" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="baseSites" type="BaseSite" cardinality="many" ordered="false">
+				<description>point of service</description>
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		<relation code="MonitorTargetInvalidateRuleRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="target2invrel" typecode="32003" />
+			<sourceElement qualifier="monitorTargets" type="MonitorTarget" cardinality="many" collectiontype="set" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="invalidateRules" type="InvalidateRule" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		<relation code="MonitorTargetCacheServerRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="target2serverrel" typecode="32004" />
+			<sourceElement qualifier="monitorTargets" type="MonitorTarget" cardinality="many" collectiontype="set" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="cacheServers" type="CacheServer" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		<relation code="MonitorTargetCatalogRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="target2catalogrel" typecode="32005" />
+			<sourceElement qualifier="monitorTargets" type="MonitorTarget" cardinality="many" collectiontype="set" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="catalogues" type="Catalog" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+	</relations>
+
 	<itemtypes>
-<!--
-		<itemtype generate="true"
-		   code="MyProduct"
-		   jaloclass="com.accenture.aitp.tailor.jalo.MyProduct"
-		   extends="Product"
-		   autocreate="true"
-	   >
+      <itemtype code="CacheSetting" autocreate="true" generate="true" jaloclass="com.accenture.aitp.jalo.CacheSetting">
+			<deployment table="cachesetting" typecode="31001" />
 			<attributes>
-				<attribute qualifier="myExampleInitialStringField" type="java.lang.String">
-					<description>My Example Initial String Value</description>
-					<modifiers initial="true"/>
-					<persistence type="property"/>
+				<attribute type="java.lang.String" qualifier="code">
+					<modifiers optional="false" unique="true"/>
+					<persistence type="property"></persistence>
 				</attribute>
-
-				<attribute qualifier="myExampleBooleanField" type="java.lang.Boolean">
-					<description>Example Initial Boolean Field</description>
-               <persistence type="property"/>
+				<attribute type="java.lang.String" qualifier="description">
+					<persistence type="property"></persistence>
 				</attribute>
-
-				<attribute qualifier="media" type="Media">
-					<persistence type="property"/>
+				<attribute type="java.lang.Integer" qualifier="defaultCacheTime">
+					<persistence type="property"></persistence>
 				</attribute>
-
+				<attribute type="java.lang.Integer" qualifier="inValidateDelayTime">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="java.lang.Integer" qualifier="invalidateMode">
+					<persistence type="property"></persistence>
+				</attribute>
 			</attributes>
 		</itemtype>
--->
+		
+        <itemtype code="MonitorTarget" autocreate="true" generate="true" jaloclass="com.accenture.aitp.jalo.CacheSetting">
+			<deployment table="monitortarget" typecode="31002" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="code">
+					<modifiers optional="false" unique="true"/>
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="description">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="targetKey">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+        <itemtype code="InvalidateRule" autocreate="true" generate="true" jaloclass="com.accenture.aitp.jalo.CacheSetting">
+			<deployment table="invalidaterule" typecode="31003" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="code" >
+					<modifiers optional="false" unique="true"/>
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="ruleKey">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="ruleContent">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+        <itemtype code="CacheServer" autocreate="true" generate="true" jaloclass="com.accenture.aitp.jalo.CacheSetting">
+			<deployment table="cacheserver" typecode="31004" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="name" >
+					<modifiers optional="false" unique="true"/>
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="description">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="serverIpAddress">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="purgeCallUrl">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="CachePagesCollection" qualifier="cachePages">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="NoCachePagesCollection" qualifier="noCachePages">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="java.lang.Integer" qualifier="maxCacheTime">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="java.lang.Long" qualifier="maxCacheSize">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="cacheCleanStrategy">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+        <itemtype code="MonitorQueque" autocreate="true" generate="true" jaloclass="com.accenture.aitp.jalo.CacheSetting">
+			<deployment table="monitorqueque" typecode="31005" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="code">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="content">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+        <itemtype code="MonitorLog" autocreate="true" generate="true" jaloclass="com.accenture.aitp.jalo.CacheSetting">
+			<deployment table="monitorlog" typecode="31006" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="message">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="targets">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="InvalidateUrlCollection" qualifier="invalidateUrls">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
 	</itemtypes>
 </items>

@@ -36,7 +36,5 @@
         <property name="mediaService" ref="mediaService"/>
         <property name="flexibleSearchService" ref="flexibleSearchService"/>
     </bean>
-    
-    <import resource="aitpcart-spring-application.xml"/>
-    
+        
 </beans>

@@ -23,9 +23,9 @@
            http://www.springframework.org/schema/util
            http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <import resource="config/aitpcart-spring-redis.xml"/>
-    <import resource="config/aitpcart-spring-session.xml"/>
-    <import resource="config/aitpcart-spring-cartserializer.xml"/>
-    <import resource="config/aitpcart-spring-service.xml"/>
-    <import resource="config/aitpcart-spring-cutom.xml"/>
+    <import resource="classpath:config/aitpcart-spring-redis.xml"/>
+    <import resource="classpath:config/aitpcart-spring-session.xml"/>
+    <import resource="classpath:config/aitpcart-spring-cartserializer.xml"/>
+    <import resource="classpath:config/aitpcart-spring-service.xml"/>
+    <import resource="classpath:config/aitpcart-spring-cutom.xml"/>
 </beans>

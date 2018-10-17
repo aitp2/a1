@@ -78,7 +78,8 @@
     </bean>
     
    <bean id="cartPathMatcher" class="org.springframework.util.AntPathMatcher" />
-    
+   
+   <bean id="AitpBeanPostProcessor" class="com.accenture.aitp.cart.config.AitpBeanPostProcessor" />
    <!-- 
     <bean id="addSessionCartFilterAfterNameListMergeDirective" depends-on="defaultStorefrontTenantDefaultFilterChainList" parent="listMergeDirective">
 		<property name="add" ref="storeSessionCartFilter" />
